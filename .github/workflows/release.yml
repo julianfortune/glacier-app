@@ -1,3 +1,6 @@
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -30,15 +33,15 @@ jobs:
           name: distributable-${{ matrix.os }}
           if-no-files-found: ignore
           path: |
-            desktop/build/**/*.deb
-            desktop/build/**/*.msi
-            desktop/build/**/*.dmg
+            composeApp/build/compose/**/*.deb
+            composeApp/build/compose/**/*.msi
+            composeApp/build/compose/**/*.dmg
 
       - name: Release
         uses: softprops/action-gh-release@f2352b97da0095b4dbbd885a81023e3deabf4fef
         with:
           prerelease: ${{ contains(github.event.inputs.version, '-rc') || contains(github.event.inputs.version, '-b') || contains(github.event.inputs.version, '-a') }}
           files: |
-            desktop/build/**/*.deb
-            desktop/build/**/*.msi
-            desktop/build/**/*.dmg
+            composeApp/build/compose/**/*.deb
+            composeApp/build/compose/**/*.msi
+            composeApp/build/compose/**/*.dmg
