@@ -39,7 +39,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.julianfortune.glacier"
-            packageVersion = "1.0.0"
+            packageVersion = "0.0.1-SNAPSHOT"
         }
     }
 }

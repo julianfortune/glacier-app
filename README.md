@@ -1,3 +1,9 @@
+# Glacier (working name)
+
+A desktop application for tracking inventory (primarily food) and generating reports.
+
+## Kotlin Multiplatform
+
 This is a Kotlin Multiplatform project targeting Desktop (JVM).
 
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
@@ -11,3 +17,7 @@ This is a Kotlin Multiplatform project targeting Desktop (JVM).
 
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+## Gradle
+
+Documentation on Kotlin Multiplatform tasks: [Kotlin Multiplatform—Native Distributions](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-native-distribution.html)
