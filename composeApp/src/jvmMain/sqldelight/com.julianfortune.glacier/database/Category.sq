@@ -1,0 +1,26 @@
+CREATE TABLE category (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+--QUERIES
+getAll:
+SELECT * FROM category;
+
+getById:
+SELECT * FROM category WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM category WHERE id = :id;
+
+deleteAll:
+DELETE FROM category;
+
+insert:
+INSERT OR REPLACE INTO category (
+    id,
+    name
+) VALUES (
+    :id,
+    :name
+);
