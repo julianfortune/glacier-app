@@ -22,6 +22,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -30,6 +32,15 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.sqldelight.driver)
+        }
+    }
+
+    targets.configureEach {
+        compilations.configureEach {
+            // TODO: Use newer API for added args
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
         }
     }
 }
@@ -50,7 +61,7 @@ compose.desktop {
 sqldelight {
     databases {
         create("Database") {
-            packageName = "com.julianfortune.glacier.database"
+            packageName = "com.julianfortune.glacier.data"
         }
     }
 }

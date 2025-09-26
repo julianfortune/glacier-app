@@ -24,3 +24,9 @@ INSERT OR REPLACE INTO category (
     :id,
     :name
 );
+
+INSERT INTO category (name)
+VALUES
+    ('Dairy'),
+    ('Perishable')
+;
