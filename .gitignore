@@ -45,3 +45,5 @@ gradle-app.setting
 
 # IntelliJ
 .idea
+
+.DS_Store
