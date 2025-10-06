@@ -1,23 +1,24 @@
-CREATE TABLE category (
+CREATE TABLE Category (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );
 
 --QUERIES
 getAll:
-SELECT * FROM category;
+SELECT * FROM Category;
 
 getById:
-SELECT * FROM category WHERE id = :id LIMIT 1;
+SELECT * FROM Category WHERE id = :id LIMIT 1;
 
 deleteById:
-DELETE FROM category WHERE id = :id;
+DELETE FROM Category WHERE id = :id;
 
 deleteAll:
-DELETE FROM category;
+DELETE FROM Category;
 
+-- TODO: Inserts should support omitting `id`
 insert:
-INSERT OR REPLACE INTO category (
+INSERT OR REPLACE INTO Category (
     id,
     name
 ) VALUES (
@@ -25,7 +26,8 @@ INSERT OR REPLACE INTO category (
     :name
 );
 
-INSERT INTO category (name)
+-- SEED DATA
+INSERT INTO Category (name)
 VALUES
     ('Dairy'),
     ('Perishable')

@@ -1,0 +1,11 @@
+CREATE TABLE DeliveryEntryProgram (
+    id INTEGER PRIMARY KEY,
+    entryId INTEGER NOT NULL,
+    programId INTEGER NOT NULL,
+    percentageHundredths INTEGER NOT NULL,
+
+    FOREIGN KEY(entryId) REFERENCES DeliveryEntry(id),
+    FOREIGN KEY(programId) REFERENCES Program(id),
+
+    UNIQUE(entryId, programId)
+);

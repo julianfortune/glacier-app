@@ -1,0 +1,33 @@
+CREATE TABLE Supplier (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+--QUERIES
+getAll:
+SELECT * FROM Supplier;
+
+getById:
+SELECT * FROM Supplier WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM Supplier WHERE id = :id;
+
+deleteAll:
+DELETE FROM Supplier;
+
+insert:
+INSERT OR REPLACE INTO Supplier (
+    id,
+    name
+) VALUES (
+    :id,
+    :name
+);
+
+-- SEED DATA
+INSERT INTO Supplier (name)
+VALUES
+    ("Charlie's Produce"),
+    ('Belleview Food Bank')
+;

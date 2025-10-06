@@ -1,0 +1,35 @@
+CREATE TABLE DeliveryEntry (
+    id INTEGER PRIMARY KEY,
+    deliveryId INTEGER NOT NULL,
+    costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ) NOT NULL,
+    unitCostCents INTEGER NOT NULL, -- Applies to 'item's by default; 'aggregate' when not null
+    itemId INTEGER NOT NULL,
+    itemCount INTEGER NOT NULL,
+
+    -- (Optional) aggregation of items
+    aggregateType TEXT CHECK( aggregateType IN ('CASE', 'BAG', 'PALLET') ),
+    aggregateCount INTEGER,
+
+    FOREIGN KEY(deliveryId) REFERENCES Delivery(id),
+    FOREIGN KEY(itemId) REFERENCES Item(id),
+
+    -- Aggregation is optional as a pair--either both present or both null
+    CHECK((aggregateType IS NULL AND aggregateCount IS NULL) OR (aggregateType IS NOT NULL AND aggregateCount IS NOT NULL))
+);
+
+--QUERIES
+getAll:
+SELECT * FROM DeliveryEntry;
+
+getById:
+SELECT * FROM DeliveryEntry WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM DeliveryEntry WHERE id = :id;
+
+deleteAll:
+DELETE FROM DeliveryEntry;
+
+-- TODO: Inserts...
+
+-- TODO: SEED DATA ...

@@ -1,0 +1,36 @@
+-- I.e., 'subaccount'
+CREATE TABLE PurchasingAccount (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+--QUERIES
+getAll:
+SELECT * FROM PurchasingAccount;
+
+getById:
+SELECT * FROM PurchasingAccount WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM PurchasingAccount WHERE id = :id;
+
+deleteAll:
+DELETE FROM PurchasingAccount;
+
+-- TODO: Inserts should support omitting `id`
+insert:
+INSERT OR REPLACE INTO PurchasingAccount (
+    id,
+    name
+) VALUES (
+    :id,
+    :name
+);
+
+-- SEED DATA
+INSERT INTO PurchasingAccount (name)
+VALUES
+    ('Account I'),
+    ('Account II'),
+    ('Account III')
+;

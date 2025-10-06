@@ -1,0 +1,11 @@
+CREATE TABLE DeliveryEntryPurchasingAccount (
+    id INTEGER PRIMARY KEY,
+    entryId INTEGER NOT NULL,
+    purchasingAccountId INTEGER NOT NULL,
+    percentageHundredths INTEGER NOT NULL,
+
+    FOREIGN KEY(entryId) REFERENCES DeliveryEntry(id),
+    FOREIGN KEY(purchasingAccountId) REFERENCES PurchasingAccount(id),
+
+    UNIQUE(entryId, purchasingAccountId)
+);

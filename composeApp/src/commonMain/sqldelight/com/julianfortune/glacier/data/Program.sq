@@ -1,0 +1,36 @@
+-- I.e. grant/project/program
+CREATE TABLE Program (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+--QUERIES
+getAll:
+SELECT * FROM Program;
+
+getById:
+SELECT * FROM Program WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM Program WHERE id = :id;
+
+deleteAll:
+DELETE FROM Program;
+
+-- TODO: Inserts should support omitting `id`
+insert:
+INSERT OR REPLACE INTO Program (
+    id,
+    name
+) VALUES (
+    :id,
+    :name
+);
+
+-- SEED DATA
+INSERT INTO Program (name)
+VALUES
+    ('Example Program A'),
+    ('Example Grant I'),
+    ('Example Project 1')
+;

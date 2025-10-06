@@ -1,0 +1,9 @@
+CREATE TABLE Delivery (
+    id INTEGER PRIMARY KEY,
+    receivedDate TEXT NOT NULL, -- ISO-8601 date, e.g., "2025-09-11"
+    supplierId INTEGER, -- TODO: Should this be not null?
+    taxesCents INTEGER,
+    feesCents INTEGER,
+
+    FOREIGN KEY(supplierId) REFERENCES Supplier(id)
+);

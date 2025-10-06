@@ -1,0 +1,46 @@
+-- Join table: items --[1:many]--> category
+CREATE TABLE ItemCategory (
+    id INTEGER PRIMARY KEY,
+    itemId INTEGER NOT NULL,
+    categoryId INTEGER NOT NULL,
+    FOREIGN KEY(itemId) REFERENCES Item(id) ON DELETE CASCADE,
+    FOREIGN KEY(categoryId) REFERENCES Category(id) ON DELETE CASCADE,
+
+    UNIQUE(itemId, categoryId)
+);
+
+--QUERIES
+getAll:
+SELECT * FROM ItemCategory;
+
+-- TODO: Get all by item ID
+
+getById:
+SELECT * FROM ItemCategory WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM ItemCategory WHERE id = :id;
+
+deleteAll:
+DELETE FROM Item;
+
+-- TODO: Inserts should support omitting `id`
+insert:
+INSERT OR REPLACE INTO Item (
+    id,
+    name,
+    weightHundredths,
+    weightUnits
+) VALUES (
+    :id,
+    :name,
+    :weight_hundredths,
+    :weight_units
+);
+
+-- SEED DATA
+-- TODO
+-- INSERT INTO program (name)
+-- VALUES
+--     ('Example Program A', ...)
+-- ;
