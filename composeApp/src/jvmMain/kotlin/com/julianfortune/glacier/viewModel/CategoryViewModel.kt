@@ -20,16 +20,4 @@ class CategoryViewModel(categoryRepository: CategoryRepository) : ViewModel() {
 //            taskRepository.insertTask(title, description)
 //        }
 //    }
-//
-//    fun toggleTaskCompleted(task: Task) {
-//        viewModelScope.launch {
-//            taskRepository.updateTaskCompleted(task.id, !task.completed)
-//        }
-//    }
-//
-//    fun deleteTask(task: Task) {
-//        viewModelScope.launch {
-//            taskRepository.deleteTask(task.id)
-//        }
-//    }
 }

@@ -1,20 +1,15 @@
 package com.julianfortune.glacier
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.Category
 import com.julianfortune.glacier.viewModel.CategoryViewModel
@@ -24,6 +19,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
+enum class NavigationPage(val title: String, val icon: ImageVector) {
+    DELIVERIES("Deliveries", Icons.Outlined.LocalShipping),
+    ITEMS("Items", Icons.Outlined.FoodBank),
+    SUPPLIERS("Suppliers", Icons.Outlined.Storefront),
+    PROGRAMS("Programs", Icons.Outlined.Cases),
+    SUBACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
+    CATEGORIES("Categories", Icons.Outlined.Category),
+    REPORTS("Reports", Icons.Outlined.Analytics),
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
@@ -32,29 +37,40 @@ fun App() {
     val categoryViewModel = koinInject<CategoryViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
+    var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
     MaterialTheme {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Categories") }
-                )
-            }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
+        Row {
+            NavigationRail(
+                containerColor = NavigationRailDefaults.ContainerColor
             ) {
-                TaskList(categoryViewModel)
+                NavigationPage.entries.forEach { page ->
+                    NavigationRailItem(
+                        selected = selectedNavigationItem == page,
+                        onClick = {
+                            selectedNavigationItem = page
+                        },
+                        icon = {
+                            Icon(page.icon, null)
+                        },
+                        label = { Text(page.title) }
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when (selectedNavigationItem) {
+                    NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
+                    else -> Text("Selected: ${selectedNavigationItem.title}")
+                }
             }
         }
     }
 }
 
-
 @Composable
-fun TaskList(viewModel: CategoryViewModel) {
+fun CategoryList(viewModel: CategoryViewModel) {
     val categories by viewModel.categories.collectAsState()
 
     if (categories.isEmpty()) {

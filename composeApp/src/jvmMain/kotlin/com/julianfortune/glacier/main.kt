@@ -12,7 +12,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "GlacierApp",
+        title = "Glacier (Dev build)",
     ) {
         App()
     }
