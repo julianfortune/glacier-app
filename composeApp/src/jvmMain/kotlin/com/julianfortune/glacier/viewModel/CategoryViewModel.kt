@@ -8,10 +8,11 @@ import kotlinx.coroutines.flow.stateIn
 
 class CategoryViewModel(categoryRepository: CategoryRepository) : ViewModel() {
     // TODO: Understand what this is doing
-    val categories = categoryRepository.getAllTasks()
+    // TODO: Does this refresh automatically ? Seems like it should
+    val categories = categoryRepository.getAll()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList()
         )
 

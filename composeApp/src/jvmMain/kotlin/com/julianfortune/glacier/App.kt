@@ -1,15 +1,26 @@
 package com.julianfortune.glacier
 
+import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.Category
 import com.julianfortune.glacier.viewModel.CategoryViewModel
@@ -46,6 +57,7 @@ fun App() {
             ) {
                 NavigationPage.entries.forEach { page ->
                     NavigationRailItem(
+                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                         selected = selectedNavigationItem == page,
                         onClick = {
                             selectedNavigationItem = page
@@ -57,9 +69,7 @@ fun App() {
                     )
                 }
             }
-            Column(
-                modifier = Modifier.fillMaxSize(),
-            ) {
+            Column {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
                     else -> Text("Selected: ${selectedNavigationItem.title}")
@@ -76,19 +86,32 @@ fun CategoryList(viewModel: CategoryViewModel) {
     if (categories.isEmpty()) {
         Text("No categories!")
     } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(categories) { category ->
-                TaskItem(category)
+            val listScrollState = rememberLazyListState()
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(end = 12.dp),
+                state = listScrollState,
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(categories) { category ->
+                    TaskItem(category)
+                }
             }
+            VerticalScrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight().padding(2.dp),
+                adapter = rememberScrollbarAdapter(listScrollState)
+            )
         }
     }
 }
 
 @Composable
 fun TaskItem(category: Category) {
-    SelectionContainer { Text(category.name) }
+    Box(modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
+        Text(category.name)
+    }
 }

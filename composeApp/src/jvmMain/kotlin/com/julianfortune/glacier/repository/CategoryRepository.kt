@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 class CategoryRepository(private val database: Database) {
 
     // TODO: Understand Flows and coroutine contexts
-    fun getAllTasks(): Flow<List<Category>> {
+    fun getAll(): Flow<List<Category>> {
         return database.categoryQueries.getAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
