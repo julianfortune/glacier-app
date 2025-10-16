@@ -27,8 +27,15 @@ INSERT OR REPLACE INTO Category (
 );
 
 -- SEED DATA
-INSERT INTO Category (name)
+INSERT INTO Category (id, name)
 VALUES
-    ('Dairy'),
-    ('Perishable')
+    (0, 'Dairy'),
+    (1, 'Perishable'),
+    (2, 'Produce'),
+    (3, 'Dry'),
+    (4, 'Canned'),
+    (5, 'Vegetables'),
+    (6, 'Fruit'),
+    (7, 'Legumes'),
+    (8, 'Frozen')
 ;

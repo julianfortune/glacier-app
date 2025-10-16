@@ -1,10 +1,11 @@
 CREATE TABLE DeliveryEntry (
     id INTEGER PRIMARY KEY,
     deliveryId INTEGER NOT NULL,
-    costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ) NOT NULL,
-    unitCostCents INTEGER NOT NULL, -- Applies to 'item's by default; 'aggregate' when not null
     itemId INTEGER NOT NULL,
     itemCount INTEGER NOT NULL,
+
+    costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ) NOT NULL,
+    unitCostCents INTEGER NOT NULL, -- Applies to 'item's by default; 'aggregate' when not null
 
     -- (Optional) aggregation of items
     aggregateType TEXT CHECK( aggregateType IN ('CASE', 'BAG', 'PALLET') ),
@@ -17,7 +18,7 @@ CREATE TABLE DeliveryEntry (
     CHECK((aggregateType IS NULL AND aggregateCount IS NULL) OR (aggregateType IS NOT NULL AND aggregateCount IS NOT NULL))
 );
 
---QUERIES
+-- QUERIES
 getAll:
 SELECT * FROM DeliveryEntry;
 

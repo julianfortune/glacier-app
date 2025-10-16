@@ -3,7 +3,7 @@ CREATE TABLE Supplier (
     name TEXT NOT NULL UNIQUE
 );
 
---QUERIES
+-- QUERIES
 getAll:
 SELECT * FROM Supplier;
 
@@ -26,8 +26,9 @@ INSERT OR REPLACE INTO Supplier (
 );
 
 -- SEED DATA
-INSERT INTO Supplier (name)
+INSERT INTO Supplier (id, name)
 VALUES
-    ("Charlie's Produce"),
-    ('Belleview Food Bank')
+    (0, "Harvest Produce"),
+    (1, "Generic Food Seller"),
+    (2, "ABC Grocery")
 ;

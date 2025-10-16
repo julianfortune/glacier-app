@@ -7,3 +7,18 @@ CREATE TABLE Delivery (
 
     FOREIGN KEY(supplierId) REFERENCES Supplier(id)
 );
+
+-- QUERIES
+getAll:
+SELECT * FROM Delivery;
+
+getById:
+SELECT * FROM Delivery WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM Delivery WHERE id = :id;
+
+deleteAll:
+DELETE FROM Delivery;
+
+-- SEED DATA

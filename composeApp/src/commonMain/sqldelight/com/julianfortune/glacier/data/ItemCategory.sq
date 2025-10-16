@@ -9,7 +9,7 @@ CREATE TABLE ItemCategory (
     UNIQUE(itemId, categoryId)
 );
 
---QUERIES
+-- QUERIES
 getAll:
 SELECT * FROM ItemCategory;
 
@@ -26,21 +26,23 @@ DELETE FROM Item;
 
 -- TODO: Inserts should support omitting `id`
 insert:
-INSERT OR REPLACE INTO Item (
+INSERT OR REPLACE INTO ItemCategory (
     id,
-    name,
-    weightHundredths,
-    weightUnits
+    itemId,
+    categoryId
 ) VALUES (
     :id,
-    :name,
-    :weight_hundredths,
-    :weight_units
+    :itemId,
+    :categoryId
 );
 
 -- SEED DATA
--- TODO
--- INSERT INTO program (name)
--- VALUES
---     ('Example Program A', ...)
--- ;
+INSERT INTO ItemCategory (itemId, categoryId)
+VALUES
+    (0, 4),
+    (0, 6),
+    (1, 1),
+    (1, 2),
+    (1, 5)
+    -- ...
+;

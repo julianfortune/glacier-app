@@ -6,7 +6,7 @@ CREATE TABLE Item (
     weightUnits TEXT CHECK( weightUnits IN ('OZ','LB') ) NOT NULL -- One of set of possible units (bc application needs to implement conversions)
 );
 
---QUERIES
+-- QUERIES
 getAll:
 SELECT * FROM Item;
 
@@ -29,13 +29,16 @@ INSERT OR REPLACE INTO Item (
 ) VALUES (
     :id,
     :name,
-    :weight_hundredths,
-    :weight_units
+    :weightHundredths,
+    :weightUnits
 );
 
 -- SEED DATA
--- TODO
--- INSERT INTO program (name)
--- VALUES
---     ('Example Program A', ...)
--- ;
+INSERT INTO Item (id, name, weightHundredths, weightUnits)
+VALUES
+    (0, "Sliced Peaches in Water", 1450, 'OZ'),
+    (1, "Cut Green Beans", 1500, 'OZ'),
+    (2, "Tuna in Water", 400, 'OZ'),
+    (3, "Chunk White Chicken", 1250, 'OZ'),
+    (4, "Low Sodium Tomato Soup", 1075, 'OZ')
+;
