@@ -23,20 +23,30 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.Category
+import com.julianfortune.glacier.view.Item
+import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.CategoryViewModel
+import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 enum class NavigationPage(val title: String, val icon: ImageVector) {
-    DELIVERIES("Deliveries", Icons.Outlined.LocalShipping),
-    ITEMS("Items", Icons.Outlined.FoodBank),
-    SUPPLIERS("Suppliers", Icons.Outlined.Storefront),
-    PROGRAMS("Programs", Icons.Outlined.Cases),
-    SUBACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
-    CATEGORIES("Categories", Icons.Outlined.Category),
+    DELIVERIES("Deliveries", Icons.Outlined.LocalShipping), ITEMS(
+        "Items",
+        Icons.Outlined.FoodBank
+    ),
+    SUPPLIERS("Suppliers", Icons.Outlined.Storefront), PROGRAMS(
+        "Programs",
+        Icons.Outlined.Cases
+    ),
+    SUBACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet), CATEGORIES(
+        "Categories",
+        Icons.Outlined.Category
+    ),
     REPORTS("Reports", Icons.Outlined.Analytics),
 }
 
@@ -44,10 +54,15 @@ enum class NavigationPage(val title: String, val icon: ImageVector) {
 @Composable
 @Preview
 fun App() {
+    // TODO: Can this be simplified ..?
     // Probably should look at: https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-viewmodel.html#using-viewmodel-in-common-code
     val categoryViewModel = koinInject<CategoryViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
+    val supplierViewModel = koinInject<SupplierViewModel> {
+        parametersOf(CoroutineScope(Dispatchers.Main))
+    }
+
     var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
     MaterialTheme {
@@ -65,13 +80,13 @@ fun App() {
                         icon = {
                             Icon(page.icon, null)
                         },
-                        label = { Text(page.title) }
-                    )
+                        label = { Text(page.title) })
                 }
             }
             Column {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
+                    NavigationPage.SUPPLIERS -> SupplierList(supplierViewModel)
                     else -> Text("Selected: ${selectedNavigationItem.title}")
                 }
             }
@@ -79,39 +94,34 @@ fun App() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryList(viewModel: CategoryViewModel) {
-    val categories by viewModel.categories.collectAsState()
-
-    if (categories.isEmpty()) {
-        Text("No categories!")
-    } else {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val listScrollState = rememberLazyListState()
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(end = 12.dp),
-                state = listScrollState,
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(categories) { category ->
-                    TaskItem(category)
-                }
+    ScrollableColumn(
+        viewModel.categories.map { categories ->
+            categories.map {
+                Item(
+                    it.name, onClick = {
+                        println("Deleting category: ${it.id} ...")
+                        viewModel.deleteCategory(it.id)
+                    })
             }
-            VerticalScrollbar(
-                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight().padding(2.dp),
-                adapter = rememberScrollbarAdapter(listScrollState)
-            )
-        }
-    }
+        }.collectAsState(emptyList())
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskItem(category: Category) {
-    Box(modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)) {
-        Text(category.name)
-    }
+fun SupplierList(viewModel: SupplierViewModel) {
+    ScrollableColumn(
+        viewModel.suppliers.map { suppliers ->
+            suppliers.map {
+                Item(
+                    it.name, onClick = {
+                        println("Deleting supplier: ${it.id} ...")
+                        viewModel.deleteSupplier(it.id)
+                    })
+            }
+        }.collectAsState(emptyList())
+    )
 }
