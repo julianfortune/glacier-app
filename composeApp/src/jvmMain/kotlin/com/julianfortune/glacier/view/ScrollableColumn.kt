@@ -2,27 +2,18 @@ package com.julianfortune.glacier.view
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
-import androidx.compose.material3.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,24 +45,16 @@ fun ScrollableColumn(items: State<List<Item>>) {
             ) {
                 items(currentItems) { i ->
                     ListItem(
+                        headlineContent = {
+                            Text(i.name)
+                        },
                         modifier = Modifier
                             .pointerHoverIcon(PointerIcon.Hand)
                             .clickable {
                                 i.onClick()
                             },
-                    ) {
-                        Column {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                Text(i.name)
-                            }
-                        }
-                    }
-                    HorizontalDivider(
-                        thickness = 1.dp
                     )
+                    HorizontalDivider(thickness = 1.dp)
                 }
             }
             VerticalScrollbar(

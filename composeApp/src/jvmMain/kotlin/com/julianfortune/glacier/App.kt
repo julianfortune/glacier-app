@@ -1,28 +1,36 @@
 package com.julianfortune.glacier
 
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.Category
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.CategoryViewModel
@@ -65,13 +73,16 @@ fun App() {
 
     var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
-    MaterialTheme {
+    MaterialTheme(
+        colorScheme = darkColorScheme() //  darkColorScheme() or lightColorScheme()
+    ) {
         Row {
             NavigationRail(
-                containerColor = NavigationRailDefaults.ContainerColor
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             ) {
                 NavigationPage.entries.forEach { page ->
                     NavigationRailItem(
+                        colors = NavigationRailItemDefaults.colors(),
                         modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                         selected = selectedNavigationItem == page,
                         onClick = {
@@ -83,11 +94,21 @@ fun App() {
                         label = { Text(page.title) })
                 }
             }
-            Column {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
                     NavigationPage.SUPPLIERS -> SupplierList(supplierViewModel)
-                    else -> Text("Selected: ${selectedNavigationItem.title}")
+                    else -> Column(
+                        Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Not implemented yet!")
+                        Text("(Selected: ${selectedNavigationItem.title})")
+                    }
                 }
             }
         }
@@ -97,31 +118,104 @@ fun App() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryList(viewModel: CategoryViewModel) {
-    ScrollableColumn(
-        viewModel.categories.map { categories ->
-            categories.map {
-                Item(
-                    it.name, onClick = {
-                        println("Deleting category: ${it.id} ...")
-                        viewModel.deleteCategory(it.id)
-                    })
+    Column {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 1.dp,
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Categories", fontSize = (1.25).em)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .height(32.dp) // Match the buttons
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                shape = MaterialTheme.shapes.extraSmall, // Match the buttons
+                            )
+                    ) {
+                        BasicTextField(
+                            modifier = Modifier.fillMaxHeight().padding(horizontal = 8.dp),
+                            value = "",
+                            onValueChange = { },
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                            decorationBox = { innerTextField ->
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Outlined.Search,
+                                        null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    innerTextField()
+                                }
+                            }
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    FilledTonalButton(
+                        onClick = { },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        modifier = Modifier.height(32.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors().copy(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                    ) {
+                        Text("New")
+                    }
+                }
             }
-        }.collectAsState(emptyList())
-    )
+        }
+        ScrollableColumn(
+            viewModel.categories.map { categories ->
+                categories.map {
+                    Item(
+                        it.name, onClick = {
+                            println("Deleting category: ${it.id} ...")
+                            viewModel.deleteCategory(it.id)
+                        })
+                }
+            }.collectAsState(emptyList())
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SupplierList(viewModel: SupplierViewModel) {
-    ScrollableColumn(
-        viewModel.suppliers.map { suppliers ->
-            suppliers.map {
-                Item(
-                    it.name, onClick = {
-                        println("Deleting supplier: ${it.id} ...")
-                        viewModel.deleteSupplier(it.id)
-                    })
-            }
-        }.collectAsState(emptyList())
-    )
+    Column {
+        // Header row -- TODO: Add action buttons (sort, select, etc.)
+        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth()) {
+            Text("Suppliers", fontSize = (1.2).em, fontWeight = FontWeight.Bold)
+        }
+        HorizontalDivider()
+        ScrollableColumn(
+            viewModel.suppliers.map { suppliers ->
+                suppliers.map {
+                    Item(
+                        it.name, onClick = {
+                            println("Deleting supplier: ${it.id} ...")
+                            viewModel.deleteSupplier(it.id)
+                        })
+                }
+            }.collectAsState(emptyList())
+        )
+    }
 }
