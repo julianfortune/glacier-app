@@ -124,7 +124,7 @@ fun CategoryList(viewModel: CategoryViewModel) {
             tonalElevation = 1.dp,
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Categories", fontSize = (1.25).em)
