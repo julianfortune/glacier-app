@@ -25,6 +25,9 @@ SELECT * FROM DeliveryEntry;
 getById:
 SELECT * FROM DeliveryEntry WHERE id = :id LIMIT 1;
 
+getByDeliveryId:
+SELECT * FROM DeliveryEntry WHERE deliveryId = :deliveryId;
+
 deleteById:
 DELETE FROM DeliveryEntry WHERE id = :id;
 

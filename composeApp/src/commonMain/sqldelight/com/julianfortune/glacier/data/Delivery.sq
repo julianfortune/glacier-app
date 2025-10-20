@@ -5,6 +5,9 @@ CREATE TABLE Delivery (
     taxesCents INTEGER,
     feesCents INTEGER,
 
+    creationDateTime TEXT NOT NULL,
+    updateDateTime TEXT NOT NULL,
+
     FOREIGN KEY(supplierId) REFERENCES Supplier(id)
 );
 
@@ -21,4 +24,11 @@ DELETE FROM Delivery WHERE id = :id;
 deleteAll:
 DELETE FROM Delivery;
 
+-- TODO: Inserting
+
 -- SEED DATA
+INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)
+VALUES
+    ("2025-10-01", 0, "2025-10-01T00:00:00Z", "2025-10-01T00:00:00Z")
+    -- ...
+;

@@ -3,6 +3,7 @@ CREATE TABLE ItemCategory (
     id INTEGER PRIMARY KEY,
     itemId INTEGER NOT NULL,
     categoryId INTEGER NOT NULL,
+
     FOREIGN KEY(itemId) REFERENCES Item(id) ON DELETE CASCADE,
     FOREIGN KEY(categoryId) REFERENCES Category(id) ON DELETE CASCADE,
 
@@ -13,7 +14,8 @@ CREATE TABLE ItemCategory (
 getAll:
 SELECT * FROM ItemCategory;
 
--- TODO: Get all by item ID
+getAllByItemId:
+SELECT * FROM ItemCategory WHERE itemId = :itemId;
 
 getById:
 SELECT * FROM ItemCategory WHERE id = :id LIMIT 1;

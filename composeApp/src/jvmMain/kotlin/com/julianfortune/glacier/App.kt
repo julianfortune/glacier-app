@@ -1,28 +1,14 @@
 package com.julianfortune.glacier
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -34,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.CategoryViewModel
+import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,18 +30,12 @@ import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 enum class NavigationPage(val title: String, val icon: ImageVector) {
-    DELIVERIES("Deliveries", Icons.Outlined.LocalShipping), ITEMS(
-        "Items",
-        Icons.Outlined.FoodBank
-    ),
-    SUPPLIERS("Suppliers", Icons.Outlined.Storefront), PROGRAMS(
-        "Programs",
-        Icons.Outlined.Cases
-    ),
-    SUBACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet), CATEGORIES(
-        "Categories",
-        Icons.Outlined.Category
-    ),
+    DELIVERIES("Deliveries", Icons.Outlined.LocalShipping),
+    ITEMS("Items", Icons.Outlined.FoodBank),
+    SUPPLIERS("Suppliers", Icons.Outlined.Storefront),
+    PROGRAMS("Programs", Icons.Outlined.Cases),
+    SUBACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
+    CATEGORIES("Categories", Icons.Outlined.Category),
     REPORTS("Reports", Icons.Outlined.Analytics),
 }
 
@@ -68,6 +49,9 @@ fun App() {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
     val supplierViewModel = koinInject<SupplierViewModel> {
+        parametersOf(CoroutineScope(Dispatchers.Main))
+    }
+    val deliveriesViewModel = koinInject<DeliveryViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
 
@@ -101,6 +85,7 @@ fun App() {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
                     NavigationPage.SUPPLIERS -> SupplierList(supplierViewModel)
+                    NavigationPage.DELIVERIES -> DeliveriesPane(deliveriesViewModel)
                     else -> Column(
                         Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
@@ -115,13 +100,13 @@ fun App() {
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryList(viewModel: CategoryViewModel) {
     Column {
         Surface(
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 1.dp,
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth(),
@@ -183,6 +168,7 @@ fun CategoryList(viewModel: CategoryViewModel) {
                 }
             }
         }
+        HorizontalDivider(thickness = 1.dp)
         ScrollableColumn(
             viewModel.categories.map { categories ->
                 categories.map {
@@ -199,13 +185,57 @@ fun CategoryList(viewModel: CategoryViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun DeliveriesPane(viewModel: DeliveryViewModel) {
+    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 1.dp,
+        ) {
+        Column(modifier = Modifier.width(240.dp),) {
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.padding(8.dp),
+            ) {
+                FilledTonalButton(
+                    onClick = { },
+                    shape = MaterialTheme.shapes.extraSmall,
+                    modifier = Modifier.height(32.dp).fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                ) {
+                    Text("New")
+                }
+            }
+            HorizontalDivider(thickness = 1.dp)
+            ScrollableColumn(
+                viewModel.deliveries.map { deliveries ->
+                    deliveries.map {
+                        Item(
+                            it.receivedDate, onClick = {
+                                println("Clicked on delivery: ${it.id} ...")
+                            })
+                    }
+                }.collectAsState(emptyList())
+            )
+        }
+        }
+        VerticalDivider(thickness = 1.dp)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface,
+        ) {
+            Text("Delivery goes here")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun SupplierList(viewModel: SupplierViewModel) {
     Column {
-        // Header row -- TODO: Add action buttons (sort, select, etc.)
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth()) {
-            Text("Suppliers", fontSize = (1.2).em, fontWeight = FontWeight.Bold)
-        }
-        HorizontalDivider()
         ScrollableColumn(
             viewModel.suppliers.map { suppliers ->
                 suppliers.map {

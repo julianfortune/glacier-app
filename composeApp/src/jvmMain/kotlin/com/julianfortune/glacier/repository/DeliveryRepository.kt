@@ -2,26 +2,23 @@ package com.julianfortune.glacier.repository
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.julianfortune.glacier.data.Category
 import com.julianfortune.glacier.data.Database
+import com.julianfortune.glacier.data.Delivery
+import com.julianfortune.glacier.data.Supplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
-class CategoryRepository(private val database: Database) {
+class DeliveryRepository(private val database: Database) {
 
     // TODO: Understand Flows and coroutine contexts
-    fun getAll(): Flow<List<Category>> {
-        return database.categoryQueries.getAll()
+    fun getAll(): Flow<List<Delivery>> {
+        return database.deliveryQueries.getAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
     }
 
     // TODO: Probably need to look into error handling ...
     fun deleteById(id: Long) {
-        database.categoryQueries.deleteById(id)
-    }
-
-    fun insert(id: Long?, name: String) {
-        database.categoryQueries.insert(id, name)
+        database.deliveryQueries.deleteById(id)
     }
 }
