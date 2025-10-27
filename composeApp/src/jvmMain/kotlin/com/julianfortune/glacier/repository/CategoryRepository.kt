@@ -21,7 +21,7 @@ class CategoryRepository(private val database: Database) {
         database.categoryQueries.deleteById(id)
     }
 
-    fun insert(id: Long?, name: String) {
-        database.categoryQueries.insert(id, name)
+    fun insert(name: String) {
+        database.categoryQueries.insert(name)
     }
 }

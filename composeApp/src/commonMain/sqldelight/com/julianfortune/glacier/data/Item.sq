@@ -19,15 +19,12 @@ DELETE FROM Item WHERE id = :id;
 deleteAll:
 DELETE FROM Item;
 
--- TODO: Inserts should support omitting `id`
 insert:
-INSERT OR REPLACE INTO Item (
-    id,
+INSERT INTO Item (
     name,
     weightHundredths,
     weightUnits
 ) VALUES (
-    :id,
     :name,
     :weightHundredths,
     :weightUnits

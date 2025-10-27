@@ -7,6 +7,22 @@ import com.julianfortune.glacier.repository.DeliveryRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+
+
+data class DeliveryEntry(
+    val itemId: Long,
+
+    )
+
+data class Delivery(
+    val date: LocalDate,
+    val supplierId: Long,
+    val taxesCents: Long,
+    val feesCents: Long,
+    val entries: List<DeliveryEntry>
+)
 
 class DeliveryViewModel(
     private val deliveryRepository: DeliveryRepository,
@@ -21,6 +37,32 @@ class DeliveryViewModel(
             initialValue = emptyList()
         )
 
+    fun saveNewDelivery(delivery: Delivery) {
+        insertDelivery(delivery.date, delivery.supplierId, delivery.taxesCents, delivery.feesCents)
+    }
+
+    private fun insertDelivery(
+        date: LocalDate,
+        supplierId: Long,
+        taxesCents: Long,
+        feesCents: Long,
+    ) {
+        val now = Instant.now()
+
+        println(">>> ${date.toString()}")
+
+        deliveryRepository.insert(
+            date.toString(),
+            supplierId,
+            taxesCents,
+            feesCents,
+            now.toString(),
+            now.toString(),
+        )
+    }
+
+    // TODO: Getting list of entries for a delivery
+
     // TODO: Inserting new Delivery (including the entries and associated data)
     // TODO: (private) Adding new entry in delivery (including the program and purchasing account links)
 
@@ -30,7 +72,7 @@ class DeliveryViewModel(
 
     fun addCategory(name: String) {
         viewModelScope.launch {
-            categoryRepository.insert(null, name)
+            categoryRepository.insert(name)
         }
     }
 
@@ -42,10 +84,5 @@ class DeliveryViewModel(
         // TODO ...
     }
 
-    // TODO: (?) Add/update supplier
-    // TODO: Add/update
-
-
-
-    // Also ... Adding new other entities ..?
+    // TODO (way later): Adding other entities ...
 }

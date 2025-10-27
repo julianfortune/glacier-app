@@ -26,14 +26,11 @@ DELETE FROM ItemCategory WHERE id = :id;
 deleteAll:
 DELETE FROM Item;
 
--- TODO: Inserts should support omitting `id`
 insert:
-INSERT OR REPLACE INTO ItemCategory (
-    id,
+INSERT INTO ItemCategory (
     itemId,
     categoryId
 ) VALUES (
-    :id,
     :itemId,
     :categoryId
 );

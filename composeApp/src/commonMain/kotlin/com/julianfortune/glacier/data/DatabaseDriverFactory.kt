@@ -6,12 +6,3 @@ import app.cash.sqldelight.db.SqlDriver
 expect class DatabaseDriverFactory {
     fun createDriver(): SqlDriver
 }
-
-fun createDatabase(databaseDriverFactory: DatabaseDriverFactory): Database {
-    val driver = databaseDriverFactory.createDriver()
-    val database = Database(driver)
-
-    // Do more work with the database (see below).
-
-    return database
-}

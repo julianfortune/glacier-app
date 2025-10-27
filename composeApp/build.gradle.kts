@@ -1,38 +1,52 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.sqldelight)
+    id("java-test-fixtures")
 }
 
 kotlin {
-    jvm()
-    
+    jvm {
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+            testLogging {
+                events("passed", "skipped", "failed")
+                showStandardStreams = true
+            }
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
+            implementation(compose.runtime)
             implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.sqldelight.coroutines)
-            implementation(libs.koin.core)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.koin.compose)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(libs.koin.core)
+            implementation(libs.sqldelight.coroutines)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.sqldelight.driver)
+        }
+        jvmTest.dependencies {
+            implementation(libs.assertj)
+            implementation(libs.junit.jupiter)
+            implementation(libs.mockito.junit)
+            implementation(libs.mockito)
+            implementation(project.dependencies.platform(libs.junit.bom))
+            runtimeOnly(libs.junit.platform.launcher)
         }
     }
 

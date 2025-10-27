@@ -34,6 +34,25 @@ DELETE FROM DeliveryEntry WHERE id = :id;
 deleteAll:
 DELETE FROM DeliveryEntry;
 
+insert:
+INSERT INTO DeliveryEntry (
+    deliveryId,
+    itemId,
+    itemCount,
+    costStatus,
+    unitCostCents,
+    aggregateType,
+    aggregateCount
+) VALUES (
+    :deliveryId,
+    :itemId,
+    :itemCount,
+    :costStatus,
+    :unitCostCents,
+    :aggregateType,
+    :aggregateCount
+);
+
 -- TODO: Inserts...
 
 -- TODO: SEED DATA ...

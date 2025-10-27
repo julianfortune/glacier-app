@@ -29,6 +29,6 @@ val appModule = module {
     }
     factory { (coroutineScope: CoroutineScope) ->
         // TODO: Use `coroutineScope` ?
-        DeliveryViewModel(get())
+        DeliveryViewModel(get(), get())
     }
 }

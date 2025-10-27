@@ -16,15 +16,8 @@ DELETE FROM Category WHERE id = :id;
 deleteAll:
 DELETE FROM Category;
 
--- TODO: Inserts should support omitting `id`
 insert:
-INSERT OR REPLACE INTO Category (
-    id,
-    name
-) VALUES (
-    :id,
-    :name
-);
+INSERT INTO Category (name) VALUES (:name);
 
 -- SEED DATA
 INSERT INTO Category (id, name)

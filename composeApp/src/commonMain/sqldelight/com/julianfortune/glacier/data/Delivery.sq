@@ -12,8 +12,8 @@ CREATE TABLE Delivery (
 );
 
 -- QUERIES
-getAll:
-SELECT * FROM Delivery;
+getAll: -- Sorted by delivery date and then by creation datetime
+SELECT * FROM Delivery ORDER BY receivedDate DESC, creationDateTime DESC;
 
 getById:
 SELECT * FROM Delivery WHERE id = :id LIMIT 1;
@@ -24,7 +24,22 @@ DELETE FROM Delivery WHERE id = :id;
 deleteAll:
 DELETE FROM Delivery;
 
--- TODO: Inserting
+insert:
+INSERT INTO Delivery (
+    receivedDate,
+    supplierId,
+    taxesCents,
+    feesCents,
+    creationDateTime,
+    updateDateTime
+) VALUES (
+    :receivedDate,
+    :supplierId,
+    :taxesCents,
+    :feesCents,
+    :creationDateTime,
+    :updateDateTime
+);
 
 -- SEED DATA
 INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)

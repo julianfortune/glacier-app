@@ -21,4 +21,22 @@ class DeliveryRepository(private val database: Database) {
     fun deleteById(id: Long) {
         database.deliveryQueries.deleteById(id)
     }
+
+    fun insert(
+        receivedDate: String,
+        supplierId: Long?,
+        taxesCents: Long?,
+        feesCents: Long?,
+        creationDateTime: String,
+        updateDateTime: String
+    ) {
+        database.deliveryQueries.insert(
+            receivedDate,
+            supplierId,
+            taxesCents,
+            feesCents,
+            creationDateTime,
+            updateDateTime
+        )
+    }
 }

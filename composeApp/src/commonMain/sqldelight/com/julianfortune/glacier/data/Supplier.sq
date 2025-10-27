@@ -17,13 +17,7 @@ deleteAll:
 DELETE FROM Supplier;
 
 insert:
-INSERT OR REPLACE INTO Supplier (
-    id,
-    name
-) VALUES (
-    :id,
-    :name
-);
+INSERT OR REPLACE INTO Supplier (name) VALUES (:name);
 
 -- SEED DATA
 INSERT INTO Supplier (id, name)

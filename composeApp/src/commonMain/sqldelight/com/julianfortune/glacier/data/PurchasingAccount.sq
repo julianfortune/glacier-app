@@ -1,3 +1,5 @@
+-- TODO: Maybe this should be renamed 'payee' or 'funding source' ?
+
 -- I.e., 'subaccount'
 CREATE TABLE PurchasingAccount (
     id INTEGER PRIMARY KEY,
@@ -17,15 +19,8 @@ DELETE FROM PurchasingAccount WHERE id = :id;
 deleteAll:
 DELETE FROM PurchasingAccount;
 
--- TODO: Inserts should support omitting `id`
 insert:
-INSERT OR REPLACE INTO PurchasingAccount (
-    id,
-    name
-) VALUES (
-    :id,
-    :name
-);
+INSERT INTO PurchasingAccount (name) VALUES (:name);
 
 -- SEED DATA
 INSERT INTO PurchasingAccount (name)
