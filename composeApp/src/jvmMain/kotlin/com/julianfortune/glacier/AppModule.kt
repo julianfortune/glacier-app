@@ -3,6 +3,7 @@ package com.julianfortune.glacier
 import com.julianfortune.glacier.data.Database
 import com.julianfortune.glacier.data.DatabaseDriverFactory
 import com.julianfortune.glacier.repository.CategoryRepository
+import com.julianfortune.glacier.repository.DeliveryEntryRepository
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.SupplierRepository
 import com.julianfortune.glacier.viewModel.CategoryViewModel
@@ -15,9 +16,10 @@ val appModule = module {
     single { DatabaseDriverFactory().createDriver() }
     single { Database(get()) }
 
-    single { CategoryRepository(get()) }
     single { SupplierRepository(get()) }
     single { DeliveryRepository(get()) }
+    single { DeliveryEntryRepository(get()) }
+    single { CategoryRepository(get()) }
 
     factory { (coroutineScope: CoroutineScope) ->
         // TODO: Use `coroutineScope` ?
@@ -29,6 +31,6 @@ val appModule = module {
     }
     factory { (coroutineScope: CoroutineScope) ->
         // TODO: Use `coroutineScope` ?
-        DeliveryViewModel(get(), get())
+        DeliveryViewModel(get(), get(), get())
     }
 }

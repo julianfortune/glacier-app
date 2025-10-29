@@ -7,7 +7,7 @@ junit = "6.0.0"
 koin = "4.1.1"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-mockito = "5.20.0"
+mockk = "1.14.6"
 sqldelight = "2.1.0"
 
 [libraries]
@@ -23,8 +23,7 @@ koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-view
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
-mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
-mockito-junit = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 

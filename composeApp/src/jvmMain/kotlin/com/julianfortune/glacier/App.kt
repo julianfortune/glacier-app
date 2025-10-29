@@ -191,43 +191,48 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 1.dp,
         ) {
-        Column(modifier = Modifier.width(240.dp),) {
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.padding(8.dp),
-            ) {
-                FilledTonalButton(
-                    onClick = { },
-                    shape = MaterialTheme.shapes.extraSmall,
-                    modifier = Modifier.height(32.dp).fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors().copy(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ),
+            Column(modifier = Modifier.width(240.dp)) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.padding(8.dp),
                 ) {
-                    Text("New")
-                }
-            }
-            HorizontalDivider(thickness = 1.dp)
-            ScrollableColumn(
-                viewModel.deliveries.map { deliveries ->
-                    deliveries.map {
-                        Item(
-                            it.receivedDate, onClick = {
-                                println("Clicked on delivery: ${it.id} ...")
-                            })
+                    FilledTonalButton(
+                        onClick = { },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        modifier = Modifier.height(32.dp).fillMaxWidth(),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors().copy(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
+                    ) {
+                        Text("New")
                     }
-                }.collectAsState(emptyList())
-            )
-        }
+                }
+                HorizontalDivider(thickness = 1.dp)
+                ScrollableColumn(
+                    viewModel.deliveries.map { deliveries ->
+                        deliveries.map {
+                            Item(
+                                it.receivedDate, onClick = {
+                                    println("Clicked on delivery: ${it.id} ...")
+                                })
+                        }
+                    }.collectAsState(emptyList())
+                )
+            }
         }
         VerticalDivider(thickness = 1.dp)
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             color = MaterialTheme.colorScheme.surface,
         ) {
-            Text("Delivery goes here")
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Delivery goes here")
+            }
         }
     }
 }

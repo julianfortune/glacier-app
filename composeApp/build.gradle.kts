@@ -43,8 +43,7 @@ kotlin {
         jvmTest.dependencies {
             implementation(libs.assertj)
             implementation(libs.junit.jupiter)
-            implementation(libs.mockito.junit)
-            implementation(libs.mockito)
+            implementation(libs.mockk)
             implementation(project.dependencies.platform(libs.junit.bom))
             runtimeOnly(libs.junit.platform.launcher)
         }

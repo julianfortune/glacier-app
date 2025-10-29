@@ -4,7 +4,6 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.data.Database
 import com.julianfortune.glacier.data.Delivery
-import com.julianfortune.glacier.data.Supplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
@@ -29,14 +28,14 @@ class DeliveryRepository(private val database: Database) {
         feesCents: Long?,
         creationDateTime: String,
         updateDateTime: String
-    ) {
-        database.deliveryQueries.insert(
+    ): Long {
+        return database.deliveryQueries.insert(
             receivedDate,
             supplierId,
             taxesCents,
             feesCents,
             creationDateTime,
             updateDateTime
-        )
+        ).value
     }
 }

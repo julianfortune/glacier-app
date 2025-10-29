@@ -1,11 +1,10 @@
 package com.julianfortune.glacier.viewModel
 
 import com.julianfortune.glacier.repository.CategoryRepository
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 
 class CategoryViewModelTest {
 
@@ -14,7 +13,7 @@ class CategoryViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        categoryRepository = mock()
+        categoryRepository = mockk(relaxed = true)
         viewModel = CategoryViewModel(categoryRepository)
     }
 
@@ -24,7 +23,6 @@ class CategoryViewModelTest {
         viewModel.deleteCategory(1L)
 
         // THEN
-        verify(categoryRepository).deleteById(eq(1L))
+        verify { categoryRepository.deleteById(1L) }
     }
-
 }
