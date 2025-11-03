@@ -2,10 +2,8 @@ package com.julianfortune.glacier.repository
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.db.QueryResult
-import com.julianfortune.glacier.data.Category
-import com.julianfortune.glacier.data.Database
-import com.julianfortune.glacier.data.Supplier
+import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.db.Supplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
@@ -18,8 +16,9 @@ class SupplierRepository(private val database: Database) {
             .mapToList(Dispatchers.IO)
     }
 
-    // TODO: Probably need to look into error handling ...
-    fun deleteById(id: Long) {
-        database.supplierQueries.deleteById(id)
+    suspend fun deleteById(id: Long): Boolean {
+        val deletedId = database.supplierQueries.deleteById(id)
+
+        return deletedId == id
     }
 }

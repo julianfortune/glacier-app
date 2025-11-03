@@ -2,8 +2,8 @@ package com.julianfortune.glacier.repository
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.julianfortune.glacier.data.Database
-import com.julianfortune.glacier.data.DeliveryEntry
+import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.db.DeliveryEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
@@ -32,7 +32,7 @@ class DeliveryEntryRepository(private val database: Database) {
         return database.deliveryEntryQueries.getByDeliveryId(deliveryId).executeAsList()
     }
 
-    fun insert(
+    suspend fun insert(
         deliveryId: Long,
         itemId: Long,
         itemCount: Long,
@@ -49,6 +49,6 @@ class DeliveryEntryRepository(private val database: Database) {
             itemCostCents,
             aggregateLabel,
             aggregateCount,
-        ).value
+        )
     }
 }

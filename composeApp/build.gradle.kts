@@ -74,7 +74,8 @@ compose.desktop {
 sqldelight {
     databases {
         create("Database") {
-            packageName = "com.julianfortune.glacier.data"
+            packageName = "com.julianfortune.glacier.db"
+            generateAsync = true
         }
     }
 }

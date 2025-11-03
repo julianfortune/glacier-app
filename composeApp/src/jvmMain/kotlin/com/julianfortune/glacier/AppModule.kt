@@ -1,7 +1,7 @@
 package com.julianfortune.glacier
 
-import com.julianfortune.glacier.data.Database
-import com.julianfortune.glacier.data.DatabaseDriverFactory
+import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.db.DatabaseDriverFactory
 import com.julianfortune.glacier.repository.CategoryRepository
 import com.julianfortune.glacier.repository.DeliveryEntryRepository
 import com.julianfortune.glacier.repository.DeliveryRepository
@@ -10,10 +10,15 @@ import com.julianfortune.glacier.viewModel.CategoryViewModel
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import org.koin.dsl.module
 
 val appModule = module {
-    single { DatabaseDriverFactory().createDriver() }
+    single {
+        runBlocking { // TODO: Figure out the right way to do this
+            DatabaseDriverFactory().createDriver()
+        }
+    }
     single { Database(get()) }
 
     single { SupplierRepository(get()) }

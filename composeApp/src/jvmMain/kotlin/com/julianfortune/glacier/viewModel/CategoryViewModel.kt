@@ -2,6 +2,7 @@ package com.julianfortune.glacier.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julianfortune.glacier.data.persisted.SavedCategory
 import com.julianfortune.glacier.repository.CategoryRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -9,7 +10,6 @@ import kotlinx.coroutines.launch
 
 class CategoryViewModel(private val categoryRepository: CategoryRepository) : ViewModel() {
     // TODO: Understand what this is doing
-    // TODO: Does this refresh automatically ? Seems like it should
     val categories = categoryRepository.getAll()
         .stateIn(
             scope = viewModelScope,
@@ -17,15 +17,9 @@ class CategoryViewModel(private val categoryRepository: CategoryRepository) : Vi
             initialValue = emptyList()
         )
 
-    fun deleteCategory(id: Long) {
+    fun deleteCategory(category: SavedCategory) {
         viewModelScope.launch {
-            categoryRepository.deleteById(id)
+            categoryRepository.delete(category)
         }
     }
-
-//    fun addTask(title: String, description: String?) {
-//        viewModelScope.launch {
-//            taskRepository.insertTask(title, description)
-//        }
-//    }
 }

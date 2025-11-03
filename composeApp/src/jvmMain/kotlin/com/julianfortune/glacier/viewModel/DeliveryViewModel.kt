@@ -47,7 +47,7 @@ class DeliveryViewModel(
             initialValue = emptyList()
         )
 
-    fun saveNewDelivery(delivery: Delivery) {
+    suspend fun saveNewDelivery(delivery: Delivery) {
         val newDeliveryId = insertDelivery(delivery.date, delivery.supplierId, delivery.taxesCents, delivery.feesCents)
         delivery.entries.forEach { entry ->
             insertDeliveryEntry(newDeliveryId, entry)
@@ -56,7 +56,7 @@ class DeliveryViewModel(
         // TODO: Insert other associated data (DeliveryEntry* tables)
     }
 
-    private fun insertDelivery(
+    private suspend fun insertDelivery(
         date: LocalDate,
         supplierId: Long,
         taxesCents: Long,
@@ -74,7 +74,7 @@ class DeliveryViewModel(
         )
     }
 
-    private fun insertDeliveryEntry(deliveryId: Long, entry: DeliveryEntry) {
+    private suspend fun insertDeliveryEntry(deliveryId: Long, entry: DeliveryEntry) {
         deliveryEntryRepository.insert(
             deliveryId,
             entry.itemId,

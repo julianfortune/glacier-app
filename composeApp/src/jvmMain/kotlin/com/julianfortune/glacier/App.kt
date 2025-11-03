@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -174,8 +173,8 @@ fun CategoryList(viewModel: CategoryViewModel) {
                 categories.map {
                     Item(
                         it.name, onClick = {
-                            println("Deleting category: ${it.id} ...")
-                            viewModel.deleteCategory(it.id)
+                            println("Deleting category: $it ...")
+                            viewModel.deleteCategory(it)
                         })
                 }
             }.collectAsState(emptyList())
