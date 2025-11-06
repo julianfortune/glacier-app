@@ -2,8 +2,8 @@ package com.julianfortune.glacier.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julianfortune.glacier.data.CostStatus
 import com.julianfortune.glacier.repository.CategoryRepository
-import com.julianfortune.glacier.repository.CostStatus
 import com.julianfortune.glacier.repository.DeliveryEntryRepository
 import com.julianfortune.glacier.repository.DeliveryRepository
 import kotlinx.coroutines.flow.SharingStarted

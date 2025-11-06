@@ -1,9 +1,9 @@
-package com.julianfortune.glacier.db
+package com.julianfortune.glacier.repository
 
 import com.julianfortune.glacier.createTestDatabase
-import com.julianfortune.glacier.data.NewCategory
-import com.julianfortune.glacier.data.persisted.SavedCategory
-import com.julianfortune.glacier.repository.CategoryRepository
+import com.julianfortune.glacier.db.Category as DbCategory
+import com.julianfortune.glacier.data.Category
+import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -36,17 +36,17 @@ class CategoryRepositoryTest {
     @Test
     fun insert(): Unit = runBlocking {
         // WHEN
-        repository.insert(NewCategory("Foobar"))
+        repository.insert(Category("Foobar"))
 
         // THEN
         val rows = database.categoryQueries.getAll().executeAsList()
-        assertThat(rows).containsExactly(Category(1, "Foobar"))
+        assertThat(rows).containsExactly(DbCategory(1, "Foobar"))
     }
 
     @Test
     fun deleteOnNonExistentCategoryFailsGracefully(): Unit = runBlocking {
         // WHEN
-        val wasSuccessful = repository.delete(SavedCategory(3L, "Foobar"))
+        val wasSuccessful = repository.delete(com.julianfortune.glacier.data.persisted.Category(3L, "Foobar"))
 
         // THEN
         assertThat(wasSuccessful).isFalse

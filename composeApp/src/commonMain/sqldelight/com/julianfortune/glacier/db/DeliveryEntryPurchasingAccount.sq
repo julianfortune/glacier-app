@@ -2,10 +2,26 @@ CREATE TABLE DeliveryEntryPurchasingAccount (
     id INTEGER PRIMARY KEY,
     entryId INTEGER NOT NULL,
     purchasingAccountId INTEGER NOT NULL,
-    percentageHundredths INTEGER NOT NULL,
+    percentageHundredths INTEGER CHECK(0 < percentageHundredths AND percentageHundredths < 10000) NOT NULL,
 
     FOREIGN KEY(entryId) REFERENCES DeliveryEntry(id),
     FOREIGN KEY(purchasingAccountId) REFERENCES PurchasingAccount(id),
 
     UNIQUE(entryId, purchasingAccountId)
 );
+
+-- QUERIES
+getAll:
+SELECT * FROM DeliveryEntryPurchasingAccount;
+
+getById:
+SELECT * FROM DeliveryEntryPurchasingAccount WHERE id = :id LIMIT 1;
+
+getByEntryId:
+SELECT * FROM DeliveryEntryPurchasingAccount WHERE entryId = :entryId;
+
+getByPurchasingAccountId:
+SELECT * FROM DeliveryEntryPurchasingAccount WHERE purchasingAccountId = :programId;
+
+deleteAll:
+DELETE FROM DeliveryEntryPurchasingAccount;

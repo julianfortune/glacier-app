@@ -1,35 +1,68 @@
 package com.julianfortune.glacier.repository
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
+import com.julianfortune.glacier.data.CostStatus
+import com.julianfortune.glacier.data.DeliveryEntry as NewDeliveryEntry
+import com.julianfortune.glacier.data.DeliveryEntryAggregation
+import com.julianfortune.glacier.data.WeightUnit
+import com.julianfortune.glacier.data.persisted.Category
+import com.julianfortune.glacier.data.persisted.CategoryLink
+import com.julianfortune.glacier.data.persisted.Item
+import com.julianfortune.glacier.data.persisted.ProgramAllocation
+import com.julianfortune.glacier.data.persisted.PurchasingAccountAllocation
+import com.julianfortune.glacier.data.persisted.Entry as PersistedEntry
 import com.julianfortune.glacier.db.Database
-import com.julianfortune.glacier.db.DeliveryEntry
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-
-enum class CostStatus {
-    PURCHASED,
-    NO_COST;
-
-    override fun toString(): String {
-        return when (this) {
-            PURCHASED -> "PURCHASED"
-            NO_COST -> "NO_COST"
-        }
-    }
-}
 
 class DeliveryEntryRepository(private val database: Database) {
 
-    fun getAll(): Flow<List<DeliveryEntry>> {
-        return database.deliveryEntryQueries.getAll()
-            .asFlow()
-            .mapToList(Dispatchers.IO)
+    // TODO: All this mapping crap needs to live in one place
+    private fun getItemById(id: Long): Item {
+        val item = database.itemQueries.getById(id).executeAsOne()
+        val itemWeight = when (item.weightUnits) {
+            "OZ" -> WeightUnit.OZ
+            "LB" -> WeightUnit.LB
+            else -> throw Exception("Unrecognized weightUnits: ${item.weightUnits}")
+        }
+        val itemCategories =
+            database.itemCategoryQueries.getAllByItemId(item.id).executeAsList().map { itemCategory ->
+                val category = database.categoryQueries.getById(itemCategory.categoryId).executeAsOne()
+                CategoryLink(itemCategory.id, Category(category.id, category.name))
+            }
+
+        return Item(item.id, item.name, item.weightHundredths, itemWeight, itemCategories)
     }
 
     // TODO: Should this be done using a Flow ...?
-    fun getAllByDeliveryId(deliveryId: Long): List<DeliveryEntry> {
-        return database.deliveryEntryQueries.getByDeliveryId(deliveryId).executeAsList()
+    fun getAllByDeliveryId(deliveryId: Long): List<PersistedEntry> {
+        val entries = database.deliveryEntryQueries.getByDeliveryId(deliveryId).executeAsList()
+
+        return entries.map { entry ->
+            // TODO: All this mapping crap needs to live in one place
+            val costStatus = when (entry.costStatus) {
+                "PURCHASED" -> CostStatus.PURCHASED
+                "NO_COST" -> CostStatus.NO_COST
+                else -> throw Exception("Unrecognized costStatus: ${entry.costStatus}")
+            }
+            val aggregate = if (entry.aggregateLabel != null && entry.aggregateCount != null) {
+                DeliveryEntryAggregation(
+                    entry.aggregateLabel,
+                    entry.aggregateCount
+                )
+            } else null
+
+            val purchasingAccounts = emptyList<PurchasingAccountAllocation>() // TODO
+            val programs = emptyList<ProgramAllocation>() // TODO
+
+            PersistedEntry(
+                entry.id,
+                entry.itemCount,
+                costStatus,
+                entry.itemCostCents,
+                aggregate,
+                getItemById(entry.itemId),
+                purchasingAccounts,
+                programs,
+            )
+        }
     }
 
     suspend fun insert(
@@ -38,8 +71,7 @@ class DeliveryEntryRepository(private val database: Database) {
         itemCount: Long,
         costStatus: CostStatus,
         itemCostCents: Long,
-        aggregateLabel: String?,
-        aggregateCount: Long?,
+        aggregate: DeliveryEntryAggregation?,
     ): Long {
         return database.deliveryEntryQueries.insert(
             deliveryId,
@@ -47,8 +79,8 @@ class DeliveryEntryRepository(private val database: Database) {
             itemCount,
             costStatus.toString(),
             itemCostCents,
-            aggregateLabel,
-            aggregateCount,
+            aggregate?.label,
+            aggregate?.aggregateCount,
         )
     }
 }

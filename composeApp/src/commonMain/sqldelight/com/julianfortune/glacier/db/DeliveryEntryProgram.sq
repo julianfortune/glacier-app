@@ -2,10 +2,26 @@ CREATE TABLE DeliveryEntryProgram (
     id INTEGER PRIMARY KEY,
     entryId INTEGER NOT NULL,
     programId INTEGER NOT NULL,
-    percentageHundredths INTEGER NOT NULL,
+    percentageHundredths INTEGER CHECK(0 < percentageHundredths AND percentageHundredths < 10000) NOT NULL,
 
     FOREIGN KEY(entryId) REFERENCES DeliveryEntry(id),
     FOREIGN KEY(programId) REFERENCES Program(id),
 
     UNIQUE(entryId, programId)
 );
+
+-- QUERIES
+getAll:
+SELECT * FROM DeliveryEntryProgram;
+
+getById:
+SELECT * FROM DeliveryEntryProgram WHERE id = :id LIMIT 1;
+
+getByEntryId:
+SELECT * FROM DeliveryEntryProgram WHERE entryId = :entryId;
+
+getByProgramId:
+SELECT * FROM DeliveryEntryProgram WHERE programId = :programId;
+
+deleteAll:
+DELETE FROM DeliveryEntryProgram;

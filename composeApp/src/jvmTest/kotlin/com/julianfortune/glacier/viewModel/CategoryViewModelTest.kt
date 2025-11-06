@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.viewModel
 
-import com.julianfortune.glacier.data.persisted.SavedCategory
+import com.julianfortune.glacier.data.persisted.Category
 import com.julianfortune.glacier.repository.CategoryRepository
 import io.mockk.mockk
 import io.mockk.verify
@@ -21,7 +21,7 @@ class CategoryViewModelTest {
     @Test
     fun deleteCategory() {
         // GIVEN
-        val target = SavedCategory(1L, "Foo")
+        val target = Category(1L, "Foo")
 
         // WHEN
         viewModel.deleteCategory(target)

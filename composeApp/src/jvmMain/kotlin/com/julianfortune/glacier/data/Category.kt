@@ -1,5 +1,5 @@
 package com.julianfortune.glacier.data
 
-data class NewCategory(
+data class Category(
     val name: String
 )

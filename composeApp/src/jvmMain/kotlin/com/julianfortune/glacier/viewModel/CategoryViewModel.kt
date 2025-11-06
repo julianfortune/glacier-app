@@ -2,7 +2,7 @@ package com.julianfortune.glacier.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.persisted.SavedCategory
+import com.julianfortune.glacier.data.persisted.Category
 import com.julianfortune.glacier.repository.CategoryRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -17,7 +17,7 @@ class CategoryViewModel(private val categoryRepository: CategoryRepository) : Vi
             initialValue = emptyList()
         )
 
-    fun deleteCategory(category: SavedCategory) {
+    fun deleteCategory(category: Category) {
         viewModelScope.launch {
             categoryRepository.delete(category)
         }
