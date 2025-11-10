@@ -172,7 +172,7 @@ fun CategoryList(viewModel: CategoryViewModel) {
             viewModel.categories.map { categories ->
                 categories.map {
                     Item(
-                        it.name, onClick = {
+                        it.data.name, onClick = {
                             println("Deleting category: $it ...")
                             viewModel.deleteCategory(it)
                         })
@@ -212,10 +212,10 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                 ScrollableColumn(
                     viewModel.deliveries.map { deliveries ->
                         deliveries.map {
-                            Item(
-                                it.receivedDate, onClick = {
-                                    println("Clicked on delivery: ${it.id} ...")
-                                })
+                            val name = it.data.receivedDate.toString()
+                            Item(name, onClick = {
+                                println("Clicked on delivery: ${it.id} ...")
+                            })
                         }
                     }.collectAsState(emptyList())
                 )

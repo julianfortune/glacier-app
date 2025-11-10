@@ -1,8 +1,8 @@
-package com.julianfortune.glacier.data
+package com.julianfortune.glacier.data.domain.delivery
 
 import java.time.LocalDate
 
-data class Delivery (
+data class DeliveryHeadline (
     val receivedDate: LocalDate,
     val supplierId: Long?,
     val taxesCents: Long?,

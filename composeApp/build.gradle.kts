@@ -33,6 +33,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.koin.compose)
             implementation(libs.koin.core)
+            implementation(libs.result4K)
             implementation(libs.sqldelight.coroutines)
         }
         jvmMain.dependencies {

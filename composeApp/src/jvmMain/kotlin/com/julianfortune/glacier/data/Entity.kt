@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.data
 
-data class PurchasingAccount(
+data class Entity<DATA>(
     val id: Long,
-    val name: String,
+    val data: DATA
 )

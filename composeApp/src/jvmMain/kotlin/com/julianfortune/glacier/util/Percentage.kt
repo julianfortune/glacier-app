@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.data
+package com.julianfortune.glacier.util
 
 // TODO: Can this be converted to inline value class ...?
 class Percentage {
@@ -58,5 +58,3 @@ class Percentage {
         return valueInHundredths
     }
 }
-
-

@@ -1,9 +1,11 @@
 package com.julianfortune.glacier.viewModel
 
-import com.julianfortune.glacier.data.persisted.Category
+import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.repository.CategoryRepository
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -21,12 +23,16 @@ class CategoryViewModelTest {
     @Test
     fun deleteCategory() {
         // GIVEN
-        val target = Category(1L, "Foo")
+        val target = Entity(1L, Category("Foo"))
 
         // WHEN
         viewModel.deleteCategory(target)
 
         // THEN
-        verify { categoryRepository.delete(target) }
+        verify {
+            runBlocking {
+                categoryRepository.delete(target)
+            }
+        }
     }
 }
