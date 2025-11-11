@@ -23,5 +23,16 @@ SELECT * FROM DeliveryEntryPurchasingAccount WHERE entryId = :entryId;
 getByPurchasingAccountId:
 SELECT * FROM DeliveryEntryPurchasingAccount WHERE purchasingAccountId = :programId;
 
+insert:
+INSERT INTO DeliveryEntryPurchasingAccount (
+    entryId,
+    purchasingAccountId,
+    percentageHundredths
+) VALUES (
+    :entryId,
+    :purchasingAccountId,
+    :percentageHundredths
+);
+
 deleteAll:
 DELETE FROM DeliveryEntryPurchasingAccount;

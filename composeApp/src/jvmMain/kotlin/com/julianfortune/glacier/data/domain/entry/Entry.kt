@@ -6,6 +6,6 @@ data class Entry(
     val costStatus: CostStatus,
     val itemCostCents: Long,
     val aggregate: EntryAggregation?,
-    val purchasingAccountIds: List<Allocation<Long>>?,
-    val programIds: List<Allocation<Long>>?
+    val purchasingAccountAllocations: List<Allocation<Long>>?,
+    val programAllocations: List<Allocation<Long>>?
 )

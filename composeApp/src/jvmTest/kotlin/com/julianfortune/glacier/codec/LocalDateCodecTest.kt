@@ -3,36 +3,43 @@ package com.julianfortune.glacier.codec
 import com.julianfortune.glacier.data.domain.item.WeightUnit
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.orThrow
 import dev.forkhandles.result4k.valueOrNull
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import java.time.LocalDate
 
-class WeightUnitCodecTest {
+class LocalDateCodecTest {
 
     @ParameterizedTest
     @CsvSource(
-        "OZ, OZ",
-        "LB, LB"
+        "2000-01-01, 10957",
+        "2025-10-01, 20362",
+        "2025-11-10, 20402",
     )
-    fun deserialize(input: String, expectedUnit: WeightUnit) {
+    fun deserialize(input: String, expectedEpochDay: Long) {
         // WHEN
-        val result = WeightUnitCodec.deserialize(input)
+        val result = LocalDateCodec.deserialize(input)
 
         // THEN
         assertThat(result).isInstanceOf(Success::class.java)
-        assertThat(result.valueOrNull()).isEqualTo(expectedUnit)
+        assertThat(result.orThrow().toEpochDay()).isEqualTo(expectedEpochDay)
     }
 
     @ParameterizedTest
     @CsvSource(
-        "OZ, OZ",
-        "LB, LB"
+        "10957, 2000-01-01",
+        "20362, 2025-10-01",
+        "20402, 2025-11-10",
     )
-    fun serializeWeightUnit(weightUnit: WeightUnit, expectedString: String) {
+    fun serializeWeightUnit(givenEpochDay: Long, expectedString: String) {
+        // GIVEN
+        val localDate = LocalDate.ofEpochDay(givenEpochDay)
+
         // WHEN
-        val result = WeightUnitCodec.serialize(weightUnit)
+        val result = LocalDateCodec.serialize(localDate)
 
         // THEN
         assertThat(result).isEqualTo(expectedString)
@@ -41,17 +48,14 @@ class WeightUnitCodecTest {
     @ParameterizedTest
     @CsvSource(
         "invalid",
-        "kg",
-        "G",
-        "POUND",
-        "''"
+        "2025-13-1",
+        "2025-01-42",
     )
     fun deserializeInvalidInput(invalidInput: String) {
         // WHEN
-        val result = WeightUnitCodec.deserialize(invalidInput)
+        val result = LocalDateCodec.deserialize(invalidInput)
 
         // THEN
         assertThat(result).isInstanceOf(Failure::class.java)
     }
-
 }

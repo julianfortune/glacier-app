@@ -45,9 +45,9 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    fun deleteOnNonExistentCategoryFailsGracefully(): Unit = runBlocking {
+    fun deleteByIdOnNonExistentCategoryFailsGracefully(): Unit = runBlocking {
         // WHEN
-        val wasSuccessful = repository.delete(Entity(3L, Category("Foobar")))
+        val wasSuccessful = repository.deleteById(3L)
 
         // THEN
         assertThat(wasSuccessful).isFalse

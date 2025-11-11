@@ -20,7 +20,7 @@ class CategoryViewModel(private val categoryRepository: CategoryRepository) : Vi
 
     fun deleteCategory(category: Entity<Category>) {
         viewModelScope.launch {
-            categoryRepository.delete(category)
+            val successful = categoryRepository.deleteById(category.id)
         }
     }
 }

@@ -23,5 +23,16 @@ SELECT * FROM DeliveryEntryProgram WHERE entryId = :entryId;
 getByProgramId:
 SELECT * FROM DeliveryEntryProgram WHERE programId = :programId;
 
+insert:
+INSERT INTO DeliveryEntryProgram (
+    entryId,
+    programId,
+    percentageHundredths
+) VALUES (
+    :entryId,
+    :programId,
+    :percentageHundredths
+);
+
 deleteAll:
 DELETE FROM DeliveryEntryProgram;

@@ -1,54 +1,49 @@
 package com.julianfortune.glacier.codec
 
-import com.julianfortune.glacier.data.domain.item.WeightUnit
+import com.julianfortune.glacier.data.domain.entry.CostStatus
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.valueOrNull
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class WeightUnitCodecTest {
+class CostStatusCodecTest {
 
     @ParameterizedTest
     @CsvSource(
-        "OZ, OZ",
-        "LB, LB"
+        "PURCHASED, PURCHASED",
+        "NO_COST, NO_COST",
     )
-    fun deserialize(input: String, expectedUnit: WeightUnit) {
+    fun deserialize(input: String, expected: CostStatus) {
         // WHEN
-        val result = WeightUnitCodec.deserialize(input)
+        val result = CostStatusCodec.deserialize(input)
 
         // THEN
         assertThat(result).isInstanceOf(Success::class.java)
-        assertThat(result.valueOrNull()).isEqualTo(expectedUnit)
+        assertThat(result.valueOrNull()).isEqualTo(expected)
     }
 
     @ParameterizedTest
     @CsvSource(
-        "OZ, OZ",
-        "LB, LB"
+        "PURCHASED, PURCHASED",
+        "NO_COST, NO_COST",
     )
-    fun serializeWeightUnit(weightUnit: WeightUnit, expectedString: String) {
+    fun serialize(costStatus: CostStatus, expected: String) {
         // WHEN
-        val result = WeightUnitCodec.serialize(weightUnit)
+        val result = CostStatusCodec.serialize(costStatus)
 
         // THEN
-        assertThat(result).isEqualTo(expectedString)
+        assertThat(result).isEqualTo(expected)
     }
 
     @ParameterizedTest
     @CsvSource(
         "invalid",
-        "kg",
-        "G",
-        "POUND",
-        "''"
     )
     fun deserializeInvalidInput(invalidInput: String) {
         // WHEN
-        val result = WeightUnitCodec.deserialize(invalidInput)
+        val result = CostStatusCodec.deserialize(invalidInput)
 
         // THEN
         assertThat(result).isInstanceOf(Failure::class.java)

@@ -2,12 +2,12 @@ package com.julianfortune.glacier.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.CostStatus
-import com.julianfortune.glacier.repository.CategoryRepository
 import com.julianfortune.glacier.repository.DeliveryRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import java.time.Instant
 import java.time.LocalDate
 
 
@@ -36,36 +36,26 @@ class DeliveryViewModel(private val deliveryRepository: DeliveryRepository) : Vi
 
     // TODO: Sorting, default: By receivedDate and then createdDatetime
     // TODO (enhancement): Filtering, e.g., by time period
-    val deliveries = deliveryRepository.getAllAsHeadlines()
+    val allDeliveries = deliveryRepository.getAllAsHeadlines()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList()
         )
 
-    suspend fun saveNewDelivery(delivery: Delivery) {
-        insertDelivery(delivery.date, delivery.supplierId, delivery.taxesCents, delivery.feesCents)
+    suspend fun save(delivery: DeliveryDetail): Long {
+        return deliveryRepository.insert(delivery)
     }
 
-    private suspend fun insertDelivery(
-        date: LocalDate,
-        supplierId: Long,
-        taxesCents: Long,
-        feesCents: Long,
-    ): Long {
-        return deliveryRepository.insert(
-            date.toString(),
-            supplierId,
-            taxesCents,
-            feesCents,
-        )
+    suspend fun update(delivery: Entity<DeliveryDetail>) {
+        TODO()
     }
 
-    // TODO: May want to set this up using flows...? Make it reactive so that changing the currently selected
-    // delivery automatically fetches and updates this list...?
-    fun getDeliveryEntries(deliveryId: Long): List<DeliveryEntry> {
+    // TODO: May want to set this up using flows...?
+    //       I.e., Make it reactive so that changing the currently selected delivery automatically fetches
+    //       and updates this list...?
+    fun getDelivery(deliveryId: Long): DeliveryDetail {
         return TODO()
     }
 
-    // TODO (way later): Adding other entities (e.g., Items, Categories, ...)
 }

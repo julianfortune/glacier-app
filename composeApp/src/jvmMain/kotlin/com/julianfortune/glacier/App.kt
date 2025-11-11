@@ -210,7 +210,7 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                 }
                 HorizontalDivider(thickness = 1.dp)
                 ScrollableColumn(
-                    viewModel.deliveries.map { deliveries ->
+                    viewModel.allDeliveries.map { deliveries ->
                         deliveries.map {
                             val name = it.data.receivedDate.toString()
                             Item(name, onClick = {

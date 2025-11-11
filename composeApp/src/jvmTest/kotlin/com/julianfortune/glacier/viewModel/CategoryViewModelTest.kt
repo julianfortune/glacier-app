@@ -31,7 +31,7 @@ class CategoryViewModelTest {
         // THEN
         verify {
             runBlocking {
-                categoryRepository.delete(target)
+                categoryRepository.deleteById(target.id)
             }
         }
     }
