@@ -2,7 +2,6 @@ package com.julianfortune.glacier.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.repository.CategoryRepository
 import com.julianfortune.glacier.repository.SupplierRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

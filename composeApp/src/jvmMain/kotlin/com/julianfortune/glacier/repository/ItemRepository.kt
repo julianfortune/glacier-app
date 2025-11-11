@@ -5,7 +5,6 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.codec.WeightUnitCodec
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.item.WeightUnit
 import com.julianfortune.glacier.db.Database
 import dev.forkhandles.result4k.orThrow
 

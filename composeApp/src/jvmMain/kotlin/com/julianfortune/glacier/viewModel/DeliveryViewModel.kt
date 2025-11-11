@@ -4,58 +4,43 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
-import com.julianfortune.glacier.data.domain.entry.CostStatus
+import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.repository.DeliveryRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import java.time.LocalDate
-
-
-data class DeliveryEntry(
-    val itemId: Long,
-    val itemCount: Long,
-    val costStatus: CostStatus,
-    val itemCostCents: Long,
-    val aggregate: Aggregate?,
-) {
-    data class Aggregate(
-        val label: String,
-        val count: Long,
-    )
-}
-
-data class Delivery(
-    val date: LocalDate,
-    val supplierId: Long,
-    val taxesCents: Long,
-    val feesCents: Long,
-    val entries: List<DeliveryEntry>
-)
 
 class DeliveryViewModel(private val deliveryRepository: DeliveryRepository) : ViewModel() {
 
+    private val currentDeliveryId = MutableStateFlow<Long?>(null)
+
     // TODO: Sorting, default: By receivedDate and then createdDatetime
     // TODO (enhancement): Filtering, e.g., by time period
-    val allDeliveries = deliveryRepository.getAllAsHeadlines()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
+    val allDeliveries: StateFlow<List<Entity<DeliveryHeadline>>> =
+        deliveryRepository
+            .getAllAsHeadlines()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
+
+    // TODO: Implement flow logic for the current delivery details to show
+    val selectedDeliveryDetail: StateFlow<Entity<DeliveryDetail>> = TODO()
+
+    fun selectDelivery(deliveryId: Long?) {
+        currentDeliveryId.value = deliveryId
+    }
 
     suspend fun save(delivery: DeliveryDetail): Long {
-        return deliveryRepository.insert(delivery)
+        return deliveryRepository.insert(delivery).also { newId ->
+            selectDelivery(newId)
+        }
     }
 
     suspend fun update(delivery: Entity<DeliveryDetail>) {
         TODO()
-    }
-
-    // TODO: May want to set this up using flows...?
-    //       I.e., Make it reactive so that changing the currently selected delivery automatically fetches
-    //       and updates this list...?
-    fun getDelivery(deliveryId: Long): DeliveryDetail {
-        return TODO()
     }
 
 }
