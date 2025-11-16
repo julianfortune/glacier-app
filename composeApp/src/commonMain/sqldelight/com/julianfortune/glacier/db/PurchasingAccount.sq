@@ -1,7 +1,7 @@
 -- TODO: Maybe this should be renamed 'payee' or 'funding source' ?
 
 -- I.e., 'subaccount'
-CREATE TABLE PurchasingAccount (
+CREATE TABLE IF NOT EXISTS PurchasingAccount (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );
@@ -23,9 +23,9 @@ insert:
 INSERT INTO PurchasingAccount (name) VALUES (:name);
 
 -- SEED DATA
-INSERT INTO PurchasingAccount (name)
-VALUES
-    ('Account I'),
-    ('Account II'),
-    ('Account III')
-;
+-- INSERT INTO PurchasingAccount (name)
+-- VALUES
+--     ('Account I'),
+--     ('Account II'),
+--     ('Account III')
+-- ;

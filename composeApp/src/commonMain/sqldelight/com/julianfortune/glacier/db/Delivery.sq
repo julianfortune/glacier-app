@@ -1,4 +1,4 @@
-CREATE TABLE Delivery (
+CREATE TABLE IF NOT EXISTS Delivery (
     id INTEGER PRIMARY KEY,
     receivedDate TEXT NOT NULL, -- ISO-8601 date, e.g., "2025-09-11"
     supplierId INTEGER, -- TODO: Should this be not null?
@@ -42,8 +42,8 @@ INSERT INTO Delivery (
 );
 
 -- SEED DATA
-INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)
-VALUES
-    ("2025-10-01", 0, "2025-10-01T00:00:00Z", "2025-10-01T00:00:00Z")
-    -- ...
-;
+-- INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)
+-- VALUES
+--     ("2025-10-01", 0, "2025-10-01T00:00:00Z", "2025-10-01T00:00:00Z")
+--     -- ...
+-- ;

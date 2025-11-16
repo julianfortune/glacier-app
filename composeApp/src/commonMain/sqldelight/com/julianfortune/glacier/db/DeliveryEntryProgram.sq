@@ -1,4 +1,4 @@
-CREATE TABLE DeliveryEntryProgram (
+CREATE TABLE IF NOT EXISTS DeliveryEntryProgram (
     id INTEGER PRIMARY KEY,
     entryId INTEGER NOT NULL,
     programId INTEGER NOT NULL,

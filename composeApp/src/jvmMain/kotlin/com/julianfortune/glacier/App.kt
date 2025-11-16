@@ -18,13 +18,13 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.ScrollableColumn
+import com.julianfortune.glacier.view.delivery.DeliveriesPane
 import com.julianfortune.glacier.viewModel.CategoryViewModel
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -40,7 +40,6 @@ enum class NavigationPage(val title: String, val icon: ImageVector) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun App() {
     // TODO: Can this be simplified ..?
     // Probably should look at: https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-viewmodel.html#using-viewmodel-in-common-code
@@ -182,59 +181,6 @@ fun CategoryList(viewModel: CategoryViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DeliveriesPane(viewModel: DeliveryViewModel) {
-    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-        Surface(
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 1.dp,
-        ) {
-            Column(modifier = Modifier.width(240.dp)) {
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.padding(8.dp),
-                ) {
-                    FilledTonalButton(
-                        onClick = { },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.height(32.dp).fillMaxWidth(),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                    ) {
-                        Text("New")
-                    }
-                }
-                HorizontalDivider(thickness = 1.dp)
-                ScrollableColumn(
-                    viewModel.allDeliveries.map { deliveries ->
-                        deliveries.map {
-                            val name = it.data.receivedDate.toString()
-                            Item(name, onClick = {
-                                println("Clicked on delivery: ${it.id} ...")
-                            })
-                        }
-                    }.collectAsState(emptyList())
-                )
-            }
-        }
-        VerticalDivider(thickness = 1.dp)
-        Surface(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-            color = MaterialTheme.colorScheme.surface,
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Delivery goes here")
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -244,7 +190,7 @@ fun SupplierList(viewModel: SupplierViewModel) {
             viewModel.suppliers.map { suppliers ->
                 suppliers.map {
                     Item(
-                        it.name, onClick = {
+                        it.data.name, onClick = {
                             println("Deleting supplier: ${it.id} ...")
                             viewModel.deleteSupplier(it.id)
                         })

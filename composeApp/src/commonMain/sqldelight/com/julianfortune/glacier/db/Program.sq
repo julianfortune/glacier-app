@@ -1,5 +1,5 @@
 -- I.e. grant/project/program
-CREATE TABLE Program (
+CREATE TABLE IF NOT EXISTS Program (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );
@@ -21,9 +21,9 @@ insert:
 INSERT INTO Program (name) VALUES (:name);
 
 -- SEED DATA
-INSERT INTO Program (name)
-VALUES
-    ('Example Program A'),
-    ('Example Grant I'),
-    ('Example Project 1')
-;
+-- INSERT INTO Program (name)
+-- VALUES
+--     ('Example Program A'),
+--     ('Example Grant I'),
+--     ('Example Project 1')
+-- ;

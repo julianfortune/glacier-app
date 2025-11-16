@@ -1,4 +1,4 @@
-CREATE TABLE DeliveryEntryPurchasingAccount (
+CREATE TABLE IF NOT EXISTS DeliveryEntryPurchasingAccount (
     id INTEGER PRIMARY KEY,
     entryId INTEGER NOT NULL,
     purchasingAccountId INTEGER NOT NULL,

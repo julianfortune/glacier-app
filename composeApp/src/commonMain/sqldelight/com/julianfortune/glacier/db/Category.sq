@@ -1,11 +1,11 @@
-CREATE TABLE Category (
+CREATE TABLE IF NOT EXISTS Category (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );
 
 --QUERIES
 getAll:
-SELECT * FROM Category;
+SELECT * FROM Category ORDER BY name ASC;
 
 getById:
 SELECT * FROM Category WHERE id = :id LIMIT 1;
@@ -20,15 +20,15 @@ insert:
 INSERT INTO Category (name) VALUES (:name);
 
 -- SEED DATA
-INSERT INTO Category (id, name)
-VALUES
-    (0, 'Dairy'),
-    (1, 'Perishable'),
-    (2, 'Produce'),
-    (3, 'Dry'),
-    (4, 'Canned'),
-    (5, 'Vegetables'),
-    (6, 'Fruit'),
-    (7, 'Legumes'),
-    (8, 'Frozen')
-;
+-- INSERT INTO Category (id, name)
+-- VALUES
+--     (0, 'Dairy'),
+--     (1, 'Perishable'),
+--     (2, 'Produce'),
+--     (3, 'Dry'),
+--     (4, 'Canned'),
+--     (5, 'Vegetables'),
+--     (6, 'Fruit'),
+--     (7, 'Legumes'),
+--     (8, 'Frozen')
+-- ;

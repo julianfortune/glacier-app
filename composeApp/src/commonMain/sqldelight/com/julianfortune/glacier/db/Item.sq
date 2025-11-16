@@ -1,5 +1,5 @@
 -- The core entity representing some quantifiable amount of food or other resource
-CREATE TABLE Item (
+CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     weightHundredths INTEGER NOT NULL, -- Stores with 2 decimals of precision (multiple by 100 for value)
@@ -8,7 +8,7 @@ CREATE TABLE Item (
 
 -- QUERIES
 getAll:
-SELECT * FROM Item;
+SELECT * FROM Item ORDER BY name ASC;
 
 getById:
 SELECT * FROM Item WHERE id = :id LIMIT 1;
@@ -31,11 +31,11 @@ INSERT INTO Item (
 );
 
 -- SEED DATA
-INSERT INTO Item (id, name, weightHundredths, weightUnits)
-VALUES
-    (0, "Sliced Peaches in Water", 1450, 'OZ'),
-    (1, "Cut Green Beans", 1500, 'OZ'),
-    (2, "Tuna in Water", 400, 'OZ'),
-    (3, "Chunk White Chicken", 1250, 'OZ'),
-    (4, "Low Sodium Tomato Soup", 1075, 'OZ')
-;
+-- INSERT INTO Item (id, name, weightHundredths, weightUnits)
+-- VALUES
+--     (0, "Sliced Peaches in Water", 1450, 'OZ'),
+--     (1, "Cut Green Beans", 1500, 'OZ'),
+--     (2, "Tuna in Water", 400, 'OZ'),
+--     (3, "Chunk White Chicken", 1250, 'OZ'),
+--     (4, "Low Sodium Tomato Soup", 1075, 'OZ')
+-- ;
