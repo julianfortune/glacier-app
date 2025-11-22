@@ -1,35 +1,20 @@
 package com.julianfortune.glacier.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Remove
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.MenuItemColors
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data class Option<ID>(
@@ -40,6 +25,9 @@ data class Option<ID>(
 // TODO(P2): Implement async fetching...? (w debounce, see: https://stackoverflow.com/a/78908108)
 //  For performance probably won't be able to load all `item`s into memory at once ..
 //  Probably *can* get away with loading the suppliers statically, but might be easier to do both the same way..
+/**
+ * Heavily inspired by: https://mui.com/material-ui/react-autocomplete/
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
@@ -48,17 +36,32 @@ fun <ID> AutoCompleteDropdownField(
     options: List<Option<ID>>,
     onSelectedChange: (ID?) -> Unit,
 ) {
-    var input by remember { mutableStateOf("") }
-
+    var input by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf<Option<ID>?>(null) }
 
+    val textFieldValue = remember(input, selectedOption) {
+        input ?: selectedOption?.title ?: ""
+    }
+
+    val filteredOptions = remember(input, options) {
+        if (input != null) {
+            options.filter { option ->
+                option.title.contains(input!!, ignoreCase = true)
+            }
+        } else {
+            options
+        }
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
+        onExpandedChange = {
+            expanded = !expanded
+        }
     ) {
         OutlinedTextField(
-            value = input,
+            value = textFieldValue,
             label = label,
             onValueChange = {
                 input = it
@@ -67,18 +70,28 @@ fun <ID> AutoCompleteDropdownField(
             },
             colors = OutlinedTextFieldDefaults.colors(),
             trailingIcon = {
-                Row {
-                    Icon(
-                        Icons.Outlined.Clear,
-                        null,
-                        modifier = Modifier
-                            .pointerHoverIcon(PointerIcon.Hand)
-                            .clickable(
-                                onClick = {
-                                    input = ""
-                                }
-                            ),
-                    )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    // TODO(P3): Improve 'clear' icon UX and re-enable
+                    // Show 'clear' button when there's text or a selection
+                    if (false && textFieldValue.isNotEmpty()) {
+                        IconButton(
+                            modifier = Modifier.size(28.dp).pointerHoverIcon(PointerIcon.Hand),
+                            onClick = {
+                                input = ""
+                                selectedOption = null
+                                onSelectedChange(null)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear selection"
+                            )
+                        }
+                    }
+                    // Dropdown toggle icon
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 }
             },
@@ -87,28 +100,61 @@ fun <ID> AutoCompleteDropdownField(
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
                 .onFocusChanged {
                     expanded = it.isFocused
+                    if (!it.isFocused) {
+                        input = null
+                    }
                 },
         )
 
-        // TODO(P1): Highlight selected item
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option.title, color = MaterialTheme.colorScheme.onSurface) },
-                    onClick = {
-                        selectedOption = option
-                        expanded = false
-                        input = option.title
+            when {
+                filteredOptions.isEmpty() -> NoOptionsMenuItem()
+                else -> filteredOptions.forEach { option ->
+                    val isSelected = option.id == selectedOption?.id
 
-                        onSelectedChange(option.id)
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                )
+                    // Use colors to highlight selected item
+                    val backgroundColor = if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else MenuDefaults.containerColor
+                    val textColor = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else MaterialTheme.colorScheme.onSurface
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(option.title)
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        modifier = Modifier
+                            .background(backgroundColor)
+                            .pointerHoverIcon(PointerIcon.Hand),
+                        colors = MenuDefaults.itemColors().copy(textColor = textColor),
+                        onClick = {
+                            selectedOption = option
+                            input = null
+                            expanded = false
+
+                            onSelectedChange(option.id)
+                        },
+                    )
+                }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview
+fun NoOptionsMenuItem() {
+    DropdownMenuItem(
+        text = { Text("No matches found") },
+        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+        enabled = false,
+        colors = MenuDefaults.itemColors(),
+        onClick = {},
+    )
+}
