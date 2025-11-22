@@ -56,7 +56,7 @@ fun ScrollableColumn(items: State<List<Item>>) {
                                 i.onClick()
                             },
                     )
-                    HorizontalDivider(thickness = 1.dp)
+//                    HorizontalDivider(thickness = 1.dp)
                 }
             }
             VerticalScrollbar(

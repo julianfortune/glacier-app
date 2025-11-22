@@ -7,20 +7,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
 import com.julianfortune.glacier.view.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 
-// TODO: Make scrollable
-// TODO: Make larger on the screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewDeliveryForm(viewModel: DeliveryViewModel) {
+    val coroutineScope = rememberCoroutineScope()
+
     val suppliers by viewModel.allSuppliers.collectAsState() // TODO(P1): Is this right ?
 
-    var receivedDate by remember { mutableStateOf("") }
+    var receivedDateInput by remember { mutableStateOf("") }
+    var supplierId by remember { mutableStateOf<Long?>(null) }
+
+    val isValid = remember(receivedDateInput, supplierId) {
+        // TODO: Parse date input
+        supplierId != null
+    }
 
     Column(
         modifier = Modifier.padding(16.dp),
@@ -35,10 +43,10 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
 
         // TODO(P4): Use a more proper date picker component
         OutlinedTextField(
-            value = receivedDate,
-            onValueChange = { receivedDate = it },
+            value = receivedDateInput,
+            onValueChange = { receivedDateInput = it },
             label = { Text("Received") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(64.dp),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(),
             placeholder = { Text("MM/DD/YYYY") }
@@ -51,11 +59,10 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                 Option(it.id, it.data.name)
             },
             onSelectedChange = { newId ->
-                println("Selected: $newId")
-            }
+                supplierId = newId
+            },
+            modifier = Modifier.fillMaxWidth()
         )
-
-        // TODO: Entries UI ...
 
         // Action Buttons
         Row(
@@ -75,12 +82,23 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
 
             Button(
                 onClick = {
-                    // Validate and submit the form
-                    TODO("Save the new delivery")
+                    val receivedData = LocalDate.now() // TODO: WRONG !
+                    val delivery = DeliveryDetail(
+                        receivedData,
+                        supplierId,
+                        null,
+                        null,
+                        emptyList()
+                    )
+
+                    coroutineScope.launch {
+                        viewModel.save(delivery)
+                        viewModel.dismissNewDelivery()
+                    }
                 },
-                enabled = true // TODO: Validation
+                enabled = isValid
             ) {
-                Text("Create Delivery")
+                Text("Create")
             }
         }
     }

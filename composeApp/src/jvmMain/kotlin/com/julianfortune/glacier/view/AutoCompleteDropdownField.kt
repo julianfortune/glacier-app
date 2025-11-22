@@ -35,6 +35,7 @@ fun <ID> AutoCompleteDropdownField(
     label: @Composable (() -> Unit)? = null,
     options: List<Option<ID>>,
     onSelectedChange: (ID?) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var input by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
@@ -95,8 +96,7 @@ fun <ID> AutoCompleteDropdownField(
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = modifier
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
                 .onFocusChanged {
                     expanded = it.isFocused
@@ -112,7 +112,7 @@ fun <ID> AutoCompleteDropdownField(
         ) {
             when {
                 filteredOptions.isEmpty() -> NoOptionsMenuItem()
-                else -> filteredOptions.forEach { option ->
+                else -> filteredOptions.map { option ->
                     val isSelected = option.id == selectedOption?.id
 
                     // Use colors to highlight selected item

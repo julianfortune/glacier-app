@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
@@ -45,8 +46,17 @@ class DeliveryViewModel(
                 initialValue = emptyList()
             )
 
+    val allItems: StateFlow<List<Entity<Item>>> =
+        itemRepository
+            .getAll()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
+
     // TODO: Implement flow logic for the current delivery details to show
-//    val selectedDeliveryDetail: StateFlow<Entity<DeliveryDetail>> = TODO()
+    // val selectedDeliveryDetail: StateFlow<Entity<DeliveryDetail>> = TODO()
 
     val newDeliveryDialogIsVisible: State<Boolean> = _newDeliveryDialogIsVisible
 
