@@ -59,6 +59,9 @@ class DeliveryRepositoryTest {
             listOf(entry)
         )
 
+        // TODO: Make sure `id` is a number larger than `1` or randomized in some way to catch bug where
+        //   number of rows modified is returned instead of ID
+
         // WHEN
         val id = runBlocking {
             repository.insert(delivery)

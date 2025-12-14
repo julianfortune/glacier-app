@@ -39,7 +39,9 @@ INSERT INTO Delivery (
     :feesCents,
     :creationDateTime,
     :updateDateTime
-);
+)
+-- NOTE: The error is due to a bug in intelliJ, see https://github.com/sqldelight/sqldelight/issues/5725
+RETURNING id;
 
 -- SEED DATA
 -- INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)

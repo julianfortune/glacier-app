@@ -9,7 +9,7 @@ kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
 mockk = "1.14.6"
 result4K = "2.23.0.0"
-sqldelight = "2.1.0"
+sqldelight = "2.2.1"
 
 [libraries]
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
@@ -28,6 +28,7 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 result4K = { module = "dev.forkhandles:result4k", version.ref = "result4K" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-sqlite-dialect = { module = "app.cash.sqldelight:sqlite-3-38-dialect", version.ref = "sqldelight"}
 
 [plugins]
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -75,6 +75,7 @@ compose.desktop {
 sqldelight {
     databases {
         create("Database") {
+            dialect(libs.sqldelight.sqlite.dialect)
             packageName = "com.julianfortune.glacier.db"
             generateAsync = true
         }

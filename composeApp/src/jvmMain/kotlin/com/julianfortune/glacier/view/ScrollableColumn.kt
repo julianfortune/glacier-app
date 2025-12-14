@@ -1,6 +1,7 @@
 package com.julianfortune.glacier.view
 
 import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,6 +14,9 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -25,15 +29,14 @@ import androidx.compose.ui.unit.dp
 
 data class Item(
     val name: String,
-    val onClick: () -> Unit
+    val onClick: () -> Unit,
+    val isSelected: Boolean = false
 )
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ScrollableColumn(items: State<List<Item>>) {
-    val currentItems by items
-
-    if (currentItems.isEmpty()) {
+fun ScrollableColumn(items: List<Item>) {
+    if (items.isEmpty()) {
         Text("No items to display!")
     } else {
         Box(
@@ -45,7 +48,15 @@ fun ScrollableColumn(items: State<List<Item>>) {
                 modifier = Modifier.fillMaxSize(),
                 state = listScrollState,
             ) {
-                items(currentItems) { i ->
+                items(items) { i ->
+                    // Use colors to highlight selected item
+                    val colors = if (i.isSelected) {
+                        ListItemDefaults.colors(
+                            headlineColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
+                    } else ListItemDefaults.colors()
+
                     ListItem(
                         headlineContent = {
                             Text(i.name)
@@ -55,8 +66,8 @@ fun ScrollableColumn(items: State<List<Item>>) {
                             .clickable {
                                 i.onClick()
                             },
+                        colors = colors,
                     )
-//                    HorizontalDivider(thickness = 1.dp)
                 }
             }
             VerticalScrollbar(

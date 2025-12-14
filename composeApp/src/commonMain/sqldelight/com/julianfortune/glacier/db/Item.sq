@@ -37,5 +37,9 @@ INSERT INTO Item (
 --     (1, "Cut Green Beans", 1500, 'OZ'),
 --     (2, "Tuna in Water", 400, 'OZ'),
 --     (3, "Chunk White Chicken", 1250, 'OZ'),
---     (4, "Low Sodium Tomato Soup", 1075, 'OZ')
+--     (4, "Low Sodium Tomato Soup", 1075, 'OZ'),
+--     (5, "Lettuce", 800, 'OZ'),
+--     (6, "Corn", 1600, 'OZ'),
+--     (7, "Broccoli", 1600, 'OZ'),
+--     (8, "Frozen Peas", 2400, 'OZ')
 -- ;

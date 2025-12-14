@@ -9,25 +9,26 @@ import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
+import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryViewModel(
     private val deliveryRepository: DeliveryRepository,
-    private val itemRepository: ItemRepository,
-    private val supplierRepository: SupplierRepository
+    itemRepository: ItemRepository,
+    supplierRepository: SupplierRepository
 ) : ViewModel() {
 
-    private val _currentDeliveryId = MutableStateFlow<Long?>(null)
-    private val _newDeliveryDialogIsVisible = mutableStateOf(false)
 
-    // TODO: Sorting, default: By receivedDate and then createdDatetime
-    // TODO (enhancement): Filtering, e.g., by time period
+    private val _newDeliveryDialogIsVisible = mutableStateOf(false)
+    val newDeliveryDialogIsVisible: State<Boolean> = _newDeliveryDialogIsVisible
+
+    // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
+    // TODO(P5): Filtering, e.g., by time period
     val allDeliveries: StateFlow<List<Entity<DeliveryHeadline>>> =
         deliveryRepository
             .getAllAsHeadlines()
@@ -55,22 +56,42 @@ class DeliveryViewModel(
                 initialValue = emptyList()
             )
 
-    // TODO: Implement flow logic for the current delivery details to show
-    // val selectedDeliveryDetail: StateFlow<Entity<DeliveryDetail>> = TODO()
 
-    val newDeliveryDialogIsVisible: State<Boolean> = _newDeliveryDialogIsVisible
+    private val _selectedDeliveryId = MutableStateFlow<Long?>(null)
+    val selectedDeliveryId: StateFlow<Long?> = _selectedDeliveryId
 
-    fun selectDelivery(deliveryId: Long?) {
-        _currentDeliveryId.value = deliveryId
+    // Derived flow for selected item details
+    val selectedDeliveryDetail: StateFlow<Entity<DeliveryDetail>?> = _selectedDeliveryId
+        .flatMapLatest { id ->
+            id?.let { deliveryRepository.getDeliveryDetailById(it) } ?: flowOf(null)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    fun selectDelivery(deliveryId: Long) {
+        _selectedDeliveryId.value = deliveryId
     }
 
     suspend fun save(delivery: DeliveryDetail): Long {
-        return deliveryRepository.insert(delivery).also { newId ->
-            selectDelivery(newId)
-        }
+        return deliveryRepository.insert(delivery)
     }
 
     suspend fun update(delivery: Entity<DeliveryDetail>) {
+        TODO()
+    }
+
+    suspend fun addEntry(deliveryId: Long) {
+        TODO()
+    }
+
+    suspend fun updateEntry(deliveryId: Long, entry: Entity<Entry>) {
+        TODO()
+    }
+
+    suspend fun deleteEntry(deliveryId: Long, entryId: Long) {
         TODO()
     }
 
@@ -80,6 +101,11 @@ class DeliveryViewModel(
 
     fun dismissNewDelivery() {
         _newDeliveryDialogIsVisible.value = false
+    }
+
+    fun newDeliveryCreated(id: Long) {
+        _newDeliveryDialogIsVisible.value = false
+        _selectedDeliveryId.value = id
     }
 
 }

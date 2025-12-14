@@ -1,7 +1,5 @@
 package com.julianfortune.glacier.repository
 
-import app.cash.sqldelight.async.coroutines.awaitAsList
-import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.codec.CostStatusCodec
@@ -15,13 +13,11 @@ import com.julianfortune.glacier.data.domain.entry.EntryAggregation
 import com.julianfortune.glacier.db.Database
 import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import java.time.Instant
 
 class DeliveryRepository(private val database: Database) {
 
-    // TODO(P3): Understand Flows and coroutine contexts
     fun getAllAsHeadlines(): Flow<List<Entity<DeliveryHeadline>>> {
         return database.deliveryQueries.getAll()
             .asFlow()
@@ -36,52 +32,54 @@ class DeliveryRepository(private val database: Database) {
             }
     }
 
-    suspend fun getById(deliveryId: Long): Entity<DeliveryDetail> {
-        val entryRows = database
-            .deliveryEntryQueries
-            .getByDeliveryId(deliveryId)
-            .awaitAsList()
+    fun getDeliveryDetailById(deliveryId: Long): Flow<Entity<DeliveryDetail>> {
+        return combine(
+            database.deliveryQueries.getById(deliveryId).asFlow(),
+            database.deliveryEntryQueries.getByDeliveryId(deliveryId).asFlow()
+            // TODO(P2): Gather foreign keys for `purchasing_account` and `program`
+        ) { deliveryResult, entriesResult ->
+            val deliveryRow = deliveryResult.executeAsOneOrNull() ?: return@combine null
+            val entryRows = entriesResult.executeAsList()
 
-        val deliveryRow = database
-            .deliveryQueries
-            .getById(deliveryId)
-            .awaitAsOne()
+            val entries = entryRows.map { entry ->
+                val costStatus = CostStatusCodec.deserialize(entry.costStatus).orThrow()
+                val aggregate = if (entry.aggregateLabel != null && entry.aggregateCount != null) {
+                    EntryAggregation(
+                        entry.aggregateLabel,
+                        entry.aggregateCount
+                    )
+                } else null
 
-        val entries = entryRows.map { entry ->
-            val costStatus = CostStatusCodec.deserialize(entry.costStatus).orThrow()
-            val aggregate = if (entry.aggregateLabel != null && entry.aggregateCount != null) {
-                EntryAggregation(
-                    entry.aggregateLabel,
-                    entry.aggregateCount
+                // TODO(P2): Plug in the foreign key results
+                val purchasingAccounts = emptyList<Allocation<Long>>()
+                val programs = emptyList<Allocation<Long>>()
+
+                Entry(
+                    entry.itemId,
+                    entry.itemCount,
+                    costStatus,
+                    entry.itemCostCents,
+                    aggregate,
+                    purchasingAccounts,
+                    programs,
                 )
-            } else null
+            }
 
-            // TODO: Gather foreign keys
-            val purchasingAccounts = emptyList<Allocation<Long>>() // TODO
-            val programs = emptyList<Allocation<Long>>() // TODO
-
-            Entry(
-                entry.itemId,
-                entry.itemCount,
-                costStatus,
-                entry.itemCostCents,
-                aggregate,
-                purchasingAccounts,
-                programs,
+            Entity(
+                deliveryRow.id,
+                DeliveryDetail(
+                    LocalDateCodec.deserialize(deliveryRow.receivedDate).orThrow(),
+                    deliveryRow.supplierId,
+                    deliveryRow.taxesCents,
+                    deliveryRow.feesCents,
+                    entries
+                )
             )
         }
-
-        return Entity(
-            deliveryRow.id,
-            DeliveryDetail(
-                LocalDateCodec.deserialize(deliveryRow.receivedDate).orThrow(),
-                deliveryRow.supplierId,
-                deliveryRow.taxesCents,
-                deliveryRow.feesCents,
-                entries
-            )
-        )
+            .filterNotNull()
+            .distinctUntilChanged() // Only emit when data actually changes
     }
+
 
     suspend fun insert(delivery: DeliveryDetail): Long {
         val now = Instant.now()
@@ -93,7 +91,12 @@ class DeliveryRepository(private val database: Database) {
             delivery.feesCents,
             now.toString(),
             now.toString(),
-        )
+        ).executeAsOneOrNull()
+
+        if (deliveryId == null) {
+            // TODO: Error handling !
+            throw RuntimeException("Failed to insert")
+        }
 
         delivery.entries?.forEach { entry ->
             val costStatus = CostStatusCodec.serialize(entry.costStatus)
@@ -128,10 +131,10 @@ class DeliveryRepository(private val database: Database) {
     }
 
     suspend fun deleteById(id: Long): Boolean {
-        // TODO(P2): Probably need to look into error handling ...
-        val deletedId = database.deliveryQueries.deleteById(id)
+        // TODO(P2): Maybe look into error handling or toast system ...
+        val rowsDeleted = database.deliveryQueries.deleteById(id)
 
-        return deletedId == id
+        return rowsDeleted > 0
     }
 
 }

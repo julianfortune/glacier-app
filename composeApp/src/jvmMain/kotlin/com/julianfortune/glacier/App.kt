@@ -24,7 +24,6 @@ import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -102,6 +101,8 @@ fun App() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryList(viewModel: CategoryViewModel) {
+    val categories by viewModel.categories.collectAsState(emptyList())
+
     Column {
         Surface(
             color = MaterialTheme.colorScheme.surface,
@@ -167,17 +168,13 @@ fun CategoryList(viewModel: CategoryViewModel) {
             }
         }
         HorizontalDivider(thickness = 1.dp)
-        ScrollableColumn(
-            viewModel.categories.map { categories ->
-                categories.map {
-                    Item(
-                        it.data.name, onClick = {
-                            println("Deleting category: $it ...")
-                            viewModel.deleteCategory(it)
-                        })
-                }
-            }.collectAsState(emptyList())
-        )
+        ScrollableColumn(categories.map {
+            Item(
+                it.data.name, onClick = {
+                    println("Deleting category: $it ...")
+                    viewModel.deleteCategory(it)
+                })
+        })
     }
 }
 
@@ -185,17 +182,16 @@ fun CategoryList(viewModel: CategoryViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SupplierList(viewModel: SupplierViewModel) {
+    val suppliers by viewModel.suppliers.collectAsState(emptyList())
+
     Column {
-        ScrollableColumn(
-            viewModel.suppliers.map { suppliers ->
-                suppliers.map {
-                    Item(
-                        it.data.name, onClick = {
-                            println("Deleting supplier: ${it.id} ...")
-                            viewModel.deleteSupplier(it.id)
-                        })
-                }
-            }.collectAsState(emptyList())
-        )
+        ScrollableColumn(suppliers.map {
+            Item(
+                it.data.name, onClick = {
+                    println("Deleting supplier: ${it.id} ...")
+                    viewModel.deleteSupplier(it.id)
+                })
+
+        })
     }
 }

@@ -55,6 +55,12 @@ fun <ID> AutoCompleteDropdownField(
         }
     }
 
+    fun clear() {
+        input = ""
+        selectedOption = null
+        onSelectedChange(null)
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
@@ -80,11 +86,7 @@ fun <ID> AutoCompleteDropdownField(
                     if (false && textFieldValue.isNotEmpty()) {
                         IconButton(
                             modifier = Modifier.size(28.dp).pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
-                                input = ""
-                                selectedOption = null
-                                onSelectedChange(null)
-                            }
+                            onClick = { clear() }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
@@ -100,8 +102,8 @@ fun <ID> AutoCompleteDropdownField(
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
                 .onFocusChanged {
                     expanded = it.isFocused
-                    if (!it.isFocused) {
-                        input = null
+                    if (!it.isFocused && input != null) {
+                        clear()
                     }
                 },
         )

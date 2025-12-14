@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
@@ -13,21 +14,39 @@ import com.julianfortune.glacier.view.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
 
+fun parseDateSafe(input: String): LocalDate? {
+    if (input.isBlank()) return null
+
+    return runCatching {
+        val formatter = DateTimeFormatter
+            .ofPattern("MM/dd/uuuu")
+            .withResolverStyle(ResolverStyle.STRICT) // Rejects invalid dates like Feb 30
+        LocalDate.parse(input, formatter)
+    }.getOrNull()
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewDeliveryForm(viewModel: DeliveryViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
-    val suppliers by viewModel.allSuppliers.collectAsState() // TODO(P1): Is this right ?
+    val suppliers by viewModel.allSuppliers.collectAsState()
 
     var receivedDateInput by remember { mutableStateOf("") }
+    var parsedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var dateError by remember { mutableStateOf(false) }
     var supplierId by remember { mutableStateOf<Long?>(null) }
 
-    val isValid = remember(receivedDateInput, supplierId) {
-        // TODO: Parse date input
-        supplierId != null
+    LaunchedEffect(receivedDateInput) {
+        parsedDate = parseDateSafe(receivedDateInput)
+        println("parsedDate: $parsedDate")
+    }
+
+    val isValid = remember(parsedDate, supplierId) {
+        parsedDate != null && supplierId != null
     }
 
     Column(
@@ -41,15 +60,22 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
             textAlign = TextAlign.Center
         )
 
-        // TODO(P4): Use a more proper date picker component
         OutlinedTextField(
             value = receivedDateInput,
             onValueChange = { receivedDateInput = it },
             label = { Text("Received") },
-            modifier = Modifier.fillMaxWidth().height(64.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(84.dp)
+                .onFocusChanged({ state ->
+                    if (!state.isFocused) {
+                        dateError = (!receivedDateInput.isBlank() && parsedDate == null)
+                    }
+                }),
             singleLine = true,
+            isError = dateError,
             colors = OutlinedTextFieldDefaults.colors(),
-            placeholder = { Text("MM/DD/YYYY") }
+            supportingText = { Text("MM/DD/YYYY") }
         )
 
         // Supplier Field
@@ -81,10 +107,11 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Button(
+                enabled = isValid,
                 onClick = {
-                    val receivedData = LocalDate.now() // TODO: WRONG !
                     val delivery = DeliveryDetail(
-                        receivedData,
+                        // This should be defined in order for button to be enabled
+                        parsedDate!!, // TODO(P3): Error handling ..?
                         supplierId,
                         null,
                         null,
@@ -92,11 +119,10 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                     )
 
                     coroutineScope.launch {
-                        viewModel.save(delivery)
-                        viewModel.dismissNewDelivery()
+                        val newDeliveryId = viewModel.save(delivery)
+                        viewModel.newDeliveryCreated(newDeliveryId)
                     }
                 },
-                enabled = isValid
             ) {
                 Text("Create")
             }
