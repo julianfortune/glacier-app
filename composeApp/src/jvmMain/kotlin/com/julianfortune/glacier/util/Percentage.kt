@@ -10,7 +10,7 @@ class Percentage {
 
         // TODO: Test
         fun splitBetween(count: Int): List<Percentage> {
-            require(count in 1..<MAX) { "Count must be in range 0..$MAX" }
+            require(count in 1..<MAX) { "Count must be in range [1, $MAX)" }
 
             val targetPercentage = MAX / count
             val remainder = MAX % count

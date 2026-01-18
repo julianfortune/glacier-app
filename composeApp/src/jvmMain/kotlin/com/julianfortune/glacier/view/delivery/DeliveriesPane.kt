@@ -5,7 +5,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -14,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -45,9 +43,10 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
     }
 
     val deliveryDetail by viewModel.selectedDeliveryDetail.collectAsState()
-    val dialogIsOpen by viewModel.newDeliveryDialogIsVisible
+    val newDeliveryDialogOpen by viewModel.newDeliveryDialogIsVisible
+    val newEntryDialogOpen by viewModel.newEntryDialogIsVisible
 
-    if (dialogIsOpen) {
+    if (newDeliveryDialogOpen) {
         BasicAlertDialog(
             onDismissRequest = { }, // Ignore implicit attempts to close the dialog
         ) {
@@ -58,6 +57,21 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                 shape = RoundedCornerShape(16.dp),
             ) {
                 NewDeliveryForm(viewModel)
+            }
+        }
+    }
+
+    if (newEntryDialogOpen) {
+        BasicAlertDialog(
+            onDismissRequest = { }, // Ignore implicit attempts to close the dialog
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                NewEntryForm(viewModel)
             }
         }
     }
@@ -111,63 +125,45 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                         style = MaterialTheme.typography.headlineMedium,
                     )
 
-                    Text("Order ID: ${deliveryDetail?.id} ...",)
+                    Text("Order ID: ${deliveryDetail?.id} ...")
+                    // TODO(P3): Make supplier editable
                     Text("Supplier ID: ${deliveryDetail?.data?.supplierId}")
 
-                    // TODO(P2):Make editable
+                    // TODO(P1): Make editable
                     Text("Fees: ${deliveryDetail?.data?.feesCents?.let { it / 100 }}")
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        "Entries",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
 
                     // TODO(NEXT): Display editable entries list
                     //  -> focus first on editing and saving functionality before any UX upgrades
+                    //  -> just go with a simple column with dividers or something standard
+                    //  -> use an `...` menu for all the actions (e.g., `Edit`, `Delete`)
 
-//                entries.mapIndexed { index, entry ->
-//                    Row(
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//                        modifier = Modifier,
-//                    ) {
-//                        Text("${index + 1}")
-//                        AutoCompleteDropdownField(
-//                            label = { Text("Item") },
-//                            options = items.map {
-//                                Option(it.id, it.data.name)
-//                            },
-//                            onSelectedChange = { newId ->
-//                                println("Selected: $newId")
-//                            }
-//                        )
-//                        OutlinedTextField(
-//                            value = firstItemCount,
-//                            onValueChange = { firstItemCount = it },
-//                            label = { Text("Count") },
-//                            singleLine = true,
-//                            modifier = Modifier.height(64.dp), // Fixes a dumb glitch where the height changes
-//                            colors = OutlinedTextFieldDefaults.colors()
-//                        )
-//                        // TODO: CostStatus dropdown
-//                        IconButton(
-//                            modifier = Modifier.size(28.dp).pointerHoverIcon(PointerIcon.Hand),
-//                            onClick = {
-//                                TODO("Delete entry")
-//                            }
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Default.Delete,
-//                                contentDescription = "Delete entry"
-//                            )
-//                        }
-//                    }
-//                }
-//
-//                Row {
-//                    Button(
-//                        onClick = {
-//                            TODO("Add new entry")
-//                        }
-//                    ) {
-//                        Text("New Entry")
-//                    }
-//                }
+                    deliveryDetail?.data?.entries?.mapIndexed { index, entry ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier,
+                        ) {
+                            // TODO(P3): Make each 'entry' item directly editable
+                            Text("${index + 1}")
+
+                            // TODO(P1): Ellipses menu with actions edit/delete/etc.
+                        }
+                    }
+
+                    Row {
+                        Button(
+                            onClick = { viewModel.showNewEntry() }
+                        ) {
+                            Text("New Entry")
+                        }
+                    }
                 }
             }
 

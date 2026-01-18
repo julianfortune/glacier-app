@@ -119,7 +119,7 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                     )
 
                     coroutineScope.launch {
-                        val newDeliveryId = viewModel.save(delivery)
+                        val newDeliveryId = viewModel.saveDelivery(delivery)
                         viewModel.newDeliveryCreated(newDeliveryId)
                     }
                 },

@@ -23,9 +23,11 @@ class DeliveryViewModel(
     supplierRepository: SupplierRepository
 ) : ViewModel() {
 
-
     private val _newDeliveryDialogIsVisible = mutableStateOf(false)
     val newDeliveryDialogIsVisible: State<Boolean> = _newDeliveryDialogIsVisible
+
+    private val _newEntryDialogIsVisible = mutableStateOf(false)
+    val newEntryDialogIsVisible: State<Boolean> = _newEntryDialogIsVisible
 
     // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
     // TODO(P5): Filtering, e.g., by time period
@@ -75,15 +77,15 @@ class DeliveryViewModel(
         _selectedDeliveryId.value = deliveryId
     }
 
-    suspend fun save(delivery: DeliveryDetail): Long {
+    suspend fun saveDelivery(delivery: DeliveryDetail): Long {
         return deliveryRepository.insert(delivery)
     }
 
-    suspend fun update(delivery: Entity<DeliveryDetail>) {
+    suspend fun updateDelivery(delivery: Entity<DeliveryDetail>) {
         TODO()
     }
 
-    suspend fun addEntry(deliveryId: Long) {
+    suspend fun saveEntry(deliveryId: Long) {
         TODO()
     }
 
@@ -106,6 +108,14 @@ class DeliveryViewModel(
     fun newDeliveryCreated(id: Long) {
         _newDeliveryDialogIsVisible.value = false
         _selectedDeliveryId.value = id
+    }
+
+    fun showNewEntry() {
+        _newEntryDialogIsVisible.value = true
+    }
+
+    fun dismissNewEntry() {
+        _newEntryDialogIsVisible.value = false
     }
 
 }
