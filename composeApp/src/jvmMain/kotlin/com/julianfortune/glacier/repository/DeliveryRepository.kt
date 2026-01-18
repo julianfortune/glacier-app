@@ -80,7 +80,6 @@ class DeliveryRepository(private val database: Database) {
             .distinctUntilChanged() // Only emit when data actually changes
     }
 
-
     suspend fun insert(delivery: DeliveryDetail): Long {
         val now = Instant.now()
 
@@ -94,40 +93,44 @@ class DeliveryRepository(private val database: Database) {
         ).executeAsOneOrNull()
 
         if (deliveryId == null) {
-            // TODO: Error handling !
+            // TODO(P3): Proper error handling
             throw RuntimeException("Failed to insert")
         }
 
         delivery.entries?.forEach { entry ->
-            val costStatus = CostStatusCodec.serialize(entry.costStatus)
-            val entryId = database.deliveryEntryQueries.insert(
-                deliveryId,
-                entry.itemId,
-                entry.itemCount,
-                costStatus,
-                entry.itemCostCents,
-                entry.aggregate?.label,
-                entry.aggregate?.count,
-            )
-
-            entry.programAllocations?.forEach { allocation ->
-                database.deliveryEntryProgramQueries.insert(
-                    entryId,
-                    allocation.allocatedTo,
-                    allocation.percentage.valueInHundredths.toLong()
-                )
-            }
-
-            entry.purchasingAccountAllocations?.forEach { allocation ->
-                database.deliveryEntryPurchasingAccountQueries.insert(
-                    entryId,
-                    allocation.allocatedTo,
-                    allocation.percentage.valueInHundredths.toLong()
-                )
-            }
+            insertDeliveryEntry(deliveryId, entry)
         }
 
         return deliveryId
+    }
+
+    suspend fun insertDeliveryEntry(deliveryId: Long, entry: Entry) {
+        val costStatus = CostStatusCodec.serialize(entry.costStatus)
+        val entryId = database.deliveryEntryQueries.insert(
+            deliveryId,
+            entry.itemId,
+            entry.itemCount,
+            costStatus,
+            entry.itemCostCents,
+            entry.aggregate?.label,
+            entry.aggregate?.count,
+        )
+
+        entry.programAllocations?.forEach { allocation ->
+            database.deliveryEntryProgramQueries.insert(
+                entryId,
+                allocation.allocatedTo,
+                allocation.percentage.valueInHundredths.toLong()
+            )
+        }
+
+        entry.purchasingAccountAllocations?.forEach { allocation ->
+            database.deliveryEntryPurchasingAccountQueries.insert(
+                entryId,
+                allocation.allocatedTo,
+                allocation.percentage.valueInHundredths.toLong()
+            )
+        }
     }
 
     suspend fun deleteById(id: Long): Boolean {

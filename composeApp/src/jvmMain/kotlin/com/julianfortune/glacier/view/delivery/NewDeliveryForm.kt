@@ -42,7 +42,6 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
 
     LaunchedEffect(receivedDateInput) {
         parsedDate = parseDateSafe(receivedDateInput)
-        println("parsedDate: $parsedDate")
     }
 
     val isValid = remember(parsedDate, supplierId) {

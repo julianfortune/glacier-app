@@ -19,8 +19,8 @@ import kotlinx.coroutines.flow.*
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryViewModel(
     private val deliveryRepository: DeliveryRepository,
-    itemRepository: ItemRepository,
-    supplierRepository: SupplierRepository
+    private val itemRepository: ItemRepository,
+    private val supplierRepository: SupplierRepository
 ) : ViewModel() {
 
     private val _newDeliveryDialogIsVisible = mutableStateOf(false)
@@ -41,21 +41,41 @@ class DeliveryViewModel(
             )
 
     val allSuppliers: StateFlow<List<Entity<Supplier>>> =
-        supplierRepository
-            .getAll()
+        supplierRepository.getAll()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = emptyList()
             )
 
+    val supplierMap: StateFlow<Map<Long, Entity<Supplier>>> =
+        supplierRepository.getAll()
+            .map { suppliers ->
+                suppliers.associateBy { it.id }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyMap()
+            )
+
     val allItems: StateFlow<List<Entity<Item>>> =
-        itemRepository
-            .getAll()
+        itemRepository.getAll()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = emptyList()
+            )
+
+    val itemMap: StateFlow<Map<Long, Entity<Item>>> =
+        itemRepository.getAll()
+            .map { items ->
+                items.associateBy { it.id }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyMap()
             )
 
 
@@ -73,6 +93,14 @@ class DeliveryViewModel(
             initialValue = null
         )
 
+    suspend fun getItemById(itemId: Long): Entity<Item> {
+        return itemRepository.getById(itemId)
+    }
+
+//    suspend fun getSupplierById(supplierId: Long): Entity<Supplier> {
+//        return supplierRepository.getById(supplierId)
+//    }
+
     fun selectDelivery(deliveryId: Long) {
         _selectedDeliveryId.value = deliveryId
     }
@@ -85,16 +113,16 @@ class DeliveryViewModel(
         TODO()
     }
 
-    suspend fun saveEntry(deliveryId: Long) {
-        TODO()
+    suspend fun saveEntry(deliveryId: Long, entry: Entry) {
+        deliveryRepository.insertDeliveryEntry(deliveryId, entry)
     }
 
     suspend fun updateEntry(deliveryId: Long, entry: Entity<Entry>) {
-        TODO()
+        // TODO(P1): Editing entries
     }
 
     suspend fun deleteEntry(deliveryId: Long, entryId: Long) {
-        TODO()
+        // TODO(P1): Deleting entries
     }
 
     fun showNewDelivery() {
