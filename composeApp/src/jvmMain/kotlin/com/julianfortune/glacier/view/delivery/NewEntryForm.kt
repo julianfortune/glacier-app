@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
+import com.julianfortune.glacier.view.CurrencyInputTextField
 import com.julianfortune.glacier.view.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
 
     var itemId by remember { mutableStateOf<Long?>(null) }
     var itemCountInput by remember { mutableStateOf("") }
-    var itemCostInput by remember { mutableStateOf("") }
+    var itemCostInput by remember { mutableStateOf<Long?>(null) }
     var costStatusIsNoCost by remember { mutableStateOf(false) }
 
     // Parsed and valid values
@@ -39,7 +40,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
 
     // TODO: Make this decimal dollars for humans
     LaunchedEffect(itemCostInput) {
-        itemCostCents = itemCostInput.toLongOrNull()
+        itemCostCents = itemCostInput
     }
 
     val isValid = remember(itemId, itemCount, costStatusIsNoCost, itemCostCents) {
@@ -101,22 +102,27 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            OutlinedTextField(
-                value = itemCostInput,
+            CurrencyInputTextField(
+                valueCents = itemCostInput,
                 onValueChange = { itemCostInput = it },
-                label = { Text("Cost in Cents") },
-                modifier = Modifier
-                    .height(64.dp)
-                    .onFocusChanged({ state ->
-                        if (!state.isFocused) {
-                            // Check for error
-                        }
-                    }),
-                singleLine = true,
-                isError = false,
-                colors = OutlinedTextFieldDefaults.colors(),
-                enabled = !costStatusIsNoCost
             )
+
+//            OutlinedTextField(
+//                value = itemCostInput,
+//                onValueChange = { itemCostInput = it },
+//                label = { Text("Cost in Cents") },
+//                modifier = Modifier
+//                    .height(64.dp)
+//                    .onFocusChanged({ state ->
+//                        if (!state.isFocused) {
+//                            // Check for error
+//                        }
+//                    }),
+//                singleLine = true,
+//                isError = false,
+//                colors = OutlinedTextFieldDefaults.colors(),
+//                enabled = !costStatusIsNoCost
+//            )
 
             Text("No cost")
             Switch(
@@ -124,8 +130,6 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
                 onCheckedChange = { costStatusIsNoCost = it }
             )
         }
-
-        // TODO(P2): Purchasing Account & Program allocations
 
         // Action Buttons
         Row(
@@ -159,9 +163,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
                         itemCount!!,
                         costStatus,
                         costCents,
-                        // TODO(P2): Aggregations
                         null,
-                        // TODO(P3): Account / program allocations
                         null,
                         null,
                     )

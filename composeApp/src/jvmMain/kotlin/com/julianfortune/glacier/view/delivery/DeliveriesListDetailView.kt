@@ -16,7 +16,10 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.data.domain.entry.CostStatus
+import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.view.Item
+import com.julianfortune.glacier.view.EntryOptionsDropdownMenu
 import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import java.time.LocalDate
@@ -27,6 +30,14 @@ import java.util.*
 fun formatLocalDate(d: LocalDate, style: FormatStyle = FormatStyle.MEDIUM): String {
     val usDateFormatter = DateTimeFormatter.ofLocalizedDate(style).withLocale(Locale.US)
     return d.format(usDateFormatter)
+}
+
+fun calculateEntryTotal(entry: Entry): Long {
+    if (entry.costStatus == CostStatus.NO_COST) {
+        return 0L
+    }
+
+    return entry.itemCount * entry.itemCostCents
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,7 +148,8 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                 ) {
                     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                         Text(
-                            deliveryDetail?.data?.receivedDate?.let { formatLocalDate(it, FormatStyle.FULL) }.toString(),
+                            deliveryDetail?.data?.receivedDate?.let { formatLocalDate(it, FormatStyle.FULL) }
+                                .toString(),
                             style = MaterialTheme.typography.headlineMedium,
                         )
 
@@ -163,15 +175,60 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.padding(vertical = 24.dp)
                         ) {
+                            // Header row
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                modifier = Modifier
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp).padding(vertical = 8.dp)
+                                        .fillMaxWidth(),
+                                ) {
+                                    Text(
+                                        text = "Name",
+                                        modifier = Modifier.weight(1f),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+
+                                    Text(
+                                        text = "Count",
+                                        modifier = Modifier.width(60.dp),
+                                        textAlign = TextAlign.End
+                                    )
+
+                                    Text(
+                                        text = "Cost",
+                                        modifier = Modifier.width(80.dp),
+                                        textAlign = TextAlign.End
+                                    )
+
+                                    Text(
+                                        text = "Total",
+                                        modifier = Modifier.width(80.dp),
+                                        textAlign = TextAlign.End
+                                    )
+
+                                    Row(modifier = Modifier.width(32.dp)) {}
+                                }
+                            }
+
                             val entries = deliveryDetail?.data?.entries
                             when {
-                                entries == null || entries.isEmpty() -> Text("None")
+                                entries == null || entries.isEmpty() -> Row(
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                ) {
+                                    Text("None", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                                }
+
                                 else -> {
                                     entries.mapIndexed { index, entry ->
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                                         ) {
                                             Text(
                                                 text = itemMap[entry.itemId]?.data?.name ?: "...",
@@ -192,10 +249,23 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                                                 textAlign = TextAlign.End
                                             )
 
+                                            val totalEntryCost = calculateEntryTotal(entry)
+                                            Text(
+                                                text = "$totalEntryCost",
+                                                modifier = Modifier.width(80.dp),
+                                                textAlign = TextAlign.End
+                                            )
+
                                             // TODO(P1): Ellipses menu with actions: edit, delete, move up, move down
 
-                                            // TODO(P3): Make each 'entry' item directly editable
+                                            Row(
+                                                modifier = Modifier.width(32.dp)
+                                            ) {
+                                                EntryOptionsDropdownMenu()
+                                            }
                                         }
+
+                                        // TODO(P2): Purchasing Account & Program allocations
                                     }
                                 }
                             }
