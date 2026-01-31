@@ -27,7 +27,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
 
     var itemId by remember { mutableStateOf<Long?>(null) }
     var itemCountInput by remember { mutableStateOf("") }
-    var itemCostInput by remember { mutableStateOf<Long?>(null) }
+    var itemCostInput by remember { mutableStateOf("") }
     var costStatusIsNoCost by remember { mutableStateOf(false) }
 
     // Parsed and valid values
@@ -40,7 +40,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
 
     // TODO: Make this decimal dollars for humans
     LaunchedEffect(itemCostInput) {
-        itemCostCents = itemCostInput
+        itemCostCents = itemCostInput.toLongOrNull()
     }
 
     val isValid = remember(itemId, itemCount, costStatusIsNoCost, itemCostCents) {
@@ -102,27 +102,27 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            CurrencyInputTextField(
-                valueCents = itemCostInput,
-                onValueChange = { itemCostInput = it },
-            )
-
-//            OutlinedTextField(
-//                value = itemCostInput,
+//            CurrencyInputTextField(
+//                valueCents = itemCostInput,
 //                onValueChange = { itemCostInput = it },
-//                label = { Text("Cost in Cents") },
-//                modifier = Modifier
-//                    .height(64.dp)
-//                    .onFocusChanged({ state ->
-//                        if (!state.isFocused) {
-//                            // Check for error
-//                        }
-//                    }),
-//                singleLine = true,
-//                isError = false,
-//                colors = OutlinedTextFieldDefaults.colors(),
-//                enabled = !costStatusIsNoCost
 //            )
+
+            OutlinedTextField(
+                value = itemCostInput,
+                onValueChange = { itemCostInput = it },
+                label = { Text("Cost in Cents") },
+                modifier = Modifier
+                    .height(64.dp)
+                    .onFocusChanged({ state ->
+                        if (!state.isFocused) {
+                            // Check for error
+                        }
+                    }),
+                singleLine = true,
+                isError = false,
+                colors = OutlinedTextFieldDefaults.colors(),
+                enabled = !costStatusIsNoCost
+            )
 
             Text("No cost")
             Switch(

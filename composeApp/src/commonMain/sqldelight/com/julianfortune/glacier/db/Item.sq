@@ -2,7 +2,9 @@
 CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
+    -- TODO(P3): Update to get away from 'weight'--needs to represent the quantity more generally (e.g., could be bunches of bananas, heads of lettuce, etc.)
     weightHundredths INTEGER NOT NULL, -- Stores with 2 decimals of precision (multiple by 100 for value)
+    -- TODO(P2): Remove `OZ`
     weightUnits TEXT CHECK( weightUnits IN ('OZ','LB') ) NOT NULL -- One of set of possible units (bc application needs to implement conversions)
 );
 
