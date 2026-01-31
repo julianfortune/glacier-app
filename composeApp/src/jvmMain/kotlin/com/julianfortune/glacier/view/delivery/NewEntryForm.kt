@@ -12,11 +12,11 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
+import com.julianfortune.glacier.view.CurrencyInput
 import com.julianfortune.glacier.view.CurrencyInputTextField
 import com.julianfortune.glacier.view.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +27,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
 
     var itemId by remember { mutableStateOf<Long?>(null) }
     var itemCountInput by remember { mutableStateOf("") }
-    var itemCostInput by remember { mutableStateOf("") }
+    var itemCostInput by remember { mutableStateOf<CurrencyInput?>(null) }
     var costStatusIsNoCost by remember { mutableStateOf(false) }
 
     // Parsed and valid values
@@ -38,9 +38,8 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
         itemCount = itemCountInput.toLongOrNull()
     }
 
-    // TODO: Make this decimal dollars for humans
     LaunchedEffect(itemCostInput) {
-        itemCostCents = itemCostInput.toLongOrNull()
+        itemCostCents = itemCostInput?.toLong()
     }
 
     val isValid = remember(itemId, itemCount, costStatusIsNoCost, itemCostCents) {
@@ -60,18 +59,20 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
             textAlign = TextAlign.Center
         )
 
-        Row {
+        Row(modifier = Modifier.fillMaxWidth()) {
             AutoCompleteDropdownField(
                 label = { Text("Item") },
                 options = items.map {
-                    Option(it.id, it.data.name)
+                    Option(it.id, "${it.data.name} (${it.data.weightHundredths / 100} ${it.data.weightUnits})")
                 },
                 onSelectedChange = { newId ->
                     itemId = newId
                 },
                 modifier = Modifier
             )
+        }
 
+        Row(modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = itemCountInput,
                 onValueChange = { itemCountInput = it },
@@ -87,9 +88,9 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
                 isError = false,
                 colors = OutlinedTextFieldDefaults.colors(),
             )
-        }
 
-        // TODO: Aggregation
+            // TODO: Aggregation
+        }
 
         Text(
             "Cost",
@@ -102,25 +103,13 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-//            CurrencyInputTextField(
-//                valueCents = itemCostInput,
-//                onValueChange = { itemCostInput = it },
-//            )
-
-            OutlinedTextField(
+            CurrencyInputTextField(
                 value = itemCostInput,
                 onValueChange = { itemCostInput = it },
-                label = { Text("Cost in Cents") },
-                modifier = Modifier
-                    .height(64.dp)
-                    .onFocusChanged({ state ->
-                        if (!state.isFocused) {
-                            // Check for error
-                        }
-                    }),
-                singleLine = true,
-                isError = false,
-                colors = OutlinedTextFieldDefaults.colors(),
+                onFocusLost = {
+                    // Simplify the cost if possible
+                    itemCostInput = itemCostInput?.toSimplifiedForm()
+                },
                 enabled = !costStatusIsNoCost
             )
 

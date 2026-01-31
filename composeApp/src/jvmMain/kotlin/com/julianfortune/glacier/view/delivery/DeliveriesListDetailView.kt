@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
+import com.julianfortune.glacier.util.formatCents
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.EntryOptionsDropdownMenu
 import com.julianfortune.glacier.view.ScrollableColumn
@@ -32,7 +33,7 @@ fun formatLocalDate(d: LocalDate, style: FormatStyle = FormatStyle.MEDIUM): Stri
     return d.format(usDateFormatter)
 }
 
-fun calculateEntryTotal(entry: Entry): Long {
+fun calculateEntryTotalCents(entry: Entry): Long {
     if (entry.costStatus == CostStatus.NO_COST) {
         return 0L
     }
@@ -157,7 +158,7 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                         Text("Supplier: ${supplierMap[deliveryDetail?.data?.supplierId]?.data?.name}")
 
                         // TODO(P1): Make editable
-                        Text("Fees: ${deliveryDetail?.data?.feesCents?.let { it / 100 }}")
+                        Text("Fees: ${formatCents(deliveryDetail?.data?.feesCents ?: 0)}")
 
                         Spacer(Modifier.height(16.dp))
 
@@ -244,14 +245,14 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                                             )
 
                                             Text(
-                                                text = "${entry.itemCostCents}",
+                                                text = "$${formatCents(entry.itemCostCents)}",
                                                 modifier = Modifier.width(80.dp),
                                                 textAlign = TextAlign.End
                                             )
 
-                                            val totalEntryCost = calculateEntryTotal(entry)
+                                            val totalEntryCostCents = calculateEntryTotalCents(entry)
                                             Text(
-                                                text = "$totalEntryCost",
+                                                text = "$${formatCents(totalEntryCostCents)}",
                                                 modifier = Modifier.width(80.dp),
                                                 textAlign = TextAlign.End
                                             )
