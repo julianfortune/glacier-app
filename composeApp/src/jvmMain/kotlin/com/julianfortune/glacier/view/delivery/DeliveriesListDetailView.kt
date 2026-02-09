@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -16,13 +17,16 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.util.formatCents
 import com.julianfortune.glacier.view.Item
-import com.julianfortune.glacier.view.EntryOptionsDropdownMenu
 import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
+import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -44,6 +48,8 @@ fun calculateEntryTotalCents(entry: Entry): Long {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeliveriesPane(viewModel: DeliveryViewModel) {
+    val coroutineScope = rememberCoroutineScope()
+
     val deliveryHeadlines by viewModel.allDeliveries.collectAsState(emptyList())
     val selectedDeliveryId by viewModel.selectedDeliveryId.collectAsState()
 
@@ -65,7 +71,7 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
 
     val deliveryDetail by viewModel.selectedDeliveryDetail.collectAsState()
     val newDeliveryDialogOpen by viewModel.newDeliveryDialogIsVisible
-    val newEntryDialogOpen by viewModel.newEntryDialogIsVisible
+    val deliveryEntryAction by viewModel.deliveryEntryAction
 
     if (newDeliveryDialogOpen) {
         BasicAlertDialog(
@@ -82,7 +88,7 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
         }
     }
 
-    if (newEntryDialogOpen) {
+    if (deliveryEntryAction != null) {
         if (selectedDeliveryId == null) {
             throw IllegalStateException("Unable to create an entry without a delivery selected")
         }
@@ -96,7 +102,51 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
-                NewEntryForm(viewModel, selectedDeliveryId!!)
+                when (deliveryEntryAction) {
+                    is DeliveryEntryAction.CreateNew -> {
+                        NewEntryForm(
+                            viewModel,
+                            "New Entry",
+                            "Create",
+                            onSubmit = { entry ->
+                                coroutineScope.launch {
+                                    viewModel.saveEntry(selectedDeliveryId!!, entry)
+                                    viewModel.dismissEntryModal()
+                                }
+                            }
+                        )
+                    }
+
+                    is DeliveryEntryAction.Edit -> {
+                        NewEntryForm(
+                            viewModel,
+                            "Edit Entry",
+                            "Update",
+                            initialEntry = (deliveryEntryAction as DeliveryEntryAction.Edit).entry,
+                            onSubmit = { newEntry ->
+                                val currentDeliveryDetail: Entity<DeliveryDetail> =
+                                    deliveryDetail
+                                        ?: throw AssertionError("Unable to delete an entry because `deliveryDetail` is unexpectedly null")
+
+                                val updatedDelivery = currentDeliveryDetail.copy(
+                                    data = currentDeliveryDetail.data.copy(
+                                        entries = currentDeliveryDetail.data.entries?.mapIndexed { i, e ->
+                                            when {
+                                                i == (deliveryEntryAction as DeliveryEntryAction.Edit).index -> newEntry
+                                                else -> e
+                                            }
+                                        }
+                                    )
+                                )
+
+                                coroutineScope.launch {
+                                    viewModel.updateDelivery(updatedDelivery)
+                                    viewModel.dismissEntryModal()
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -262,7 +312,27 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                                             Row(
                                                 modifier = Modifier.width(32.dp)
                                             ) {
-                                                EntryOptionsDropdownMenu()
+                                                EntryOptionsDropdownMenu(
+                                                    edit = {
+                                                        viewModel.showEditEntry(index, entry)
+                                                    },
+                                                    delete = {
+                                                        // TODO(P4): Revisit this code to try to make more fluent
+                                                        val currentDeliveryDetail: Entity<DeliveryDetail> =
+                                                            deliveryDetail
+                                                                ?: throw AssertionError("Unable to delete an entry because `deliveryDetail` is unexpectedly null")
+
+                                                        val updatedDelivery = currentDeliveryDetail.copy(
+                                                            data = currentDeliveryDetail.data.copy(
+                                                                entries = currentDeliveryDetail.data.entries?.filterIndexed { i, _ -> i != index }
+                                                            )
+                                                        )
+
+                                                        coroutineScope.launch {
+                                                            viewModel.updateDelivery(updatedDelivery)
+                                                        }
+                                                    },
+                                                )
                                             }
                                         }
 

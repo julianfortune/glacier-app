@@ -31,6 +31,9 @@ SELECT * FROM DeliveryEntry WHERE deliveryId = :deliveryId;
 deleteById:
 DELETE FROM DeliveryEntry WHERE id = :id;
 
+deleteByDeliveryId:
+DELETE FROM DeliveryEntry WHERE deliveryId = :deliveryId;
+
 deleteAll:
 DELETE FROM DeliveryEntry;
 

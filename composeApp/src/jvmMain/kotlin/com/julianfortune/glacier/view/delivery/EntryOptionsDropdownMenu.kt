@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view
+package com.julianfortune.glacier.view.delivery
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -20,7 +20,10 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EntryOptionsDropdownMenu() {
+fun EntryOptionsDropdownMenu(
+    edit: () -> Unit,
+    delete: () -> Unit,
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Box {
@@ -43,7 +46,8 @@ fun EntryOptionsDropdownMenu() {
                 text = { Text("Edit") },
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    /* TODO(P1): Open edit entry modal */
+                    edit()
+                    expanded = false
                 }
             )
 
@@ -51,7 +55,8 @@ fun EntryOptionsDropdownMenu() {
                 text = { Text("Delete") },
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    /* TODO(P1): Delete entry */
+                    delete()
+                    expanded = false
                 }
             )
 

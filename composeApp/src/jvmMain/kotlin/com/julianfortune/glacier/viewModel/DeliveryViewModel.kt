@@ -13,6 +13,7 @@ import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -26,8 +27,8 @@ class DeliveryViewModel(
     private val _newDeliveryDialogIsVisible = mutableStateOf(false)
     val newDeliveryDialogIsVisible: State<Boolean> = _newDeliveryDialogIsVisible
 
-    private val _newEntryDialogIsVisible = mutableStateOf(false)
-    val newEntryDialogIsVisible: State<Boolean> = _newEntryDialogIsVisible
+    private val _newEntryDialogIsVisible = mutableStateOf<DeliveryEntryAction?>(null)
+    val deliveryEntryAction: State<DeliveryEntryAction?> = _newEntryDialogIsVisible
 
     // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
     // TODO(P5): Filtering, e.g., by time period
@@ -110,19 +111,11 @@ class DeliveryViewModel(
     }
 
     suspend fun updateDelivery(delivery: Entity<DeliveryDetail>) {
-        TODO()
+        return deliveryRepository.update(delivery)
     }
 
     suspend fun saveEntry(deliveryId: Long, entry: Entry) {
         deliveryRepository.insertDeliveryEntry(deliveryId, entry)
-    }
-
-    suspend fun updateEntry(deliveryId: Long, entry: Entity<Entry>) {
-        // TODO(P1): Editing entries
-    }
-
-    suspend fun deleteEntry(deliveryId: Long, entryId: Long) {
-        // TODO(P1): Deleting entries
     }
 
     fun showNewDelivery() {
@@ -139,11 +132,15 @@ class DeliveryViewModel(
     }
 
     fun showNewEntry() {
-        _newEntryDialogIsVisible.value = true
+        _newEntryDialogIsVisible.value = DeliveryEntryAction.CreateNew
     }
 
-    fun dismissNewEntry() {
-        _newEntryDialogIsVisible.value = false
+    fun showEditEntry(index: Int, entry: Entry) {
+        _newEntryDialogIsVisible.value = DeliveryEntryAction.Edit(index, entry)
+    }
+
+    fun dismissEntryModal() {
+        _newEntryDialogIsVisible.value = null
     }
 
 }

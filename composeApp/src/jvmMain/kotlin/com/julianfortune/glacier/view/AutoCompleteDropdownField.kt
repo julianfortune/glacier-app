@@ -22,24 +22,27 @@ data class Option<ID>(
     val title: String,
 )
 
-// TODO(P2): Implement async fetching...? (w debounce, see: https://stackoverflow.com/a/78908108)
+// TODO(P4): Implement async fetching...? (w debounce, see: https://stackoverflow.com/a/78908108)
 //  For performance probably won't be able to load all `item`s into memory at once ..
 //  Probably *can* get away with loading the suppliers statically, but might be easier to do both the same way..
 /**
  * Heavily inspired by: https://mui.com/material-ui/react-autocomplete/
  */
+
+// TODO(NEXT): Make this component 'controlled' so the delivery entry modal can control the initial value !!!
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun <ID> AutoCompleteDropdownField(
-    label: @Composable (() -> Unit)? = null,
+    selectedOption: Option<ID>?,
     options: List<Option<ID>>,
-    onSelectedChange: (ID?) -> Unit,
+    onSelectedChange: (Option<ID>?) -> Unit,
+    label: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var input by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf<Option<ID>?>(null) }
 
     val textFieldValue = remember(input, selectedOption) {
         input ?: selectedOption?.title ?: ""
@@ -57,7 +60,6 @@ fun <ID> AutoCompleteDropdownField(
 
     fun clear() {
         input = ""
-        selectedOption = null
         onSelectedChange(null)
     }
 
@@ -72,7 +74,7 @@ fun <ID> AutoCompleteDropdownField(
             label = label,
             onValueChange = {
                 input = it
-                selectedOption = null
+                onSelectedChange(null)
                 expanded = true
             },
             colors = OutlinedTextFieldDefaults.colors(),
@@ -135,11 +137,9 @@ fun <ID> AutoCompleteDropdownField(
                             .pointerHoverIcon(PointerIcon.Hand),
                         colors = MenuDefaults.itemColors().copy(textColor = textColor),
                         onClick = {
-                            selectedOption = option
+                            onSelectedChange(option)
                             input = null
                             expanded = false
-
-                            onSelectedChange(option.id)
                         },
                     )
                 }

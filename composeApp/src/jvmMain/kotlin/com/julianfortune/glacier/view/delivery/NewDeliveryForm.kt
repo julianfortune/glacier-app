@@ -38,14 +38,14 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
     var receivedDateInput by remember { mutableStateOf("") }
     var parsedDate by remember { mutableStateOf<LocalDate?>(null) }
     var dateError by remember { mutableStateOf(false) }
-    var supplierId by remember { mutableStateOf<Long?>(null) }
+    var selectedSupplier by remember { mutableStateOf<Option<Long>?>(null) }
 
     LaunchedEffect(receivedDateInput) {
         parsedDate = parseDateSafe(receivedDateInput)
     }
 
-    val isValid = remember(parsedDate, supplierId) {
-        parsedDate != null && supplierId != null
+    val isValid = remember(parsedDate, selectedSupplier) {
+        parsedDate != null && selectedSupplier != null
     }
 
     Column(
@@ -79,13 +79,14 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
 
         // Supplier Field
         AutoCompleteDropdownField(
-            label = { Text("Supplier") },
+            selectedOption = selectedSupplier,
             options = suppliers.map {
                 Option(it.id, it.data.name)
             },
-            onSelectedChange = { newId ->
-                supplierId = newId
+            onSelectedChange = { newSupplier ->
+                selectedSupplier = newSupplier
             },
+            label = { Text("Supplier") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -111,7 +112,7 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                     val delivery = DeliveryDetail(
                         // This should be defined in order for button to be enabled
                         parsedDate!!, // TODO(P3): Error handling ..?
-                        supplierId,
+                        selectedSupplier?.id,
                         null,
                         null,
                         emptyList()

@@ -104,6 +104,28 @@ class DeliveryRepository(private val database: Database) {
         return deliveryId
     }
 
+    suspend fun update(delivery: Entity<DeliveryDetail>) {
+        val now = Instant.now()
+
+        val updateResult = database.deliveryQueries.update(
+            LocalDateCodec.serialize(delivery.data.receivedDate),
+            delivery.data.supplierId,
+            delivery.data.taxesCents,
+            delivery.data.feesCents,
+            now.toString(),
+        )
+
+        println("updateResult=$updateResult")
+
+        // Delete all the entries and insert all new ones
+        // TODO: Maybe it would be helpful to assign each entry an 'index' because order matters, and then
+        //  we can do mutations more efficiently
+        database.deliveryEntryQueries.deleteByDeliveryId(delivery.id)
+        delivery.data.entries?.forEach { entry ->
+            insertDeliveryEntry(delivery.id, entry)
+        }
+    }
+
     suspend fun insertDeliveryEntry(deliveryId: Long, entry: Entry) {
         val costStatus = CostStatusCodec.serialize(entry.costStatus)
         val entryId = database.deliveryEntryQueries.insert(

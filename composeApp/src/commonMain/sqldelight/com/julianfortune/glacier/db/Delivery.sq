@@ -43,6 +43,15 @@ INSERT INTO Delivery (
 -- NOTE: The error is due to a bug in intelliJ, see https://github.com/sqldelight/sqldelight/issues/5725
 RETURNING id;
 
+update:
+UPDATE Delivery SET
+    receivedDate = :receivedDate,
+    supplierId = :supplierId,
+    taxesCents = :taxesCents,
+    feesCents = :feesCents,
+    updateDateTime = :updateDateTime
+;
+
 -- SEED DATA
 -- INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)
 -- VALUES

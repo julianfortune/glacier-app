@@ -20,19 +20,32 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
-    val coroutineScope = rememberCoroutineScope()
-
+fun NewEntryForm(
+    viewModel: DeliveryViewModel,
+    title: String,
+    submitButtonText: String,
+    initialEntry: Entry? = null,
+    onSubmit: (entry: Entry) -> Unit
+) {
     val items by viewModel.allItems.collectAsState()
 
-    var itemId by remember { mutableStateOf<Long?>(null) }
-    var itemCountInput by remember { mutableStateOf("") }
-    var itemCostInput by remember { mutableStateOf<CurrencyInput?>(null) }
-    var costStatusIsNoCost by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
+    var itemCountInput by remember { mutableStateOf(initialEntry?.itemCount?.toString() ?: "") }
+    var itemCostInput by remember { mutableStateOf(initialEntry?.itemCostCents?.let { CurrencyInput.fromLong(it) }) }
+    var costStatusIsNoCost by remember { mutableStateOf((initialEntry?.costStatus == CostStatus.NO_COST) ?: false) }
 
     // Parsed and valid values
     var itemCount by remember { mutableStateOf<Long?>(null) }
     var itemCostCents by remember { mutableStateOf<Long?>(null) }
+
+    // Update the selected item once the `items` state populates
+    LaunchedEffect(initialEntry, items) {
+        selectedItem = initialEntry?.itemId?.let { initialItemId ->
+            items.find { it.id == initialEntry.itemId }?.let { item ->
+                Option(initialItemId, item.data.name)
+            }
+        }
+    }
 
     LaunchedEffect(itemCountInput) {
         itemCount = itemCountInput.toLongOrNull()
@@ -42,10 +55,10 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
         itemCostCents = itemCostInput?.toLong()
     }
 
-    val isValid = remember(itemId, itemCount, costStatusIsNoCost, itemCostCents) {
+    val isValid = remember(selectedItem, itemCount, costStatusIsNoCost, itemCostCents) {
         val costIsValid = costStatusIsNoCost || itemCostCents != null
 
-        itemId != null && itemCount != null && costIsValid
+        selectedItem != null && itemCount != null && costIsValid
     }
 
     Column(
@@ -53,7 +66,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            "New Entry",
+            title,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -61,13 +74,14 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
 
         Row(modifier = Modifier.fillMaxWidth()) {
             AutoCompleteDropdownField(
-                label = { Text("Item") },
+                selectedOption = selectedItem,
                 options = items.map {
                     Option(it.id, "${it.data.name} (${it.data.weightHundredths / 100} ${it.data.weightUnits})")
                 },
-                onSelectedChange = { newId ->
-                    itemId = newId
+                onSelectedChange = { newItem ->
+                    selectedItem = newItem
                 },
+                label = { Text("Item") },
                 modifier = Modifier
             )
         }
@@ -128,7 +142,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
         ) {
             TextButton(
                 onClick = {
-                    viewModel.dismissNewEntry()
+                    viewModel.dismissEntryModal()
                 }
             ) {
                 Text("Cancel")
@@ -148,7 +162,7 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
                         else -> itemCostCents!!
                     }
                     val entry = Entry(
-                        itemId!!,
+                        selectedItem!!.id,
                         itemCount!!,
                         costStatus,
                         costCents,
@@ -157,13 +171,10 @@ fun NewEntryForm(viewModel: DeliveryViewModel, deliveryId: Long) {
                         null,
                     )
 
-                    coroutineScope.launch {
-                        viewModel.saveEntry(deliveryId, entry)
-                        viewModel.dismissNewEntry()
-                    }
+                    onSubmit(entry)
                 },
             ) {
-                Text("Create")
+                Text(submitButtonText)
             }
         }
     }
