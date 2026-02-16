@@ -36,7 +36,7 @@ class DeliveryRepositoryTest {
     fun insert() {
         // GIVEN
         val itemId = runBlocking {
-            database.itemQueries.insert("Food", 32L, "OZ")
+            database.itemQueries.insert("Food", "Box", 32L)
         }
         val supplierId = runBlocking {
             database.supplierQueries.insert("Foo Bar")
@@ -45,9 +45,11 @@ class DeliveryRepositoryTest {
         val entry = Entry(
             itemId,
             10,
-            CostStatus.NO_COST,
+            "crate",
             1500L,
             null,
+            CostStatus.NO_COST,
+            8000,
             emptyList(),
             emptyList(),
         )
@@ -76,7 +78,7 @@ class DeliveryRepositoryTest {
 
         val deliveryEntry = database.deliveryEntryQueries.getByDeliveryId(id).executeAsOne()
         assertThat(deliveryEntry.itemId).isEqualTo(entry.itemId)
-        assertThat(deliveryEntry.itemCount).isEqualTo(entry.itemCount)
+        assertThat(deliveryEntry.unitCount).isEqualTo(entry.unitCount)
         assertThat(deliveryEntry.costStatus).isEqualTo(CostStatusCodec.serialize(entry.costStatus))
         // TODO: Aggregate
 

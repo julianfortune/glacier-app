@@ -42,7 +42,7 @@ fun calculateEntryTotalCents(entry: Entry): Long {
         return 0L
     }
 
-    return entry.itemCount * entry.itemCostCents
+    return entry.unitCount * entry.unitCostCents
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -288,14 +288,15 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                                                 overflow = TextOverflow.Ellipsis
                                             )
 
+                                            // TODO(ASAP): Handle new/changed columns
                                             Text(
-                                                text = "${entry.itemCount}",
+                                                text = "${entry.unitCount}",
                                                 modifier = Modifier.width(60.dp),
                                                 textAlign = TextAlign.End
                                             )
 
                                             Text(
-                                                text = "$${formatCents(entry.itemCostCents)}",
+                                                text = "$${formatCents(entry.unitCostCents)}",
                                                 modifier = Modifier.width(80.dp),
                                                 textAlign = TextAlign.End
                                             )

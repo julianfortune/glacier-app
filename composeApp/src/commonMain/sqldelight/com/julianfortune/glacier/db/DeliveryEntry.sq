@@ -1,21 +1,19 @@
 CREATE TABLE IF NOT EXISTS DeliveryEntry (
     id INTEGER PRIMARY KEY,
+
     deliveryId INTEGER NOT NULL,
     itemId INTEGER NOT NULL,
-    itemCount INTEGER NOT NULL,
+
+    unitCount INTEGER NOT NULL,
+    unitName TEXT NOT NULL, -- E.g., 'loose', 'bulk', 'crate', 'barrel', 'case'
+    unitWeightGrams INTEGER NOT NULL,
+    itemsPerUnit INTEGER, -- Optional value for 'pack' size
 
     costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ) NOT NULL,
-    itemCostCents INTEGER NOT NULL,
-
-    -- (Optional) Keep track of a 'logical' 'aggregation' of items used for display but ignored for calculations
-    aggregateLabel TEXT,
-    aggregateCount INTEGER,
+    unitCostCents INTEGER NOT NULL, -- Rename from 'itemCostCents'
 
     FOREIGN KEY(deliveryId) REFERENCES Delivery(id),
-    FOREIGN KEY(itemId) REFERENCES Item(id),
-
-    -- Aggregation is optional as a mutual pair--either both present or both null
-    CHECK((aggregateLabel IS NULL AND aggregateCount IS NULL) OR (aggregateLabel IS NOT NULL AND aggregateCount IS NOT NULL))
+    FOREIGN KEY(itemId) REFERENCES Item(id)
 );
 
 -- QUERIES
@@ -41,21 +39,21 @@ insert:
 INSERT INTO DeliveryEntry (
     deliveryId,
     itemId,
-    itemCount,
+    unitCount,
+    unitName,
+    unitWeightGrams,
+    itemsPerUnit,
     costStatus,
-    itemCostCents,
-    aggregateLabel,
-    aggregateCount
+    unitCostCents
 ) VALUES (
     :deliveryId,
     :itemId,
-    :itemCount,
+    :unitCount,
+    :unitName,
+    :unitWeightGrams,
+    :itemsPerUnit,
     :costStatus,
-    :itemCostCents,
-    :aggregateLabel,
-    :aggregateCount
+    :unitCostCents
 );
-
--- TODO: Inserts...
 
 -- TODO: SEED DATA ...

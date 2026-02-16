@@ -16,7 +16,6 @@ import com.julianfortune.glacier.view.CurrencyInput
 import com.julianfortune.glacier.view.CurrencyInputTextField
 import com.julianfortune.glacier.view.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,8 +29,8 @@ fun NewEntryForm(
     val items by viewModel.allItems.collectAsState()
 
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
-    var itemCountInput by remember { mutableStateOf(initialEntry?.itemCount?.toString() ?: "") }
-    var itemCostInput by remember { mutableStateOf(initialEntry?.itemCostCents?.let { CurrencyInput.fromLong(it) }) }
+    var itemCountInput by remember { mutableStateOf(initialEntry?.unitCount?.toString() ?: "") }
+    var itemCostInput by remember { mutableStateOf(initialEntry?.unitCostCents?.let { CurrencyInput.fromLong(it) }) }
     var costStatusIsNoCost by remember { mutableStateOf((initialEntry?.costStatus == CostStatus.NO_COST) ?: false) }
 
     // Parsed and valid values
@@ -76,7 +75,7 @@ fun NewEntryForm(
             AutoCompleteDropdownField(
                 selectedOption = selectedItem,
                 options = items.map {
-                    Option(it.id, "${it.data.name} (${it.data.weightHundredths / 100} ${it.data.weightUnits})")
+                    Option(it.id, it.data.name + if (it.data.weightGrams != null) { "(${it.data.weightGrams})" } else "")
                 },
                 onSelectedChange = { newItem ->
                     selectedItem = newItem
@@ -161,12 +160,15 @@ fun NewEntryForm(
                         costStatusIsNoCost -> 0L
                         else -> itemCostCents!!
                     }
+                    // TODO(ASAP): Handle the new / changed values
                     val entry = Entry(
                         selectedItem!!.id,
                         itemCount!!,
+                        TODO("Unit name"),
+                        TODO("Unit weight"),
+                        null,
                         costStatus,
                         costCents,
-                        null,
                         null,
                         null,
                     )

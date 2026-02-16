@@ -1,10 +1,11 @@
 -- The core entity representing some quantifiable amount of food or other resource
 CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    -- TODO(P3): Update to get away from 'weight'--needs to represent the quantity more generally (e.g., could be bunches of bananas, heads of lettuce, etc.)
-    weightHundredths INTEGER NOT NULL, -- Stores with 2 decimals of precision (multiple by 100 for value)
-    weightUnits TEXT CHECK( weightUnits IN ('OZ','LB') ) NOT NULL -- One of set of possible units (bc application needs to implement conversions)
+    name TEXT NOT NULL,
+    description TEXT, -- A physical descipriont of the item--E.g., Box, Can, Head, Bunch,
+    weightGrams INTEGER, -- Optional, estimated/average weight for the item
+
+    UNIQUE(name, description, weightGrams)
 );
 
 -- QUERIES
@@ -23,24 +24,26 @@ DELETE FROM Item;
 insert:
 INSERT INTO Item (
     name,
-    weightHundredths,
-    weightUnits
+    description,
+    weightGrams
 ) VALUES (
     :name,
-    :weightHundredths,
-    :weightUnits
+    :description,
+    :weightGrams
 );
 
 -- SEED DATA
--- INSERT INTO Item (id, name, weightHundredths, weightUnits)
--- VALUES
---     (0, "Sliced Peaches in Water", 1450, 'OZ'),
---     (1, "Cut Green Beans", 1500, 'OZ'),
---     (2, "Tuna in Water", 400, 'OZ'),
---     (3, "Chunk White Chicken", 1250, 'OZ'),
---     (4, "Low Sodium Tomato Soup", 1075, 'OZ'),
---     (5, "Lettuce", 800, 'OZ'),
---     (6, "Corn", 1600, 'OZ'),
---     (7, "Broccoli", 1600, 'OZ'),
---     (8, "Frozen Peas", 2400, 'OZ')
--- ;
+INSERT INTO Item (id, name, description, weightGrams)
+VALUES
+    (0, "Sliced Peaches in Water", "Can", 1450),
+    (1, "Cut Green Beans", "Can", 1500),
+    (2, "Tuna in Water", "Can", 400),
+    (3, "Fresh Green Beans", "Bulk", NULL),
+    (4, "Bananas", "Bunch", 900),
+    (5, "Frozen Peas", NULL, 2400),
+    (6, "Chunk White Chicken", NULL, 1250),
+    (7, "Low Sodium Tomato Soup", NULL,1075),
+    (8, "Lettuce", "Head", NULL),
+    (9, "Corn", "Ear", 1200),
+    (10, "Broccoli", 1600, 'OZ')
+;

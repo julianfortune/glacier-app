@@ -5,7 +5,6 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.codec.LocalDateCodec
-import com.julianfortune.glacier.codec.WeightUnitCodec
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
@@ -23,24 +22,21 @@ class ItemRepository(private val database: Database) {
             .mapToList(Dispatchers.IO)
             .map { items ->
                 items.map { i ->
-                    val weightUnits = WeightUnitCodec.deserialize(i.weightUnits).orThrow()
-
-                    // TODO(P1): Fetch categories
-                    Entity(i.id, Item(i.name, i.weightHundredths, weightUnits, emptyList()))
+                    // TODO(?): Fetch categories as well
+                    Entity(i.id, Item(i.name, i.description, i.weightGrams, emptyList()))
                 }
             }
     }
 
     suspend fun getById(id: Long): Entity<Item> {
         val item = database.itemQueries.getById(id).awaitAsOne()
-        val units = WeightUnitCodec.deserialize(item.weightUnits).orThrow()
         val itemCategoryIds = database
             .itemCategoryQueries
             .getAllByItemId(item.id)
             .awaitAsList()
             .map { it.categoryId }
 
-        return Entity(item.id, Item(item.name, item.weightHundredths, units, itemCategoryIds))
+        return Entity(item.id, Item(item.name, item.description, item.weightGrams, itemCategoryIds))
     }
 
 }

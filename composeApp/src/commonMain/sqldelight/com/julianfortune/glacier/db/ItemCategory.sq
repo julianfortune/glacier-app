@@ -36,12 +36,12 @@ INSERT INTO ItemCategory (
 );
 
 -- SEED DATA
--- INSERT INTO ItemCategory (itemId, categoryId)
--- VALUES
---     (0, 4),
---     (0, 6),
---     (1, 1),
---     (1, 2),
---     (1, 5)
---     -- ...
--- ;
+INSERT INTO ItemCategory (itemId, categoryId)
+VALUES
+    (0, 4),
+    (0, 6),
+    (1, 1),
+    (1, 2),
+    (1, 5)
+    -- ...
+;

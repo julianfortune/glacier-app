@@ -9,7 +9,6 @@ import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.data.domain.entry.Allocation
 import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.data.domain.entry.EntryAggregation
 import com.julianfortune.glacier.db.Database
 import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.Dispatchers
@@ -43,12 +42,6 @@ class DeliveryRepository(private val database: Database) {
 
             val entries = entryRows.map { entry ->
                 val costStatus = CostStatusCodec.deserialize(entry.costStatus).orThrow()
-                val aggregate = if (entry.aggregateLabel != null && entry.aggregateCount != null) {
-                    EntryAggregation(
-                        entry.aggregateLabel,
-                        entry.aggregateCount
-                    )
-                } else null
 
                 // TODO(P2): Plug in the foreign key results
                 val purchasingAccounts = emptyList<Allocation<Long>>()
@@ -56,10 +49,12 @@ class DeliveryRepository(private val database: Database) {
 
                 Entry(
                     entry.itemId,
-                    entry.itemCount,
+                    entry.unitCount,
+                    entry.unitName,
+                    entry.unitWeightGrams,
+                    entry.itemsPerUnit,
                     costStatus,
-                    entry.itemCostCents,
-                    aggregate,
+                    entry.unitCostCents,
                     purchasingAccounts,
                     programs,
                 )
@@ -131,11 +126,12 @@ class DeliveryRepository(private val database: Database) {
         val entryId = database.deliveryEntryQueries.insert(
             deliveryId,
             entry.itemId,
-            entry.itemCount,
+            entry.unitCount,
+            entry.unitName,
+            entry.unitWeightGrams,
+            entry.itemsPerUnit,
             costStatus,
-            entry.itemCostCents,
-            entry.aggregate?.label,
-            entry.aggregate?.count,
+            entry.unitCostCents,
         )
 
         entry.programAllocations?.forEach { allocation ->

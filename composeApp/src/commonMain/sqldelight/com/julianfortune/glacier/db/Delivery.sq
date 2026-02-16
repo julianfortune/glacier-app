@@ -52,9 +52,3 @@ UPDATE Delivery SET
     updateDateTime = :updateDateTime
 ;
 
--- SEED DATA
--- INSERT INTO Delivery (receivedDate, supplierId, creationDateTime, updateDateTime)
--- VALUES
---     ("2025-10-01", 0, "2025-10-01T00:00:00Z", "2025-10-01T00:00:00Z")
---     -- ...
--- ;
