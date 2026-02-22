@@ -60,7 +60,7 @@ fun EntryOptionsDropdownMenu(
                 }
             )
 
-            // TODO(P3): Swap up / down
+            // TODO(P3): Move up / down
         }
     }
 }

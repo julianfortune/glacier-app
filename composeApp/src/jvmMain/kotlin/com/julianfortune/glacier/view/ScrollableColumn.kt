@@ -3,7 +3,9 @@ package com.julianfortune.glacier.view
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,12 +38,18 @@ data class Item(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ScrollableColumn(items: List<Item>) {
-    if (items.isEmpty()) {
-        Text("No items to display!")
-    } else {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (items.isEmpty()) {
+            Column (
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("No items to display.")
+            }
+        } else {
             val listScrollState = rememberLazyListState()
 
             LazyColumn(

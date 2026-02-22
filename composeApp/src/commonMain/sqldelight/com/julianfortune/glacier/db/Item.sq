@@ -33,17 +33,17 @@ INSERT INTO Item (
 );
 
 -- SEED DATA
-INSERT INTO Item (id, name, description, weightGrams)
-VALUES
-    (0, "Sliced Peaches in Water", "Can", 1450),
-    (1, "Cut Green Beans", "Can", 1500),
-    (2, "Tuna in Water", "Can", 400),
-    (3, "Fresh Green Beans", "Bulk", NULL),
-    (4, "Bananas", "Bunch", 900),
-    (5, "Frozen Peas", NULL, 2400),
-    (6, "Chunk White Chicken", NULL, 1250),
-    (7, "Low Sodium Tomato Soup", NULL,1075),
-    (8, "Lettuce", "Head", NULL),
-    (9, "Corn", "Ear", 1200),
-    (10, "Broccoli", 1600, 'OZ')
-;
+-- INSERT INTO Item (id, name, description, weightGrams)
+-- VALUES
+--     (0, "Sliced Peaches in Water", "Can", 1450),
+--     (1, "Cut Green Beans", "Can", 1500),
+--     (2, "Tuna in Water", "Can", 400),
+--     (3, "Fresh Green Beans", "Bulk", NULL),
+--     (4, "Bananas", "Bunch", 900),
+--     (5, "Frozen Peas", NULL, 2400),
+--     (6, "Chunk White Chicken", NULL, 1250),
+--     (7, "Low Sodium Tomato Soup", NULL,1075),
+--     (8, "Lettuce", "Head", NULL),
+--     (9, "Corn", "Ear", 1200),
+--     (10, "Broccoli", 1600, 'OZ')
+-- ;

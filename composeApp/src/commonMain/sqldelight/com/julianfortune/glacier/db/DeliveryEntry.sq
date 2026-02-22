@@ -55,5 +55,3 @@ INSERT INTO DeliveryEntry (
     :costStatus,
     :unitCostCents
 );
-
--- TODO: SEED DATA ...

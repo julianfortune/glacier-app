@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.ScrollableColumn
-import com.julianfortune.glacier.view.delivery.DeliveriesPane
+import com.julianfortune.glacier.view.delivery.DeliveriesListDetailView
 import com.julianfortune.glacier.viewModel.CategoryViewModel
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
@@ -82,7 +82,7 @@ fun App() {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
                     NavigationPage.SUPPLIERS -> SupplierList(supplierViewModel)
-                    NavigationPage.DELIVERIES -> DeliveriesPane(deliveriesViewModel)
+                    NavigationPage.DELIVERIES -> DeliveriesListDetailView(deliveriesViewModel)
                     else -> Column(
                         Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,

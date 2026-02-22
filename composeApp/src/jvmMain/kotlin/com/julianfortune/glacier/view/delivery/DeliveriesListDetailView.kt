@@ -47,7 +47,7 @@ fun calculateEntryTotalCents(entry: Entry): Long {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeliveriesPane(viewModel: DeliveryViewModel) {
+fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
     val deliveryHeadlines by viewModel.allDeliveries.collectAsState(emptyList())
@@ -217,11 +217,6 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                             style = MaterialTheme.typography.headlineSmall,
                         )
 
-                        // TODO(NEXT): Display editable entries list
-                        //  -> focus first on editing and saving functionality before any UX upgrades
-                        //  -> just go with a simple column with dividers or something standard
-                        //  -> use an `...` menu for all the actions (e.g., `Edit`, `Delete`)
-
                         Column(
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.padding(vertical = 24.dp)
@@ -238,7 +233,7 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                                         .fillMaxWidth(),
                                 ) {
                                     Text(
-                                        text = "Name",
+                                        text = "Item",
                                         modifier = Modifier.weight(1f),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
@@ -307,8 +302,6 @@ fun DeliveriesPane(viewModel: DeliveryViewModel) {
                                                 modifier = Modifier.width(80.dp),
                                                 textAlign = TextAlign.End
                                             )
-
-                                            // TODO(P1): Ellipses menu with actions: edit, delete, move up, move down
 
                                             Row(
                                                 modifier = Modifier.width(32.dp)
