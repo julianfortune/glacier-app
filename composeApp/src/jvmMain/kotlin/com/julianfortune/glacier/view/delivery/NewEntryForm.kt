@@ -1,7 +1,6 @@
 package com.julianfortune.glacier.view.delivery
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.remember
@@ -42,35 +41,50 @@ fun NewEntryForm(
     val items by viewModel.allItems.collectAsState()
 
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
-    var itemCountInput by remember { mutableStateOf(initialEntry?.unitCount?.toString() ?: "") }
-    var itemCostInput by remember { mutableStateOf(initialEntry?.unitCostCents?.let { CurrencyInput.fromLong(it) }) }
-    var costStatusIsNoCost by remember { mutableStateOf((initialEntry?.costStatus == CostStatus.NO_COST) ?: false) }
+    var unitName by remember { mutableStateOf(initialEntry?.unitName ?: "") }
+    var itemsPerUnitInput by remember { mutableStateOf(initialEntry?.itemsPerUnit?.toString() ?: "") }
+    var unitWeightInput by remember { mutableStateOf(initialEntry?.unitWeightGrams?.toString() ?: "") }
+
+    var costStatusIsNoCost by remember { mutableStateOf((initialEntry?.costStatus == CostStatus.NO_COST)) }
+    var unitCostInput by remember { mutableStateOf(initialEntry?.unitCostCents?.let { CurrencyInput.fromLong(it) }) }
+
+    var unitCountInput by remember { mutableStateOf(initialEntry?.unitCount?.toString() ?: "") }
 
     // Parsed and valid values
-    var itemCount by remember { mutableStateOf<Long?>(null) }
-    var itemCostCents by remember { mutableStateOf<Long?>(null) }
+    var unitCount by remember { mutableStateOf<Long?>(null) }
+    var unitCostCents by remember { mutableStateOf<Long?>(null) }
+    var itemsPerUnit by remember { mutableStateOf<Long?>(null) }
+    var unitWeightGrams by remember { mutableStateOf<Long?>(null) }
 
     // Update the selected item once the `items` state populates
     LaunchedEffect(initialEntry, items) {
         selectedItem = initialEntry?.itemId?.let { initialItemId ->
             items.find { it.id == initialEntry.itemId }?.let { item ->
-                Option(initialItemId, item.data.name)
+                Option(initialItemId, renderItemName(item.data))
             }
         }
     }
 
-    LaunchedEffect(itemCountInput) {
-        itemCount = itemCountInput.toLongOrNull()
+    LaunchedEffect(unitCountInput) {
+        unitCount = unitCountInput.toLongOrNull()
     }
 
-    LaunchedEffect(itemCostInput) {
-        itemCostCents = itemCostInput?.toLong()
+    LaunchedEffect(unitCostInput) {
+        unitCostCents = unitCostInput?.toLong()
     }
 
-    val isValid = remember(selectedItem, itemCount, costStatusIsNoCost, itemCostCents) {
-        val costIsValid = costStatusIsNoCost || itemCostCents != null
+    LaunchedEffect(unitWeightInput) {
+        unitWeightGrams = unitWeightInput.toLongOrNull()
+    }
 
-        selectedItem != null && itemCount != null && costIsValid
+    LaunchedEffect(itemsPerUnitInput) {
+        itemsPerUnit = itemsPerUnitInput.toLongOrNull()
+    }
+
+    val isValid = remember(selectedItem, unitCount, costStatusIsNoCost, unitCostCents) {
+        val costIsValid = costStatusIsNoCost || unitCostCents != null
+
+        selectedItem != null && unitWeightGrams != null && unitCount != null && costIsValid
     }
 
     Column(
@@ -100,8 +114,8 @@ fun NewEntryForm(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = "Case", // TODO
-                onValueChange = {  }, // TODO
+                value = unitName,
+                onValueChange = { unitName = it },
                 label = { Text("Unit") },
                 modifier = Modifier
                     .height(64.dp)
@@ -117,8 +131,8 @@ fun NewEntryForm(
             )
 
             OutlinedTextField(
-                value = "Case", // TODO
-                onValueChange = {  }, // TODO
+                value = itemsPerUnitInput,
+                onValueChange = { itemsPerUnitInput = it },
                 label = { Text("Pack Size") },
                 modifier = Modifier
                     .height(64.dp)
@@ -138,9 +152,9 @@ fun NewEntryForm(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = "800g", // TODO
-                    onValueChange = {  }, // TODO
-                    label = { Text("Weight") },
+                    value = unitWeightInput,
+                    onValueChange = { unitWeightInput = it },
+                    label = { Text("Weight (grams)") },
                     modifier = Modifier
                         .height(64.dp)
                         .onFocusChanged({ state ->
@@ -152,13 +166,6 @@ fun NewEntryForm(
                     isError = false,
                     colors = OutlinedTextFieldDefaults.colors(),
                 )
-                // TODO: Dropdown selector ?
-                Checkbox(
-                    // TODO
-                    checked = costStatusIsNoCost,
-                    onCheckedChange = { costStatusIsNoCost = it }
-                )
-                Text("Specify exact weight")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -169,11 +176,11 @@ fun NewEntryForm(
             ) {
                 CurrencyInputTextField(
                     label = { Text("Unit Cost") },
-                    value = itemCostInput,
-                    onValueChange = { itemCostInput = it },
+                    value = unitCostInput,
+                    onValueChange = { unitCostInput = it },
                     onFocusLost = {
                         // Simplify the cost if possible
-                        itemCostInput = itemCostInput?.toSimplifiedForm()
+                        unitCostInput = unitCostInput?.toSimplifiedForm()
                     },
                     enabled = !costStatusIsNoCost
                 )
@@ -190,8 +197,8 @@ fun NewEntryForm(
             }
 
             OutlinedTextField(
-                value = itemCountInput,
-                onValueChange = { itemCountInput = it },
+                value = unitCountInput,
+                onValueChange = { unitCountInput = it },
                 label = { Text("Count") },
                 modifier = Modifier
                     .height(64.dp)
@@ -233,15 +240,14 @@ fun NewEntryForm(
                     }
                     val costCents = when {
                         costStatusIsNoCost -> 0L
-                        else -> itemCostCents!!
+                        else -> unitCostCents!!
                     }
-                    // TODO(ASAP): Handle the new / changed values
                     val entry = Entry(
                         selectedItem!!.id,
-                        itemCount!!,
-                        TODO("Unit name"),
-                        TODO("Unit weight"),
-                        null,
+                        unitCount!!,
+                        unitName,
+                        unitWeightGrams!!,
+                        itemsPerUnit,
                         costStatus,
                         costCents,
                         null,

@@ -45,5 +45,5 @@ INSERT INTO Item (
 --     (7, "Low Sodium Tomato Soup", NULL,1075),
 --     (8, "Lettuce", "Head", NULL),
 --     (9, "Corn", "Ear", 1200),
---     (10, "Broccoli", 1600, 'OZ')
+--     (10, "Broccoli", NULL, NULL)
 -- ;
