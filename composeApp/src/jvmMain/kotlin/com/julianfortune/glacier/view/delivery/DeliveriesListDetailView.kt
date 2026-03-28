@@ -192,6 +192,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                     Text("No delivery selected.")
                 }
             } else {
+                // TODO(P2): Move into separate composable file
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -239,6 +240,15 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                         overflow = TextOverflow.Ellipsis
                                     )
 
+                                    // TODO(P1): Add `Unit`, `Unit Weight`, `Total` (weight)
+                                    // TODO(P1): Reorder to put unit columns together
+
+                                    Text(
+                                        text = "Unit Cost",
+                                        modifier = Modifier.width(80.dp),
+                                        textAlign = TextAlign.End
+                                    )
+
                                     Text(
                                         text = "Count",
                                         modifier = Modifier.width(60.dp),
@@ -247,12 +257,6 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
 
                                     Text(
                                         text = "Cost",
-                                        modifier = Modifier.width(80.dp),
-                                        textAlign = TextAlign.End
-                                    )
-
-                                    Text(
-                                        text = "Total",
                                         modifier = Modifier.width(80.dp),
                                         textAlign = TextAlign.End
                                     )
@@ -285,17 +289,17 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
 
                                             // TODO(ASAP): Handle new/changed columns
                                             Text(
-                                                text = "${entry.unitCount}",
-                                                modifier = Modifier.width(60.dp),
-                                                textAlign = TextAlign.End
-                                            )
-
-                                            Text(
                                                 text = "$${formatCents(entry.unitCostCents)}",
                                                 modifier = Modifier.width(80.dp),
                                                 textAlign = TextAlign.End
                                             )
 
+                                            Text(
+                                                text = "${entry.unitCount}",
+                                                modifier = Modifier.width(60.dp),
+                                                textAlign = TextAlign.End
+                                            )
+                                            
                                             val totalEntryCostCents = calculateEntryTotalCents(entry)
                                             Text(
                                                 text = "$${formatCents(totalEntryCostCents)}",
