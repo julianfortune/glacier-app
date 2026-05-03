@@ -299,7 +299,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                                 modifier = Modifier.width(60.dp),
                                                 textAlign = TextAlign.End
                                             )
-                                            
+
                                             val totalEntryCostCents = calculateEntryTotalCents(entry)
                                             Text(
                                                 text = "$${formatCents(totalEntryCostCents)}",

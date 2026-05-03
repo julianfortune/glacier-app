@@ -1,12 +1,9 @@
 package com.julianfortune.glacier.codec
 
-import com.julianfortune.glacier.data.domain.item.WeightUnit
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.orThrow
-import dev.forkhandles.result4k.valueOrNull
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDate
