@@ -3,6 +3,7 @@ package com.julianfortune.glacier.repository
 import com.julianfortune.glacier.codec.CostStatusCodec
 import com.julianfortune.glacier.codec.LocalDateCodec
 import com.julianfortune.glacier.createTestDatabase
+import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
@@ -46,7 +47,7 @@ class DeliveryRepositoryTest {
             itemId,
             10,
             "crate",
-            1500L,
+            Weight.ofCentigrams(150000),
             null,
             CostStatus.NO_COST,
             8000,

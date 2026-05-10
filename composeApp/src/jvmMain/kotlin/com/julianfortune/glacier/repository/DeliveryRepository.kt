@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.codec.CostStatusCodec
 import com.julianfortune.glacier.codec.LocalDateCodec
 import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.data.domain.entry.Allocation
@@ -46,12 +47,13 @@ class DeliveryRepository(private val database: Database) {
                 // TODO(P2): Plug in the foreign key results
                 val purchasingAccounts = emptyList<Allocation<Long>>()
                 val programs = emptyList<Allocation<Long>>()
+                val unitWeight = entry.unitWeightCentigrams.let(Weight::ofCentigrams)
 
                 Entry(
                     entry.itemId,
                     entry.unitCount,
                     entry.unitName,
-                    entry.unitWeightGrams,
+                    unitWeight,
                     entry.itemsPerUnit,
                     costStatus,
                     entry.unitCostCents,
@@ -128,7 +130,7 @@ class DeliveryRepository(private val database: Database) {
             entry.itemId,
             entry.unitCount,
             entry.unitName,
-            entry.unitWeightGrams,
+            entry.unitWeight.centigrams,
             entry.itemsPerUnit,
             costStatus,
             entry.unitCostCents,

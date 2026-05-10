@@ -10,7 +10,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
-import com.julianfortune.glacier.view.Option
+import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -111,7 +111,7 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                 onClick = {
                     val delivery = DeliveryDetail(
                         // This should be defined in order for button to be enabled
-                        parsedDate!!, // TODO(P3): Error handling ..?
+                        parsedDate!!, // TODO(P3): Better error handling / typing ..?
                         selectedSupplier?.id,
                         null,
                         null,

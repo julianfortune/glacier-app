@@ -21,9 +21,9 @@ insert:
 INSERT INTO Program (name) VALUES (:name);
 
 -- SEED DATA
--- INSERT INTO Program (name)
--- VALUES
---     ('Example Program A'),
---     ('Example Grant I'),
---     ('Example Project 1')
--- ;
+INSERT OR IGNORE INTO Program (name)
+VALUES
+    ('Example Program A'),
+    ('Example Grant I'),
+    ('Example Project 1')
+;

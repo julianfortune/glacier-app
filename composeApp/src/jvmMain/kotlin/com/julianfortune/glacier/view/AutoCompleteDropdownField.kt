@@ -3,7 +3,6 @@ package com.julianfortune.glacier.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -15,12 +14,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.view.data.Option
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-data class Option<ID>(
-    val id: ID,
-    val title: String,
-)
 
 // TODO(P4): Implement async fetching...? (w debounce, see: https://stackoverflow.com/a/78908108)
 //  For performance probably won't be able to load all `item`s into memory at once ..

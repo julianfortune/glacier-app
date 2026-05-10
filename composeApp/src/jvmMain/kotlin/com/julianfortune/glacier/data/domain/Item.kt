@@ -3,6 +3,6 @@ package com.julianfortune.glacier.data.domain
 data class Item(
     val name: String,
     val description: String?,
-    val weightGrams: Long?,
+    val weight: Weight?,
     val categoryIds: List<Long>
 )

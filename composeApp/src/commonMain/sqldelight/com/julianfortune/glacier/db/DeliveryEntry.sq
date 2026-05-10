@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS DeliveryEntry (
 
     unitCount INTEGER NOT NULL,
     unitName TEXT NOT NULL, -- E.g., 'loose', 'bulk', 'crate', 'barrel', 'case'
-    unitWeightGrams INTEGER NOT NULL,
+    unitWeightCentigrams INTEGER NOT NULL,
     itemsPerUnit INTEGER, -- Optional value for 'pack' size
 
     costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ) NOT NULL,
@@ -41,7 +41,7 @@ INSERT INTO DeliveryEntry (
     itemId,
     unitCount,
     unitName,
-    unitWeightGrams,
+    unitWeightCentigrams,
     itemsPerUnit,
     costStatus,
     unitCostCents
@@ -50,7 +50,7 @@ INSERT INTO DeliveryEntry (
     :itemId,
     :unitCount,
     :unitName,
-    :unitWeightGrams,
+    :unitWeightCentigrams,
     :itemsPerUnit,
     :costStatus,
     :unitCostCents

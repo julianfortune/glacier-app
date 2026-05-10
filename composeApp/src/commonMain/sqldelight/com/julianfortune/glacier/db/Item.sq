@@ -3,9 +3,9 @@ CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT, -- A physical descipriont of the item--E.g., Box, Can, Head, Bunch,
-    weightGrams INTEGER, -- Optional, estimated/average weight for the item
+    weightCentigrams INTEGER, -- Optional, estimated/average weight for the item
 
-    UNIQUE(name, description, weightGrams)
+    UNIQUE(name, description, weightCentigrams)
 );
 
 -- QUERIES
@@ -25,25 +25,25 @@ insert:
 INSERT INTO Item (
     name,
     description,
-    weightGrams
+    weightCentigrams
 ) VALUES (
     :name,
     :description,
-    :weightGrams
+    :weightCentigrams
 );
 
 -- SEED DATA
--- INSERT INTO Item (id, name, description, weightGrams)
--- VALUES
---     (0, "Sliced Peaches in Water", "Can", 1450),
---     (1, "Cut Green Beans", "Can", 1500),
---     (2, "Tuna in Water", "Can", 400),
---     (3, "Fresh Green Beans", "Bulk", NULL),
---     (4, "Bananas", "Bunch", 900),
---     (5, "Frozen Peas", NULL, 2400),
---     (6, "Chunk White Chicken", NULL, 1250),
---     (7, "Low Sodium Tomato Soup", NULL,1075),
---     (8, "Lettuce", "Head", NULL),
---     (9, "Corn", "Ear", 1200),
---     (10, "Broccoli", NULL, NULL)
--- ;
+INSERT OR IGNORE INTO Item (id, name, description, weightCentigrams)
+VALUES
+    (0, "Sliced Peaches in Water", "Can", 145000),
+    (1, "Cut Green Beans", "Can", 150000),
+    (2, "Tuna in Water", "Can", 40000),
+    (3, "Fresh Green Beans", "Bulk", NULL),
+    (4, "Bananas", "Bunch", 90000),
+    (5, "Frozen Peas", NULL, 240000),
+    (6, "Chunk White Chicken", NULL, 125000),
+    (7, "Low Sodium Tomato Soup", NULL,107500),
+    (8, "Lettuce", "Head", NULL),
+    (9, "Corn", "Ear", 120000),
+    (10, "Broccoli", NULL, NULL)
+;

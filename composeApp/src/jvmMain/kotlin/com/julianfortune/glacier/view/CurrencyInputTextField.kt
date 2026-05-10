@@ -65,7 +65,8 @@ fun CurrencyInputTextField(
     label: @Composable (() -> Unit)? = { Text("Cost") },
     enabled: Boolean = true,
     isError: Boolean = false,
-    onFocusLost: () -> Unit = {}
+    onFocusLost: () -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
         value = value?.value ?: "",
@@ -74,7 +75,7 @@ fun CurrencyInputTextField(
             CurrencyInput.fromString(newValue)?.let { onValueChange(it) }
         },
         label = label,
-        modifier = Modifier
+        modifier = modifier
             .height(64.dp)
             .onFocusChanged({ state ->
                 if (!state.isFocused) {
