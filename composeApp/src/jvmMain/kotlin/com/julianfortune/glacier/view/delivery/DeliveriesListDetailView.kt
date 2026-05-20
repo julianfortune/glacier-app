@@ -240,8 +240,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                         overflow = TextOverflow.Ellipsis
                                     )
 
-                                    // TODO(P1): Add `Unit`, `Unit Weight`, `Total` (weight)
-                                    // TODO(P1): Reorder to put unit columns together
+                                    // TODO(P2): (?) Add `Unit`
 
                                     Text(
                                         text = "Unit Cost",
@@ -256,7 +255,13 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                     )
 
                                     Text(
-                                        text = "Cost",
+                                        text = "Weight (lbs)",
+                                        modifier = Modifier.width(104.dp),
+                                        textAlign = TextAlign.End
+                                    )
+
+                                    Text(
+                                        text = "Total",
                                         modifier = Modifier.width(80.dp),
                                         textAlign = TextAlign.End
                                     )
@@ -287,7 +292,6 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                                 overflow = TextOverflow.Ellipsis
                                             )
 
-                                            // TODO(ASAP): Handle new/changed columns
                                             Text(
                                                 text = "$${formatCents(entry.unitCostCents)}",
                                                 modifier = Modifier.width(80.dp),
@@ -297,6 +301,13 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                             Text(
                                                 text = "${entry.unitCount}",
                                                 modifier = Modifier.width(60.dp),
+                                                textAlign = TextAlign.End
+                                            )
+
+                                            val totalWeightInPounds = entry.unitWeight.times(entry.unitCount).toPounds()
+                                            Text(
+                                                text = "%.2f".format(totalWeightInPounds),
+                                                modifier = Modifier.width(104.dp),
                                                 textAlign = TextAlign.End
                                             )
 

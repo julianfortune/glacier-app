@@ -2,9 +2,10 @@ package com.julianfortune.glacier.data.domain
 
 import com.julianfortune.glacier.util.dividedBy
 import java.math.BigInteger
+import java.math.RoundingMode
 
 // TODO(P3): Revisit accuracy at lower and upper magnitude bounds
-// TODO(P5): Assess performance (and improve)
+// TODO(P5): Assess performance (and improve if needed)
 
 data class Weight(val centigrams: Long) {
 
@@ -34,14 +35,28 @@ data class Weight(val centigrams: Long) {
             val totalOzHundredths = poundsInOzHundredths.toBigDecimal() + (ounces * 100).toBigDecimal()
             val centigrams = (totalOzHundredths.times(GRAMS_PER_OZ.toBigDecimal()))
 
-            return ofCentigrams(centigrams.toBigInteger())
+            return ofCentigrams(centigrams.setScale(0, RoundingMode.HALF_EVEN).toBigInteger())
         }
     }
 
+    fun times(multiple: Number): Weight {
+        return ofCentigrams(centigrams * multiple.toLong())
+    }
+
     fun toImperial(): Pair<Long, Float> {
-        val totalOzHundredths = (this.centigrams.toBigDecimal() / GRAMS_PER_OZ.toBigDecimal()).toBigInteger()
+        val totalOzHundredths = (centigrams.toBigDecimal() / GRAMS_PER_OZ.toBigDecimal()).toBigInteger()
         val (pounds, ozHundredths) = totalOzHundredths.dividedBy((OZ_PER_POUND * 100).toBigInteger())
 
         return Pair(pounds.toLong(), (ozHundredths.toFloat() / 100))
+    }
+
+    fun toPounds(): Float {
+        val totalOzHundredths = centigrams.toBigDecimal() / GRAMS_PER_OZ.toBigDecimal()
+        val poundsHundredths = totalOzHundredths
+            .divide(OZ_PER_POUND.toBigDecimal())
+            .setScale(0, RoundingMode.HALF_EVEN)
+            .toFloat()
+
+        return poundsHundredths / 100
     }
 }

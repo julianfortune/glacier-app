@@ -112,6 +112,8 @@ fun NewEntryForm(
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
+                    Spacer(modifier = Modifier.height(4.dp))
+
                     OutlinedTextField(
                         value = unitName,
                         onValueChange = { unitName = it },
