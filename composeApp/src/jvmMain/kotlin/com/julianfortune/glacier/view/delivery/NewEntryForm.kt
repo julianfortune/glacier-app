@@ -34,8 +34,16 @@ fun NewEntryForm(
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
 
     var unitName by remember { mutableStateOf(initialEntry?.unitName ?: "") }
-    var unitWeightPoundsInput by remember { mutableStateOf(initialEntry?.unitWeight?.toImperial()?.first?.toString() ?: "") }
-    var unitWeightOuncesInput by remember { mutableStateOf(initialEntry?.unitWeight?.toImperial()?.second?.toString() ?: "") }
+    var unitWeightPoundsInput by remember {
+        mutableStateOf(
+            initialEntry?.unitWeight?.toImperial()?.first?.toString() ?: ""
+        )
+    }
+    var unitWeightOuncesInput by remember {
+        mutableStateOf(
+            initialEntry?.unitWeight?.toImperial()?.second?.toString() ?: ""
+        )
+    }
 
     var costStatusIsNoCost by remember { mutableStateOf((initialEntry?.costStatus == CostStatus.NO_COST)) }
     var unitCostInput by remember { mutableStateOf(initialEntry?.unitCostCents?.let { CurrencyInput.fromLong(it) }) }
@@ -97,96 +105,71 @@ fun NewEntryForm(
                 }, label = { Text("Item") }, modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            OutlinedCard(
-                shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.outlinedCardColors(
-                    containerColor = CardDefaults.cardColors().containerColor
-                )
+            Text(
+                text = "Unit",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-                    Text(
-                        text = "Unit",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                OutlinedTextField(
+                    value = unitName,
+                    onValueChange = { unitName = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.height(64.dp).weight(2f).onFocusChanged({ state ->
+                        if (!state.isFocused) {
+                            // Check for error
+                        }
+                    }),
+                    singleLine = true,
+                    isError = false,
+                    colors = OutlinedTextFieldDefaults.colors(),
+                )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-                    OutlinedTextField(
-                        value = unitName,
-                        onValueChange = { unitName = it },
-                        label = { Text("Name") },
-                        modifier = Modifier.height(64.dp).fillMaxWidth().onFocusChanged({ state ->
+                OutlinedTextField(
+                    value = unitWeightPoundsInput,
+                    onValueChange = { unitWeightPoundsInput = it },
+                    label = { Text("Lbs") },
+                    modifier = Modifier
+                        .height(64.dp)
+                        .weight(1f) // Takes up half the available space
+                        .onFocusChanged({ state ->
                             if (!state.isFocused) {
                                 // Check for error
                             }
                         }),
-                        singleLine = true,
-                        isError = false,
-                        colors = OutlinedTextFieldDefaults.colors(),
-                    )
+                    singleLine = true,
+                    isError = false,
+                    colors = OutlinedTextFieldDefaults.colors(),
+                )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = unitWeightPoundsInput,
-                            onValueChange = { unitWeightPoundsInput = it },
-                            label = { Text("Lbs") },
-                            modifier = Modifier
-                                .height(64.dp)
-                                .weight(1f) // Takes up half the available space
-                                .onFocusChanged({ state ->
-                                    if (!state.isFocused) {
-                                        // Check for error
-                                    }
-                                }),
-                            singleLine = true,
-                            isError = false,
-                            colors = OutlinedTextFieldDefaults.colors(),
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        OutlinedTextField(
-                            value = unitWeightOuncesInput,
-                            onValueChange = { unitWeightOuncesInput = it },
-                            label = { Text("Oz") },
-                            modifier = Modifier
-                                .height(64.dp)
-                                .weight(1f) // Takes up half the available space
-                                .onFocusChanged({ state ->
-                                    if (!state.isFocused) {
-                                        // Check for error
-                                    }
-                                }),
-                            singleLine = true,
-                            isError = false,
-                            colors = OutlinedTextFieldDefaults.colors(),
-                        )
-                    }
-                }
+                OutlinedTextField(
+                    value = unitWeightOuncesInput,
+                    onValueChange = { unitWeightOuncesInput = it },
+                    label = { Text("Oz") },
+                    modifier = Modifier
+                        .height(64.dp)
+                        .weight(1f) // Takes up half the available space
+                        .onFocusChanged({ state ->
+                            if (!state.isFocused) {
+                                // Check for error
+                            }
+                        }),
+                    singleLine = true,
+                    isError = false,
+                    colors = OutlinedTextFieldDefaults.colors(),
+                )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = unitCountInput,
-                onValueChange = { unitCountInput = it },
-                label = { Text("Count") },
-                modifier = Modifier.height(64.dp).fillMaxWidth().onFocusChanged({ state ->
-                    if (!state.isFocused) {
-                        // Check for error
-                    }
-                }),
-                singleLine = true,
-                isError = false,
-                colors = OutlinedTextFieldDefaults.colors(),
-            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -209,7 +192,7 @@ fun NewEntryForm(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 CurrencyInputTextField(
-                    label = { Text("Cost (per unit)") },
+                    label = { Text("Price") },
                     value = unitCostInput,
                     onValueChange = { unitCostInput = it },
                     onFocusLost = {
@@ -220,6 +203,30 @@ fun NewEntryForm(
                     modifier = Modifier.weight(0.7f)
                 )
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Quantity",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = unitCountInput,
+                onValueChange = { unitCountInput = it },
+                label = { Text("Count") },
+                modifier = Modifier.height(64.dp).fillMaxWidth().onFocusChanged({ state ->
+                    if (!state.isFocused) {
+                        // Check for error
+                    }
+                }),
+                singleLine = true,
+                isError = false,
+                colors = OutlinedTextFieldDefaults.colors(),
+            )
         }
 
         // Action Buttons

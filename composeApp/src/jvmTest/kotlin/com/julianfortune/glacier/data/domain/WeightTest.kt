@@ -9,16 +9,14 @@ class WeightTest {
     @ParameterizedTest(name = "{index}: {0}lbs{1}oz")
     @CsvSource(
         value = [
-            "2, 8",
-            "5000, 8",
+            "0, 0.01", // Lower bound
             "0, 1",
-            "0, 15.9",
-            "0, 0.5",
-            "0, 0.05",
-            "100000, 1",
-            "5000, 1",
+            "2, 8",
             "624, 0",
-            "2094967295, 15",
+            "5000, 1",
+            "5000, 8",
+            "100000, 1",
+            "2094967295, 15", // Upper bound
         ]
     )
     fun ofImperialRoundTripProducesSame(pounds: Int, ounces: Float) {

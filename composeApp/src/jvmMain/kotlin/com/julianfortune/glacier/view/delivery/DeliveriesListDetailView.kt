@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -37,12 +41,18 @@ fun formatLocalDate(d: LocalDate, style: FormatStyle = FormatStyle.MEDIUM): Stri
     return d.format(usDateFormatter)
 }
 
-fun calculateEntryTotalCents(entry: Entry): Long {
+fun calculateEntryTotalCostCents(entry: Entry): Long {
     if (entry.costStatus == CostStatus.NO_COST) {
         return 0L
     }
 
     return entry.unitCount * entry.unitCostCents
+}
+
+fun calculateDeliveryTotalCostCents(delivery: DeliveryDetail): Long {
+    val totalUnitsCost = delivery.entries?.map { calculateEntryTotalCostCents(it) }?.reduceOrNull { a, b -> a + b } ?: 0
+
+    return totalUnitsCost + (delivery.feesCents ?: 0) + (delivery.taxesCents ?: 0)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -156,6 +166,9 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 1.dp,
         ) {
+            // TODO(P1): Refactor this header / list layout to look like Categories page (see screenshot mockup)
+            //  into a reusable component (settings for: elevation (?) to set bg color, handler for `createNew`, (later) search, filter, etc.)
+            // TODO(P1): Add support for dropdown ellipses menu with support for delete and edit (configurable)
             Column(modifier = Modifier.width(240.dp)) {
                 Surface(
                     color = MaterialTheme.colorScheme.surface,
@@ -163,7 +176,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                 ) {
                     FilledTonalButton(
                         shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.height(32.dp).fillMaxWidth(),
+                        modifier = Modifier.height(32.dp).fillMaxWidth().pointerHoverIcon(PointerIcon.Hand),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                         colors = ButtonDefaults.filledTonalButtonColors().copy(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -295,27 +308,31 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                                             Text(
                                                 text = "$${formatCents(entry.unitCostCents)}",
                                                 modifier = Modifier.width(80.dp),
-                                                textAlign = TextAlign.End
+                                                textAlign = TextAlign.End,
+                                                fontFamily = FontFamily.Monospace
                                             )
 
                                             Text(
                                                 text = "${entry.unitCount}",
                                                 modifier = Modifier.width(60.dp),
-                                                textAlign = TextAlign.End
+                                                textAlign = TextAlign.End,
+                                                fontFamily = FontFamily.Monospace
                                             )
 
                                             val totalWeightInPounds = entry.unitWeight.times(entry.unitCount).toPounds()
                                             Text(
                                                 text = "%.2f".format(totalWeightInPounds),
                                                 modifier = Modifier.width(104.dp),
-                                                textAlign = TextAlign.End
+                                                textAlign = TextAlign.End,
+                                                fontFamily = FontFamily.Monospace
                                             )
 
-                                            val totalEntryCostCents = calculateEntryTotalCents(entry)
+                                            val totalEntryCostCents = calculateEntryTotalCostCents(entry)
                                             Text(
                                                 text = "$${formatCents(totalEntryCostCents)}",
                                                 modifier = Modifier.width(80.dp),
-                                                textAlign = TextAlign.End
+                                                textAlign = TextAlign.End,
+                                                fontFamily = FontFamily.Monospace
                                             )
 
                                             Row(
@@ -360,6 +377,19 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                             ) {
                                 Text("New Entry")
                             }
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        // Total cost of delivery
+                        val totalCostCents = deliveryDetail?.let { calculateDeliveryTotalCostCents(it.data) }
+                        totalCostCents?.let {
+                            Text(
+                                text = "$${formatCents(it)}",
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.End,
+                                fontFamily = FontFamily.Monospace
+                            )
                         }
                     }
                 }
