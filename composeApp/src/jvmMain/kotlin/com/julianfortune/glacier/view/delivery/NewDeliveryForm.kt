@@ -3,78 +3,89 @@ package com.julianfortune.glacier.view.delivery
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
+import com.julianfortune.glacier.view.CurrencyInput
+import com.julianfortune.glacier.view.CurrencyInputTextField
+import com.julianfortune.glacier.view.LocalDateInput
+import com.julianfortune.glacier.view.LocalDateInputTextField
 import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.ResolverStyle
 
-fun parseDateSafe(input: String): LocalDate? {
-    if (input.isBlank()) return null
 
-    return runCatching {
-        val formatter = DateTimeFormatter
-            .ofPattern("MM/dd/uuuu")
-            .withResolverStyle(ResolverStyle.STRICT) // Rejects invalid dates like Feb 30
-        LocalDate.parse(input, formatter)
-    }.getOrNull()
-}
-
+// TODO(P2): Update this component to handle editing in addition to creating new
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewDeliveryForm(viewModel: DeliveryViewModel) {
+fun NewDeliveryForm(
+    viewModel: DeliveryViewModel,
+    title: String,
+    submitButtonText: String,
+    initialDeliveryDetail: DeliveryDetail? = null,
+) {
     val coroutineScope = rememberCoroutineScope()
 
     val suppliers by viewModel.allSuppliers.collectAsState()
 
-    var receivedDateInput by remember { mutableStateOf("") }
-    var parsedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var receivedDateInput by remember { mutableStateOf<LocalDateInput?>(LocalDateInput.ofToday()) }
     var dateError by remember { mutableStateOf(false) }
     var selectedSupplier by remember { mutableStateOf<Option<Long>?>(null) }
-
-    LaunchedEffect(receivedDateInput) {
-        parsedDate = parseDateSafe(receivedDateInput)
+    var feesCentsInput by remember {
+        mutableStateOf(initialDeliveryDetail?.feesCents?.let {
+            CurrencyInput.fromLong(it)
+        })
+    }
+    var taxesCentsInput by remember {
+        mutableStateOf(initialDeliveryDetail?.taxesCents?.let {
+            CurrencyInput.fromLong(it)
+        })
     }
 
-    val isValid = remember(parsedDate, selectedSupplier) {
-        parsedDate != null && selectedSupplier != null
+    var feesCents by remember { mutableStateOf<Long?>(null) }
+    var taxesCents by remember { mutableStateOf<Long?>(null) }
+
+    val isValid = remember(receivedDateInput, selectedSupplier) {
+        receivedDateInput is LocalDateInput.Valid && selectedSupplier != null
+    }
+
+    LaunchedEffect(feesCentsInput) {
+        feesCents = feesCentsInput?.toLong()
+    }
+
+    LaunchedEffect(taxesCentsInput) {
+        taxesCents = taxesCentsInput?.toLong()
     }
 
     Column(
         modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            "New Delivery",
+            text = title,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
 
-        OutlinedTextField(
+        LocalDateInputTextField(
             value = receivedDateInput,
-            onValueChange = { receivedDateInput = it },
-            label = { Text("Received") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(84.dp)
-                .onFocusChanged({ state ->
-                    if (!state.isFocused) {
-                        dateError = (!receivedDateInput.isBlank() && parsedDate == null)
-                    }
-                }),
-            singleLine = true,
+            onValueChange = {
+                receivedDateInput = it
+                if (it !is LocalDateInput.Invalid) {
+                    dateError = false
+                }
+            },
+            onFocusLost = {
+                dateError = (receivedDateInput is LocalDateInput.Invalid)
+            },
+            label = { Text("Received*") },
             isError = dateError,
-            colors = OutlinedTextFieldDefaults.colors(),
-            supportingText = { Text("MM/DD/YYYY") }
+            modifier = Modifier.fillMaxWidth(),
         )
 
         // Supplier Field
@@ -86,9 +97,30 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
             onSelectedChange = { newSupplier ->
                 selectedSupplier = newSupplier
             },
-            label = { Text("Supplier") },
+            label = { Text("Supplier*") },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CurrencyInputTextField(
+                value = feesCentsInput,
+                onValueChange = { feesCentsInput = it },
+                label = { Text("Fees") },
+                modifier = Modifier.weight(1f),
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            CurrencyInputTextField(
+                value = taxesCentsInput,
+                onValueChange = { taxesCentsInput = it },
+                label = { Text("Taxes") },
+                modifier = Modifier.weight(1f),
+            )
+        }
 
         // Action Buttons
         Row(
@@ -111,10 +143,10 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                 onClick = {
                     val delivery = DeliveryDetail(
                         // This should be defined in order for button to be enabled
-                        parsedDate!!, // TODO(P3): Better error handling / typing ..?
+                        (receivedDateInput!! as LocalDateInput.Valid).parsed, // TODO(P3): Better error handling / typing ..?
                         selectedSupplier?.id,
-                        null,
-                        null,
+                        taxesCents,
+                        feesCents,
                         emptyList()
                     )
 
@@ -124,7 +156,7 @@ fun NewDeliveryForm(viewModel: DeliveryViewModel) {
                     }
                 },
             ) {
-                Text("Create")
+                Text(submitButtonText)
             }
         }
     }

@@ -4,20 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -31,15 +24,7 @@ import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.*
-
-fun formatLocalDate(d: LocalDate, style: FormatStyle = FormatStyle.MEDIUM): String {
-    val usDateFormatter = DateTimeFormatter.ofLocalizedDate(style).withLocale(Locale.US)
-    return d.format(usDateFormatter)
-}
 
 fun calculateEntryTotalCostCents(entry: Entry): Long {
     if (entry.costStatus == CostStatus.NO_COST) {
@@ -93,7 +78,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
-                NewDeliveryForm(viewModel)
+                NewDeliveryForm(viewModel, "New Delivery", "Create")
             }
         }
     }
@@ -222,7 +207,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                         Text("Supplier: ${supplierMap[deliveryDetail?.data?.supplierId]?.data?.name}")
 
                         // TODO(P1): Make editable
-                        Text("Fees: ${formatCents(deliveryDetail?.data?.feesCents ?: 0)}")
+                        Text("Fees: $${formatCents(deliveryDetail?.data?.feesCents ?: 0)}")
 
                         Spacer(Modifier.height(16.dp))
 

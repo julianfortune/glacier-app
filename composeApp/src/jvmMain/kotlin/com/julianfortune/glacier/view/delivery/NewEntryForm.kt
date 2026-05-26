@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
@@ -246,6 +245,7 @@ fun NewEntryForm(
 
             Button(
                 enabled = isValid,
+                // TODO(P3): Refactor handler to live somewhere else
                 onClick = {
                     val costStatus = when {
                         costStatusIsNoCost -> CostStatus.NO_COST

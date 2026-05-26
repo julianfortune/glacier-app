@@ -1,6 +1,5 @@
 package com.julianfortune.glacier.view
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
@@ -24,13 +23,10 @@ value class CurrencyInput private constructor(val value: String) {
             return CurrencyInput(formatCents(cents))
         }
 
-        fun fromString(value: String): CurrencyInput? {
-
-            return when {
-                value == "" -> CurrencyInput("")
-                DECIMAL_REGEX.matches(value) -> CurrencyInput(value)
-                else -> null
-            }
+        fun fromString(value: String): CurrencyInput? = when {
+            value == "" -> CurrencyInput("")
+            DECIMAL_REGEX.matches(value) -> CurrencyInput(value)
+            else -> null
         }
     }
 
@@ -49,7 +45,9 @@ value class CurrencyInput private constructor(val value: String) {
             val parts = value.split('.')
 
             val dollars = numberInputToLong(parts.getOrNull(0))
-            val cents = numberInputToLong(parts.getOrNull(1))
+
+            val centsInput = parts.getOrNull(1) // Cents can be `X` or `XX`
+            val cents = numberInputToLong(if (centsInput?.length == 1) "${centsInput}0" else centsInput)
 
             dollars * 100 + cents
         }
@@ -71,9 +69,7 @@ fun CurrencyInputTextField(
     OutlinedTextField(
         value = value?.value ?: "",
         placeholder = { Text("0.00") },
-        onValueChange = { newValue ->
-            CurrencyInput.fromString(newValue)?.let { onValueChange(it) }
-        },
+        onValueChange = { newValue -> CurrencyInput.fromString(newValue)?.let { onValueChange(it) } },
         label = label,
         modifier = modifier
             .height(64.dp)

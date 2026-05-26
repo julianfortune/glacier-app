@@ -29,11 +29,15 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(compose.runtime)
             implementation(compose.ui)
+
+            // Forkhandles
+            implementation(project.dependencies.platform(libs.forkhandles.bom))
+            implementation("dev.forkhandles:result4k")
+
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.koin.compose)
             implementation(libs.koin.core)
-            implementation(libs.result4K)
             implementation(libs.sqldelight.coroutines)
         }
         jvmMain.dependencies {
