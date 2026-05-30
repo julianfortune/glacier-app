@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,12 +19,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
+import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.util.formatCents
 import com.julianfortune.glacier.view.Item
 import com.julianfortune.glacier.view.ScrollableColumn
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
+import com.julianfortune.glacier.viewModel.data.DeliveryAction
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
@@ -65,10 +70,10 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
     }
 
     val deliveryDetail by viewModel.selectedDeliveryDetail.collectAsState()
-    val newDeliveryDialogOpen by viewModel.newDeliveryDialogIsVisible
+    val deliveryAction by viewModel.deliveryAction
     val deliveryEntryAction by viewModel.deliveryEntryAction
 
-    if (newDeliveryDialogOpen) {
+    if (deliveryAction != null) {
         BasicAlertDialog(
             onDismissRequest = { }, // Ignore implicit attempts to close the dialog
         ) {
@@ -78,7 +83,60 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
-                NewDeliveryForm(viewModel, "New Delivery", "Create")
+                when (deliveryAction) {
+                    is DeliveryAction.CreateNew -> {
+                        NewDeliveryForm(
+                            viewModel,
+                            "New Delivery",
+                            "Create",
+                            onSubmit = { newDelivery ->
+                                coroutineScope.launch {
+                                    val delivery = DeliveryDetail(
+                                        newDelivery.receivedDate,
+                                        newDelivery.supplierId,
+                                        newDelivery.taxesCents,
+                                        newDelivery.feesCents,
+                                        emptyList()
+                                    )
+                                    val newDeliveryId = viewModel.saveDelivery(delivery)
+                                    viewModel.newDeliveryCreated(newDeliveryId)
+                                }
+                            })
+                    }
+
+                    is DeliveryAction.Edit -> {
+                        val delivery = (deliveryAction as DeliveryAction.Edit).delivery
+                        val headline = DeliveryHeadline(
+                            delivery.data.receivedDate,
+                            delivery.data.supplierId,
+                            delivery.data.taxesCents,
+                            delivery.data.feesCents,
+                        )
+                        NewDeliveryForm(
+                            viewModel,
+                            "Edit Delivery",
+                            "Save",
+                            initialDelivery = headline,
+                            onSubmit = { updated ->
+                                coroutineScope.launch {
+                                    val delivery = Entity(
+                                        delivery.id, DeliveryDetail(
+                                            updated.receivedDate,
+                                            updated.supplierId,
+                                            updated.taxesCents,
+                                            updated.feesCents,
+                                            delivery.data.entries
+                                        )
+                                    )
+                                    viewModel.updateDelivery(delivery)
+                                    viewModel.newDeliveryCreated(delivery.id)
+                                }
+                            }
+                        )
+                    }
+
+                    else -> throw Error("`deliveryAction` must not be `null`")
+                }
             }
         }
     }
@@ -141,6 +199,8 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                             }
                         )
                     }
+
+                    else -> throw Error("`deliveryEntryAction` must not be `null`")
                 }
             }
         }
@@ -177,6 +237,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                 ScrollableColumn(deliveryItems)
             }
         }
+
         Surface(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             color = MaterialTheme.colorScheme.surface,
@@ -197,17 +258,48 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                         .verticalScroll(rememberScrollState())
                 ) {
                     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-                        Text(
-                            deliveryDetail?.data?.receivedDate?.let { formatLocalDate(it, FormatStyle.FULL) }
-                                .toString(),
-                            style = MaterialTheme.typography.headlineMedium,
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column() {
+                                Spacer(Modifier.height(4.dp)) // Better align with icon buttons
+                                Text(
+                                    deliveryDetail?.data?.receivedDate?.let { formatLocalDate(it, FormatStyle.FULL) }
+                                        .toString(),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                )
 
-                        // TODO(P3): Make supplier editable
-                        Text("Supplier: ${supplierMap[deliveryDetail?.data?.supplierId]?.data?.name}")
-
-                        // TODO(P1): Make editable
-                        Text("Fees: $${formatCents(deliveryDetail?.data?.feesCents ?: 0)}")
+                                Text("${supplierMap[deliveryDetail?.data?.supplierId]?.data?.name}")
+                                Text("Fees: $${formatCents(deliveryDetail?.data?.feesCents ?: 0)}")
+                                Text("Taxes: $${formatCents(deliveryDetail?.data?.taxesCents ?: 0)}")
+                            }
+                            Row {
+                                IconButton(
+                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                    onClick = {
+                                        // TODO: Better error-handling
+                                        viewModel.showEditDelivery(deliveryDetail!!)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Edit,
+                                        contentDescription = "Edit delivery details"
+                                    )
+                                }
+                                IconButton(
+                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                    onClick = {
+                                        // TODO: #14
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Delete,
+                                        contentDescription = "Delete delivery"
+                                    )
+                                }
+                            }
+                        }
 
                         Spacer(Modifier.height(16.dp))
 

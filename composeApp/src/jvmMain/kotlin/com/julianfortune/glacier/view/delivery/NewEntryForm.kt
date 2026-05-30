@@ -97,7 +97,7 @@ fun NewEntryForm(
 
         Column {
             AutoCompleteDropdownField(
-                selectedOption = selectedItem, options = items.map {
+                selectedOptionId = selectedItem, options = items.map {
                     Option(it.id, renderItemName(it.data))
                 }, onSelectedChange = { newItem ->
                     selectedItem = newItem

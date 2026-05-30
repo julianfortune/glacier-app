@@ -18,6 +18,10 @@ sealed interface LocalDateInput {
     val value: String
 
     companion object {
+        fun of(localDate: LocalDate): Valid {
+            return Valid(localDate.format(FORMATTER), localDate)
+        }
+
         fun ofToday(): LocalDateInput.Valid {
             val today = LocalDate.now()
             return Valid(today.format(FORMATTER), today)

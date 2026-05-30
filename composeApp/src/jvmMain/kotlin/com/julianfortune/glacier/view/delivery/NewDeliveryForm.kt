@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
+import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
+import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
 import com.julianfortune.glacier.view.CurrencyInput
 import com.julianfortune.glacier.view.CurrencyInputTextField
@@ -26,22 +28,23 @@ fun NewDeliveryForm(
     viewModel: DeliveryViewModel,
     title: String,
     submitButtonText: String,
-    initialDeliveryDetail: DeliveryDetail? = null,
+    initialDelivery: DeliveryHeadline? = null,
+    onSubmit: (delivery: DeliveryHeadline) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val suppliers by viewModel.allSuppliers.collectAsState()
 
-    var receivedDateInput by remember { mutableStateOf<LocalDateInput?>(LocalDateInput.ofToday()) }
+    val initialReceivedDate = initialDelivery?.receivedDate?.let { LocalDateInput.of(it) } ?: LocalDateInput.ofToday()
+
+    var receivedDateInput by remember { mutableStateOf<LocalDateInput?>(initialReceivedDate) }
     var dateError by remember { mutableStateOf(false) }
     var selectedSupplier by remember { mutableStateOf<Option<Long>?>(null) }
     var feesCentsInput by remember {
-        mutableStateOf(initialDeliveryDetail?.feesCents?.let {
+        mutableStateOf(initialDelivery?.feesCents?.let {
             CurrencyInput.fromLong(it)
         })
     }
     var taxesCentsInput by remember {
-        mutableStateOf(initialDeliveryDetail?.taxesCents?.let {
+        mutableStateOf(initialDelivery?.taxesCents?.let {
             CurrencyInput.fromLong(it)
         })
     }
@@ -51,6 +54,15 @@ fun NewDeliveryForm(
 
     val isValid = remember(receivedDateInput, selectedSupplier) {
         receivedDateInput is LocalDateInput.Valid && selectedSupplier != null
+    }
+
+    // Update the selected supplier once the `suppliers` state populates
+    LaunchedEffect(suppliers) {
+        selectedSupplier = suppliers.firstOrNull {
+            it.id == initialDelivery?.supplierId
+        }?.let {
+            Option(it.id, it.data.name)
+        }
     }
 
     LaunchedEffect(feesCentsInput) {
@@ -90,7 +102,7 @@ fun NewDeliveryForm(
 
         // Supplier Field
         AutoCompleteDropdownField(
-            selectedOption = selectedSupplier,
+            selectedOptionId = selectedSupplier,
             options = suppliers.map {
                 Option(it.id, it.data.name)
             },
@@ -141,19 +153,15 @@ fun NewDeliveryForm(
             Button(
                 enabled = isValid,
                 onClick = {
-                    val delivery = DeliveryDetail(
+                    val delivery = DeliveryHeadline(
                         // This should be defined in order for button to be enabled
                         (receivedDateInput!! as LocalDateInput.Valid).parsed, // TODO(P3): Better error handling / typing ..?
                         selectedSupplier?.id,
                         taxesCents,
-                        feesCents,
-                        emptyList()
+                        feesCents
                     )
 
-                    coroutineScope.launch {
-                        val newDeliveryId = viewModel.saveDelivery(delivery)
-                        viewModel.newDeliveryCreated(newDeliveryId)
-                    }
+                    onSubmit(delivery)
                 },
             ) {
                 Text(submitButtonText)

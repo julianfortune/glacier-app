@@ -30,7 +30,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun <ID> AutoCompleteDropdownField(
-    selectedOption: Option<ID>?,
+    selectedOptionId: Option<ID>?,
     options: List<Option<ID>>,
     onSelectedChange: (Option<ID>?) -> Unit,
     label: @Composable (() -> Unit)? = null,
@@ -39,8 +39,8 @@ fun <ID> AutoCompleteDropdownField(
     var input by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
 
-    val textFieldValue = remember(input, selectedOption) {
-        input ?: selectedOption?.title ?: ""
+    val textFieldValue = remember(input, selectedOptionId) {
+        input ?: selectedOptionId?.title ?: ""
     }
 
     val filteredOptions = remember(input, options) {
@@ -112,7 +112,7 @@ fun <ID> AutoCompleteDropdownField(
             when {
                 filteredOptions.isEmpty() -> NoOptionsMenuItem()
                 else -> filteredOptions.map { option ->
-                    val isSelected = option.id == selectedOption?.id
+                    val isSelected = option.id == selectedOptionId?.id
 
                     // Use colors to highlight selected item
                     val backgroundColor = if (isSelected) {

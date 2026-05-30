@@ -13,6 +13,7 @@ import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.viewModel.data.DeliveryAction
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -24,8 +25,8 @@ class DeliveryViewModel(
     private val supplierRepository: SupplierRepository
 ) : ViewModel() {
 
-    private val _newDeliveryDialogIsVisible = mutableStateOf(false)
-    val newDeliveryDialogIsVisible: State<Boolean> = _newDeliveryDialogIsVisible
+    private val _newDeliveryDialogIsVisible = mutableStateOf<DeliveryAction?>(null)
+    val deliveryAction: State<DeliveryAction?> = _newDeliveryDialogIsVisible
 
     private val _newEntryDialogIsVisible = mutableStateOf<DeliveryEntryAction?>(null)
     val deliveryEntryAction: State<DeliveryEntryAction?> = _newEntryDialogIsVisible
@@ -119,15 +120,19 @@ class DeliveryViewModel(
     }
 
     fun showNewDelivery() {
-        _newDeliveryDialogIsVisible.value = true
+        _newDeliveryDialogIsVisible.value = DeliveryAction.CreateNew
+    }
+
+    fun showEditDelivery(delivery: Entity<DeliveryDetail>) {
+        _newDeliveryDialogIsVisible.value = DeliveryAction.Edit(delivery)
     }
 
     fun dismissNewDelivery() {
-        _newDeliveryDialogIsVisible.value = false
+        _newDeliveryDialogIsVisible.value = null
     }
 
     fun newDeliveryCreated(id: Long) {
-        _newDeliveryDialogIsVisible.value = false
+        _newDeliveryDialogIsVisible.value = null
         _selectedDeliveryId.value = id
     }
 
