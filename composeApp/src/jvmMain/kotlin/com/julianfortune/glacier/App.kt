@@ -155,7 +155,7 @@ fun CategoryList(viewModel: CategoryViewModel) {
                     FilledTonalButton(
                         onClick = { },
                         shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.height(32.dp),
+                        modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                         colors = ButtonDefaults.filledTonalButtonColors().copy(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,

@@ -25,8 +25,8 @@ class DeliveryViewModel(
     private val supplierRepository: SupplierRepository
 ) : ViewModel() {
 
-    private val _newDeliveryDialogIsVisible = mutableStateOf<DeliveryAction?>(null)
-    val deliveryAction: State<DeliveryAction?> = _newDeliveryDialogIsVisible
+    private val _deliveryAction = mutableStateOf<DeliveryAction?>(null)
+    val deliveryAction: State<DeliveryAction?> = _deliveryAction
 
     private val _newEntryDialogIsVisible = mutableStateOf<DeliveryEntryAction?>(null)
     val deliveryEntryAction: State<DeliveryEntryAction?> = _newEntryDialogIsVisible
@@ -115,25 +115,43 @@ class DeliveryViewModel(
         return deliveryRepository.update(delivery)
     }
 
+    suspend fun deleteDelivery(deliveryId: Long): Boolean {
+        return deliveryRepository.deleteById(deliveryId)
+    }
+
     suspend fun saveEntry(deliveryId: Long, entry: Entry) {
         deliveryRepository.insertDeliveryEntry(deliveryId, entry)
     }
 
     fun showNewDelivery() {
-        _newDeliveryDialogIsVisible.value = DeliveryAction.CreateNew
+        _deliveryAction.value = DeliveryAction.CreateNew
     }
 
     fun showEditDelivery(delivery: Entity<DeliveryDetail>) {
-        _newDeliveryDialogIsVisible.value = DeliveryAction.Edit(delivery)
+        _deliveryAction.value = DeliveryAction.Edit(delivery)
     }
 
-    fun dismissNewDelivery() {
-        _newDeliveryDialogIsVisible.value = null
+    fun showDeleteDelivery(delivery: Entity<DeliveryDetail>) {
+        _deliveryAction.value = DeliveryAction.Delete(delivery.id)
+    }
+
+    fun cancelDeliveryAction() {
+        _deliveryAction.value = null
     }
 
     fun newDeliveryCreated(id: Long) {
-        _newDeliveryDialogIsVisible.value = null
+        _deliveryAction.value = null
         _selectedDeliveryId.value = id
+    }
+
+    fun deliveryDeleted(id: Long) {
+        _deliveryAction.value = null
+        _selectedDeliveryId.update { currentId ->
+            when {
+                currentId == id -> null
+                else -> currentId
+            }
+        }
     }
 
     fun showNewEntry() {

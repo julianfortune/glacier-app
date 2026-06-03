@@ -6,11 +6,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
-import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.view.AutoCompleteDropdownField
 import com.julianfortune.glacier.view.CurrencyInput
 import com.julianfortune.glacier.view.CurrencyInputTextField
@@ -18,7 +18,6 @@ import com.julianfortune.glacier.view.LocalDateInput
 import com.julianfortune.glacier.view.LocalDateInputTextField
 import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import kotlinx.coroutines.launch
 
 
 // TODO(P2): Update this component to handle editing in addition to creating new
@@ -141,8 +140,9 @@ fun NewDeliveryForm(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(
+                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    viewModel.dismissNewDelivery()
+                    viewModel.cancelDeliveryAction()
                 }
             ) {
                 Text("Cancel")
@@ -151,6 +151,7 @@ fun NewDeliveryForm(
             Spacer(modifier = Modifier.width(8.dp))
 
             Button(
+                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 enabled = isValid,
                 onClick = {
                     val delivery = DeliveryHeadline(
