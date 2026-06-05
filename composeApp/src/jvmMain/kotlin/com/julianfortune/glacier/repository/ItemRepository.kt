@@ -4,13 +4,10 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.julianfortune.glacier.codec.LocalDateCodec
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.db.Database
-import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -43,4 +40,28 @@ class ItemRepository(private val database: Database) {
         return Entity(item.id, Item(item.name, item.description, weight, itemCategoryIds))
     }
 
+    suspend fun insert(item: Item): Long {
+        val newItemId = database.itemQueries.insert(item.name, item.description, item.weight?.centigrams).awaitAsOne()
+
+        for (categoryId in item.categoryIds) {
+            database.itemCategoryQueries.insert(newItemId, categoryId)
+        }
+
+        return newItemId
+    }
+
+    suspend fun update(item: Entity<Item>) {
+        database.itemQueries.updateById(item.data.name, item.data.description, item.data.weight?.centigrams, item.id)
+        database.itemCategoryQueries.deleteByItemId(item.id)
+
+        for (categoryId in item.data.categoryIds) {
+            database.itemCategoryQueries.insert(item.id, categoryId)
+        }
+    }
+
+    suspend fun deleteById(id: Long): Boolean {
+        val rowsUpdated = database.itemQueries.deleteById(id) // `ItemCategories` are deleted by CASCADE-ing
+
+        return rowsUpdated > 1
+    }
 }

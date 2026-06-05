@@ -1,9 +1,10 @@
 package com.julianfortune.glacier.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.Entity
-import com.julianfortune.glacier.db.Category as DbCategory
 import com.julianfortune.glacier.data.domain.Category
+import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import com.julianfortune.glacier.db.Category as DbCategory
 
 class CategoryRepositoryTest {
 
@@ -40,8 +42,24 @@ class CategoryRepositoryTest {
         repository.insert(Category("Foobar"))
 
         // THEN
-        val rows = database.categoryQueries.getAll().executeAsList()
+        val rows = database.categoryQueries.getAll().awaitAsList()
         assertThat(rows).containsExactly(DbCategory(1, "Foobar"))
+    }
+
+    @Test
+    fun update(): Unit = runBlocking {
+        // GIVEN
+        val category = Category("Diary")
+        val id = repository.insert(category)
+
+        val updatedCategory = Category("Dairy")
+
+        // WHEN
+        repository.update(Entity(id, updatedCategory))
+
+        // THEN
+        val rows = database.categoryQueries.getAll().awaitAsList()
+        assertThat(rows).containsExactly(DbCategory(1, "Dairy"))
     }
 
     @Test

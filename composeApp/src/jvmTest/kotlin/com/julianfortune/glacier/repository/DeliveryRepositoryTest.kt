@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.codec.CostStatusCodec
 import com.julianfortune.glacier.codec.LocalDateCodec
 import com.julianfortune.glacier.createTestDatabase
@@ -37,10 +38,10 @@ class DeliveryRepositoryTest {
     fun insert() {
         // GIVEN
         val itemId = runBlocking {
-            database.itemQueries.insert("Food", "Box", 32L)
+            database.itemQueries.insert("Food", "Box", 32L).awaitAsOne()
         }
         val supplierId = runBlocking {
-            database.supplierQueries.insert("Foo Bar")
+            database.supplierQueries.insert("Foo Bar").awaitAsOne()
         }
 
         val entry = Entry(

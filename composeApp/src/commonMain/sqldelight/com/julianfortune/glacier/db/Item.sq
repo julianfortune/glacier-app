@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
-    description TEXT, -- A physical descipriont of the item--E.g., Box, Can, Head, Bunch,
+    description TEXT, -- A physical description of the item--E.g., Box, Can, Head, Bunch,
     weightCentigrams INTEGER, -- Optional, estimated/average weight for the item
 
     UNIQUE(name, description, weightCentigrams)
@@ -30,7 +30,16 @@ INSERT INTO Item (
     :name,
     :description,
     :weightCentigrams
-);
+)
+RETURNING id;
+
+updateById:
+UPDATE Item
+SET
+    name = :name,
+    description = :description,
+    weightCentigrams = :weightCentigrams
+WHERE id = :id;
 
 -- SEED DATA
 INSERT OR IGNORE INTO Item (id, name, description, weightCentigrams)

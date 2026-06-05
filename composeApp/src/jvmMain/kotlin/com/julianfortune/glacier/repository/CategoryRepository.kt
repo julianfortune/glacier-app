@@ -25,13 +25,18 @@ class CategoryRepository(private val database: Database) {
             }
     }
 
+    suspend fun insert(category: Category): Long {
+        return database.categoryQueries.insert(category.name)
+    }
+
+    suspend fun update(category: Entity<Category>) {
+        database.categoryQueries.updateById(category.data.name, category.id)
+    }
+
     suspend fun deleteById(id: Long): Boolean {
         val deletedId = database.categoryQueries.deleteById(id)
 
         return deletedId == id
     }
 
-    suspend fun insert(category: Category): Long {
-        return database.categoryQueries.insert(category.name)
-    }
 }

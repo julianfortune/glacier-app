@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.data.Entity
@@ -23,9 +24,17 @@ class SupplierRepository(private val database: Database) {
             }
     }
 
-    suspend fun deleteById(id: Long): Boolean {
-        val deletedId = database.supplierQueries.deleteById(id)
+    suspend fun insert(supplier: Supplier): Long {
+        return database.supplierQueries.insert(supplier.name).awaitAsOne()
+    }
 
-        return deletedId == id
+    suspend fun update(supplier: Entity<Supplier>) {
+        database.supplierQueries.updateById(supplier.data.name, supplier.id)
+    }
+
+    suspend fun deleteById(id: Long): Boolean {
+        val rowsUpdated = database.supplierQueries.deleteById(id)
+
+        return rowsUpdated > 1
     }
 }

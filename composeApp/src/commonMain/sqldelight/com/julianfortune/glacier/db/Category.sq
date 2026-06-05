@@ -19,6 +19,11 @@ DELETE FROM Category;
 insert:
 INSERT INTO Category (name) VALUES (:name);
 
+updateById:
+UPDATE Category
+SET name = :name
+WHERE id = :id;
+
 -- SEED DATA
 INSERT OR IGNORE INTO Category (id, name)
 VALUES

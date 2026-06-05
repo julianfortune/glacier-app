@@ -1,5 +1,7 @@
 package com.julianfortune.glacier.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.codec.CostStatusCodec
@@ -38,8 +40,8 @@ class DeliveryRepository(private val database: Database) {
             database.deliveryEntryQueries.getByDeliveryId(deliveryId).asFlow()
             // TODO(P2): Gather foreign keys for `purchasing_account` and `program`
         ) { deliveryResult, entriesResult ->
-            val deliveryRow = deliveryResult.executeAsOneOrNull() ?: return@combine null
-            val entryRows = entriesResult.executeAsList()
+            val deliveryRow = deliveryResult.awaitAsOne()
+            val entryRows = entriesResult.awaitAsList()
 
             val entries = entryRows.map { entry ->
                 val costStatus = CostStatusCodec.deserialize(entry.costStatus).orThrow()
@@ -87,12 +89,7 @@ class DeliveryRepository(private val database: Database) {
             delivery.feesCents,
             now.toString(),
             now.toString(),
-        ).executeAsOneOrNull()
-
-        if (deliveryId == null) {
-            // TODO(P3): Proper error handling
-            throw RuntimeException("Failed to insert")
-        }
+        ).awaitAsOne()
 
         delivery.entries?.forEach { entry ->
             insertDeliveryEntry(deliveryId, entry)

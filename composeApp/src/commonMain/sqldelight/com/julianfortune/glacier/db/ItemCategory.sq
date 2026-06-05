@@ -23,8 +23,12 @@ SELECT * FROM ItemCategory WHERE id = :id LIMIT 1;
 deleteById:
 DELETE FROM ItemCategory WHERE id = :id;
 
+deleteByItemId:
+DELETE FROM ItemCategory WHERE itemId = :itemId;
+
+
 deleteAll:
-DELETE FROM Item;
+DELETE FROM ItemCategory;
 
 insert:
 INSERT INTO ItemCategory (
