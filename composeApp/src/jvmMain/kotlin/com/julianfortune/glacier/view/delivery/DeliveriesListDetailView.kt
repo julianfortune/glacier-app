@@ -1,19 +1,20 @@
 package com.julianfortune.glacier.view.delivery
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
-import com.julianfortune.glacier.view.Item
-import com.julianfortune.glacier.view.ScrollableColumn
+import com.julianfortune.glacier.view.shared.CollectionView
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.data.DeliveryAction
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
@@ -30,19 +31,6 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
 
     val itemMap by viewModel.itemMap.collectAsState()
     val supplierMap by viewModel.supplierMap.collectAsState()
-
-    val deliveryItems = remember(deliveryHeadlines, selectedDeliveryId) {
-        deliveryHeadlines.map { delivery ->
-            val dateString = formatLocalDate(delivery.data.receivedDate)
-            val isSelected = delivery.id == selectedDeliveryId
-
-            Item(
-                dateString,
-                { viewModel.selectDelivery(delivery.id) },
-                isSelected,
-            )
-        }
-    }
 
     val deliveryDetail by viewModel.selectedDeliveryDetail.collectAsState()
     val deliveryAction by viewModel.deliveryAction
@@ -200,30 +188,35 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 1.dp,
         ) {
-            // TODO(P1): Refactor this header / list layout to look like Categories page (see screenshot mockup)
-            //  into a reusable component (settings for: elevation (?) to set bg color, handler for `createNew`, (later) search, filter, etc.)
-            // TODO(P1): Add support for dropdown ellipses menu with support for delete and edit (configurable)
-            Column(modifier = Modifier.width(240.dp)) {
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.padding(8.dp),
-                ) {
-                    FilledTonalButton(
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.height(32.dp).fillMaxWidth().pointerHoverIcon(PointerIcon.Hand),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        onClick = {
-                            viewModel.showNewDelivery()
-                        },
-                    ) {
-                        Text("New")
+            // TODO(P4): Add support for dropdown ellipses menu with support for delete and edit (configurable)
+            Column(modifier = Modifier.width(260.dp)) {
+                CollectionView(
+                    "Deliveries",
+                    deliveryHeadlines,
+                    selectedDeliveryId,
+                    content = { c, modifier, elevation ->
+                        val dateString = formatLocalDate(c.data.receivedDate)
+                        ListItem(
+                            headlineContent = {
+                                Text(dateString)
+                            },
+                            supportingContent = {
+                                val supplier = (c.data.supplierId).let { supplierMap[it] }
+                                Text(supplier?.data?.name ?: "Unknown Supplier")
+                            },
+                            modifier = modifier.clickable(
+                                enabled = true,
+                                onClick = {
+                                    viewModel.selectDelivery(c.id)
+                                }
+                            ),
+                            tonalElevation = elevation,
+                        )
+                    },
+                    onClickCreateNew = {
+                        viewModel.showNewDelivery()
                     }
-                }
-                ScrollableColumn(deliveryItems)
+                )
             }
         }
 

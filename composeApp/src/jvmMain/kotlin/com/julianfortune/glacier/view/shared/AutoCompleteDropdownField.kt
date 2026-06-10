@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view
+package com.julianfortune.glacier.view.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +23,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 /**
  * Heavily inspired by: https://mui.com/material-ui/react-autocomplete/
  */
-
-// TODO(NEXT): Make this component 'controlled' so the delivery entry modal can control the initial value !!!
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

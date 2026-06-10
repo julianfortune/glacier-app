@@ -11,11 +11,11 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
-import com.julianfortune.glacier.view.AutoCompleteDropdownField
-import com.julianfortune.glacier.view.CurrencyInput
-import com.julianfortune.glacier.view.CurrencyInputTextField
-import com.julianfortune.glacier.view.LocalDateInput
-import com.julianfortune.glacier.view.LocalDateInputTextField
+import com.julianfortune.glacier.view.shared.AutoCompleteDropdownField
+import com.julianfortune.glacier.view.shared.CurrencyInput
+import com.julianfortune.glacier.view.shared.CurrencyInputTextField
+import com.julianfortune.glacier.view.shared.LocalDateInput
+import com.julianfortune.glacier.view.shared.LocalDateInputTextField
 import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 

@@ -12,10 +12,10 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.view.AutoCompleteDropdownField
-import com.julianfortune.glacier.view.CurrencyInput
-import com.julianfortune.glacier.view.CurrencyInputTextField
-import com.julianfortune.glacier.view.Selection
+import com.julianfortune.glacier.view.shared.AutoCompleteDropdownField
+import com.julianfortune.glacier.view.shared.CurrencyInput
+import com.julianfortune.glacier.view.shared.CurrencyInputTextField
+import com.julianfortune.glacier.view.shared.Selection
 import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 

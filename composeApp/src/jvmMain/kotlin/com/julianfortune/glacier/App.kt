@@ -1,23 +1,19 @@
 package com.julianfortune.glacier
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
-import com.julianfortune.glacier.view.Item
-import com.julianfortune.glacier.view.ScrollableColumn
+import com.julianfortune.glacier.view.category.CategoryListView
 import com.julianfortune.glacier.view.delivery.DeliveriesListDetailView
 import com.julianfortune.glacier.viewModel.CategoryViewModel
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
@@ -80,9 +76,10 @@ fun App() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 when (selectedNavigationItem) {
-                    NavigationPage.CATEGORIES -> CategoryList(categoryViewModel)
-                    NavigationPage.SUPPLIERS -> SupplierList(supplierViewModel)
+                    NavigationPage.CATEGORIES -> CategoryListView(categoryViewModel)
                     NavigationPage.DELIVERIES -> DeliveriesListDetailView(deliveriesViewModel)
+                    // NavigationPage.ITEMS -> TODO(P1)
+                    // NavigationPage.SUPPLIERS -> TODO(P1)
                     else -> Column(
                         Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
@@ -97,101 +94,3 @@ fun App() {
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CategoryList(viewModel: CategoryViewModel) {
-    val categories by viewModel.categories.collectAsState(emptyList())
-
-    Column {
-        Surface(
-            color = MaterialTheme.colorScheme.surface,
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Categories", fontSize = (1.25).em)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .height(32.dp) // Match the buttons
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                shape = MaterialTheme.shapes.extraSmall, // Match the buttons
-                            )
-                    ) {
-                        BasicTextField(
-                            modifier = Modifier.fillMaxHeight().padding(horizontal = 8.dp),
-                            value = "",
-                            onValueChange = { },
-                            singleLine = true,
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                            decorationBox = { innerTextField ->
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Search,
-                                        null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    innerTextField()
-                                }
-                            }
-                        )
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    FilledTonalButton(
-                        onClick = { },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                    ) {
-                        Text("New")
-                    }
-                }
-            }
-        }
-        HorizontalDivider(thickness = 1.dp)
-        ScrollableColumn(categories.map {
-            Item(
-                it.data.name, onClick = {
-                    println("Deleting category: $it ...")
-                    viewModel.deleteCategory(it)
-                })
-        })
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SupplierList(viewModel: SupplierViewModel) {
-    val suppliers by viewModel.suppliers.collectAsState(emptyList())
-
-    Column {
-        ScrollableColumn(suppliers.map {
-            Item(
-                it.data.name, onClick = {
-                    println("Deleting supplier: ${it.id} ...")
-                    viewModel.deleteSupplier(it.id)
-                })
-
-        })
-    }
-}

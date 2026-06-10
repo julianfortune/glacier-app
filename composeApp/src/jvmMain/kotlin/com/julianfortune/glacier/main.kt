@@ -17,8 +17,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             title = "Glacier (Dev build)",
-
-            ) {
+        ) {
             App()
         }
     }

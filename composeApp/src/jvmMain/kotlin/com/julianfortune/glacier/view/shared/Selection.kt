@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view
+package com.julianfortune.glacier.view.shared
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

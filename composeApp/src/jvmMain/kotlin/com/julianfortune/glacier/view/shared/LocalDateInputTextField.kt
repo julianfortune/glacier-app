@@ -1,6 +1,5 @@
-package com.julianfortune.glacier.view
+package com.julianfortune.glacier.view.shared
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -22,7 +21,7 @@ sealed interface LocalDateInput {
             return Valid(localDate.format(FORMATTER), localDate)
         }
 
-        fun ofToday(): LocalDateInput.Valid {
+        fun ofToday(): Valid {
             val today = LocalDate.now()
             return Valid(today.format(FORMATTER), today)
         }
