@@ -20,28 +20,26 @@ class ItemRepository(private val database: Database) {
             .mapToList(Dispatchers.IO)
             .map { items ->
                 items.map { i ->
-                    val weight = i.weightCentigrams?.let(Weight::ofCentigrams)
-                    // TODO(?): Fetch categories as well
+                    // TODO(P1): Fetch categories as well
                     val categoryIds = emptyList<Long>()
-                    Entity(i.id, Item(i.name, i.description, weight, categoryIds))
+                    Entity(i.id, Item(i.name, categoryIds))
                 }
             }
     }
 
     suspend fun getById(id: Long): Entity<Item> {
         val item = database.itemQueries.getById(id).awaitAsOne()
-        val weight = item.weightCentigrams?.let(Weight::ofCentigrams)
         val itemCategoryIds = database
             .itemCategoryQueries
             .getAllByItemId(item.id)
             .awaitAsList()
             .map { it.categoryId }
 
-        return Entity(item.id, Item(item.name, item.description, weight, itemCategoryIds))
+        return Entity(item.id, Item(item.name, itemCategoryIds))
     }
 
     suspend fun insert(item: Item): Long {
-        val newItemId = database.itemQueries.insert(item.name, item.description, item.weight?.centigrams).awaitAsOne()
+        val newItemId = database.itemQueries.insert(item.name, null).awaitAsOne()
 
         for (categoryId in item.categoryIds) {
             database.itemCategoryQueries.insert(newItemId, categoryId)
@@ -51,7 +49,7 @@ class ItemRepository(private val database: Database) {
     }
 
     suspend fun update(item: Entity<Item>) {
-        database.itemQueries.updateById(item.data.name, item.data.description, item.data.weight?.centigrams, item.id)
+        database.itemQueries.updateById(item.data.name, null, item.id)
         database.itemCategoryQueries.deleteByItemId(item.id)
 
         for (categoryId in item.data.categoryIds) {

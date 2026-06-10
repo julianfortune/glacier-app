@@ -23,7 +23,6 @@ fun ItemForm(
     onSubmit: (item: Item) -> Unit
 ) {
     var name by remember { mutableStateOf(initialItem?.name ?: "") }
-    var description by remember { mutableStateOf(initialItem?.description ?: "") }
 
     val isValid = remember(name) {
         name != ""
@@ -57,22 +56,7 @@ fun ItemForm(
             colors = OutlinedTextFieldDefaults.colors(),
         )
 
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Description") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .onFocusChanged({ state ->
-                    if (!state.isFocused) {
-                        // Check for error
-                    }
-                }),
-            singleLine = true,
-            isError = false,
-            colors = OutlinedTextFieldDefaults.colors(),
-        )
+        // TODO(P0): Category drop down
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -96,9 +80,7 @@ fun ItemForm(
                 onClick = {
                     val item = Item(
                         name,
-                        if (description != "") description else null,
-                        // TODO(P2): Weight and categories
-                        null,
+                        // TODO(P0): Save category links
                         emptyList(),
                     )
                     onSubmit(item)

@@ -1,0 +1,25 @@
+-- NOTE: All dates are ISO-8601 date, e.g., "YYYY-MM-DD"
+CREATE TABLE IF NOT EXISTS Report (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+
+    -- Date range
+    startDate TEXT NOT NULL,
+    endDate TEXT NOT NULL,
+
+    -- Filters
+    categoryId INTEGER,
+    costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ),
+    programId INTEGER,
+    purchasingAccountId INTEGER,
+    supplierId INTEGER,
+
+    -- Cached values
+    cachedTotalWeightGrams INTEGER,
+    cachedTotalCostCents INTEGER,
+    cachedAt INTEGER, -- Unix epoch timestamp seconds
+
+    -- Metadata
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);

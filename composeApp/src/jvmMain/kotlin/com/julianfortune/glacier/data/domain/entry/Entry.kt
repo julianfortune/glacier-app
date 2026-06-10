@@ -7,9 +7,10 @@ data class Entry(
     val unitCount: Long,
     val unitName: String,
     val unitWeight: Weight,
-    val itemsPerUnit: Long?,
     val costStatus: CostStatus,
     val unitCostCents: Long,
-    val purchasingAccountAllocations: List<Allocation<Long>>?,
-    val programAllocations: List<Allocation<Long>>?
+    val itemWeight: Weight?,
+    val itemsPerUnit: Long?,
+    val programId: Long?,
+    val purchasingAccountId: Long?,
 )

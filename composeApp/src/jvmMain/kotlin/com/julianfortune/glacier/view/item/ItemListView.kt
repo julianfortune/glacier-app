@@ -13,7 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.Entity
-import com.julianfortune.glacier.view.delivery.renderItemName
 import com.julianfortune.glacier.view.shared.CollectionView
 import com.julianfortune.glacier.view.shared.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.view.shared.EntityOptionsDropdownMenu
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
 
 
 // TODO: Proactively check if `Item` is referenced by any Deliveries and prevent deleting
-// TODO(?): Add an `archived` status to `Item` to allow soft deletes while preserving existing data
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +43,7 @@ fun ItemListView(viewModel: ItemViewModel) {
         ) { item, modifier, elevation ->
             ListItem(
                 headlineContent = {
-                    Text(renderItemName(item.data))
+                    Text(item.data.name)
                 },
                 modifier = modifier.clickable(
                     enabled = true,

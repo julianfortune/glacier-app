@@ -38,14 +38,14 @@ class ItemRepositoryTest {
     fun insert(): Unit = runBlocking {
         // GIVEN
         val categoryId = categoryRepository.insert(Category("Dairy"))
-        val item = Item("Butter", "Stick", Weight.ofImperial(0, 8f), listOf(categoryId))
+        val item = Item("Butter", listOf(categoryId))
 
         // WHEN
         val id = itemRepository.insert(item)
 
         // THEN
         val rows = database.itemQueries.getAll().awaitAsList()
-        assertThat(rows).containsExactly(DbItem(id, item.name, item.description, item.weight?.centigrams))
+        assertThat(rows).containsExactly(DbItem(id, item.name, null))
 
         val itemCategoryRows = database.itemCategoryQueries.getAll().awaitAsList()
         assertThat(itemCategoryRows).hasSize(1)
@@ -58,18 +58,24 @@ class ItemRepositoryTest {
     fun update(): Unit = runBlocking {
         // GIVEN
         val categoryId = categoryRepository.insert(Category("Dairy"))
-        val item = Item("Butter", "Stick", Weight.ofImperial(0, 8f), listOf(categoryId))
+        val item = Item("Butter", listOf(categoryId))
         val id = itemRepository.insert(item)
 
         val updatedCategoryId = categoryRepository.insert(Category("Perishable"))
-        val updatedItem = Item("Margerine", "Tub", Weight.ofImperial(0, 4f), listOf(updatedCategoryId))
+        val updatedItem = Item("Margerine", listOf(updatedCategoryId))
 
         // WHEN
         itemRepository.update(Entity(id, updatedItem))
 
         // THEN
         val rows = database.itemQueries.getAll().awaitAsList()
-        assertThat(rows).containsExactly(DbItem(id, updatedItem.name, updatedItem.description, updatedItem.weight?.centigrams))
+        assertThat(rows).containsExactly(
+            DbItem(
+                id,
+                updatedItem.name,
+                null,
+            )
+        )
 
         val itemCategoryRows = database.itemCategoryQueries.getAll().awaitAsList()
         assertThat(itemCategoryRows).hasSize(1)
@@ -82,7 +88,7 @@ class ItemRepositoryTest {
     fun deleteById(): Unit = runBlocking {
         // GIVEN
         val categoryId = categoryRepository.insert(Category("Dairy"))
-        val item = Item("Butter", "Stick", Weight.ofImperial(0, 8f), listOf(categoryId))
+        val item = Item("Butter", listOf(categoryId))
         val itemId = itemRepository.insert(item)
 
         // WHEN

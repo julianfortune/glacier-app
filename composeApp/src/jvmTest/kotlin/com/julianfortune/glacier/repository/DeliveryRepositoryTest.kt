@@ -25,8 +25,6 @@ class DeliveryRepositoryTest {
         database = createTestDatabase()
 
         // Blow away test data defined in `.sq` files
-        database.deliveryEntryProgramQueries.deleteAll()
-        database.deliveryEntryPurchasingAccountQueries.deleteAll()
         database.deliveryEntryQueries.deleteAll()
         database.deliveryQueries.deleteAll()
 
@@ -38,7 +36,7 @@ class DeliveryRepositoryTest {
     fun insert() {
         // GIVEN
         val itemId = runBlocking {
-            database.itemQueries.insert("Food", "Box", 32L).awaitAsOne()
+            database.itemQueries.insert("Food", null).awaitAsOne()
         }
         val supplierId = runBlocking {
             database.supplierQueries.insert("Foo Bar").awaitAsOne()
@@ -49,11 +47,12 @@ class DeliveryRepositoryTest {
             10,
             "crate",
             Weight.ofCentigrams(150000),
-            null,
             CostStatus.NO_COST,
             8000,
-            emptyList(),
-            emptyList(),
+            null,
+            null,
+            null,
+            null,
         )
         val delivery = DeliveryDetail(
             LocalDate.of(2025, 10, 26),

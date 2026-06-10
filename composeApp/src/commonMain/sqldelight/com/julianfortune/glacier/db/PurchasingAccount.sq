@@ -1,6 +1,3 @@
--- TODO: Maybe this should be renamed 'payee' or 'funding source' ?
-
--- I.e., 'subaccount'
 CREATE TABLE IF NOT EXISTS PurchasingAccount (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE

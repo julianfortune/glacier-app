@@ -26,7 +26,6 @@ DELETE FROM ItemCategory WHERE id = :id;
 deleteByItemId:
 DELETE FROM ItemCategory WHERE itemId = :itemId;
 
-
 deleteAll:
 DELETE FROM ItemCategory;
 
@@ -42,10 +41,8 @@ INSERT INTO ItemCategory (
 -- SEED DATA
 INSERT OR IGNORE INTO ItemCategory (itemId, categoryId)
 VALUES
-    (0, 4),
-    (0, 6),
+    (0, 0),
     (1, 1),
-    (1, 2),
-    (1, 5)
+    (1, 2)
     -- ...
 ;

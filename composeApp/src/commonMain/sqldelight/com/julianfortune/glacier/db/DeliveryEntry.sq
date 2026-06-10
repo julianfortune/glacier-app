@@ -4,16 +4,30 @@ CREATE TABLE IF NOT EXISTS DeliveryEntry (
     deliveryId INTEGER NOT NULL,
     itemId INTEGER NOT NULL,
 
+    -- Quanity of goods
     unitCount INTEGER NOT NULL,
     unitName TEXT NOT NULL, -- E.g., 'loose', 'bulk', 'crate', 'barrel', 'case'
-    unitWeightCentigrams INTEGER NOT NULL,
+    itemWeightCentigrams INTEGER, -- Optional value for the weight of a single item
     itemsPerUnit INTEGER, -- Optional value for 'pack' size
+    unitWeightCentigrams INTEGER NOT NULL,
 
+    -- Cost
     costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ) NOT NULL,
     unitCostCents INTEGER NOT NULL, -- Rename from 'itemCostCents'
 
+    -- Allocations
+    programId INTEGER,
+    purchasingAccountId INTEGER,
+
+    -- TODO: Created/updated timestamps
+    -- Meta
+    -- createdAt INTEGER NOT NULL, -- Unix epoch timestamp seconds
+    -- updatedAt INTEGER NOT NULL, -- Unix epoch timestamp seconds
+
     FOREIGN KEY(deliveryId) REFERENCES Delivery(id),
-    FOREIGN KEY(itemId) REFERENCES Item(id)
+    FOREIGN KEY(itemId) REFERENCES Item(id),
+    FOREIGN KEY(programId) REFERENCES Program(id),
+    FOREIGN KEY(purchasingAccountId) REFERENCES PurchasingAccount(id)
 );
 
 -- QUERIES
@@ -41,17 +55,23 @@ INSERT INTO DeliveryEntry (
     itemId,
     unitCount,
     unitName,
-    unitWeightCentigrams,
     itemsPerUnit,
+    itemWeightCentigrams,
+    unitWeightCentigrams,
     costStatus,
-    unitCostCents
+    unitCostCents,
+    programId,
+    purchasingAccountId
 ) VALUES (
     :deliveryId,
     :itemId,
     :unitCount,
     :unitName,
-    :unitWeightCentigrams,
     :itemsPerUnit,
+    :itemWeightCentigrams,
+    :unitWeightCentigrams,
     :costStatus,
-    :unitCostCents
+    :unitCostCents,
+    :programId,
+    :purchasingAccountId
 );

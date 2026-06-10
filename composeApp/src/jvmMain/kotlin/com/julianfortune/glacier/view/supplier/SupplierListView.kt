@@ -22,8 +22,6 @@ import kotlinx.coroutines.launch
 
 
 // TODO: Proactively check if `Supplier` is referenced by any Deliveries and prevent deleting
-// TODO(?): Add an `archived` status to `Supplier` to allow soft deletes (hide in most parts of the UI)
-//  while preserving existing data integrity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -30,10 +30,5 @@ VALUES
     (0, 'Dairy'),
     (1, 'Perishable'),
     (2, 'Produce'),
-    (3, 'Dry'),
-    (4, 'Canned'),
-    (5, 'Vegetables'),
-    (6, 'Fruit'),
-    (7, 'Legumes'),
-    (8, 'Frozen')
+    (3, 'Bread')
 ;

@@ -59,7 +59,7 @@ fun NewEntryForm(
     LaunchedEffect(initialEntry, items) {
         selectedItem = initialEntry?.itemId?.let { initialItemId ->
             items.find { it.id == initialEntry.itemId }?.let { item ->
-                Option(initialItemId, renderItemName(item.data))
+                Option(initialItemId, item.data.name)
             }
         }
     }
@@ -98,7 +98,7 @@ fun NewEntryForm(
         Column {
             AutoCompleteDropdownField(
                 selectedOptionId = selectedItem, options = items.map {
-                    Option(it.id, renderItemName(it.data))
+                    Option(it.id, it.data.name)
                 }, onSelectedChange = { newItem ->
                     selectedItem = newItem
                 }, label = { Text("Item") }, modifier = Modifier.fillMaxWidth()
@@ -260,9 +260,10 @@ fun NewEntryForm(
                         unitCount!!,
                         unitName,
                         unitWeight!!,
-                        itemsPerUnit,
                         costStatus,
                         costCents,
+                        null, // TODO(P1): Item weight
+                        itemsPerUnit,
                         null,
                         null,
                     )

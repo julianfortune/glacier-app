@@ -38,17 +38,13 @@ class DeliveryRepository(private val database: Database) {
         return combine(
             database.deliveryQueries.getById(deliveryId).asFlow(),
             database.deliveryEntryQueries.getByDeliveryId(deliveryId).asFlow()
-            // TODO(P2): Gather foreign keys for `purchasing_account` and `program`
         ) { deliveryResult, entriesResult ->
             val deliveryRow = deliveryResult.awaitAsOne()
             val entryRows = entriesResult.awaitAsList()
 
             val entries = entryRows.map { entry ->
                 val costStatus = CostStatusCodec.deserialize(entry.costStatus).orThrow()
-
-                // TODO(P2): Plug in the foreign key results
-                val purchasingAccounts = emptyList<Allocation<Long>>()
-                val programs = emptyList<Allocation<Long>>()
+                val itemWeight = entry.itemWeightCentigrams?.let(Weight::ofCentigrams)
                 val unitWeight = entry.unitWeightCentigrams.let(Weight::ofCentigrams)
 
                 Entry(
@@ -56,11 +52,12 @@ class DeliveryRepository(private val database: Database) {
                     entry.unitCount,
                     entry.unitName,
                     unitWeight,
-                    entry.itemsPerUnit,
                     costStatus,
                     entry.unitCostCents,
-                    purchasingAccounts,
-                    programs,
+                    itemWeight,
+                    entry.itemsPerUnit,
+                    entry.programId,
+                    entry.purchasingAccountId,
                 )
             }
 
@@ -121,32 +118,19 @@ class DeliveryRepository(private val database: Database) {
 
     suspend fun insertDeliveryEntry(deliveryId: Long, entry: Entry) {
         val costStatus = CostStatusCodec.serialize(entry.costStatus)
-        val entryId = database.deliveryEntryQueries.insert(
+        database.deliveryEntryQueries.insert(
             deliveryId,
             entry.itemId,
             entry.unitCount,
             entry.unitName,
-            entry.unitWeight.centigrams,
             entry.itemsPerUnit,
+            entry.itemWeight?.centigrams,
+            entry.unitWeight.centigrams,
             costStatus,
             entry.unitCostCents,
+            entry.programId,
+            entry.purchasingAccountId,
         )
-
-        entry.programAllocations?.forEach { allocation ->
-            database.deliveryEntryProgramQueries.insert(
-                entryId,
-                allocation.allocatedTo,
-                allocation.percentage.valueInHundredths.toLong()
-            )
-        }
-
-        entry.purchasingAccountAllocations?.forEach { allocation ->
-            database.deliveryEntryPurchasingAccountQueries.insert(
-                entryId,
-                allocation.allocatedTo,
-                allocation.percentage.valueInHundredths.toLong()
-            )
-        }
     }
 
     suspend fun deleteById(id: Long): Boolean {

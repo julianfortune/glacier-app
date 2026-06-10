@@ -2,10 +2,10 @@
 CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
-    description TEXT, -- A physical description of the item--E.g., Box, Can, Head, Bunch,
-    weightCentigrams INTEGER, -- Optional, estimated/average weight for the item
+    -- JSON list of integers in centigrams representing possible weights for the item
+    savedWeightListInCentigrams TEXT,
 
-    UNIQUE(name, description, weightCentigrams)
+    UNIQUE(name)
 );
 
 -- QUERIES
@@ -24,12 +24,10 @@ DELETE FROM Item;
 insert:
 INSERT INTO Item (
     name,
-    description,
-    weightCentigrams
+    savedWeightListInCentigrams
 ) VALUES (
     :name,
-    :description,
-    :weightCentigrams
+    :savedWeightListInCentigrams
 )
 RETURNING id;
 
@@ -37,22 +35,14 @@ updateById:
 UPDATE Item
 SET
     name = :name,
-    description = :description,
-    weightCentigrams = :weightCentigrams
+    savedWeightListInCentigrams = :savedWeightListInCentigrams
 WHERE id = :id;
 
 -- SEED DATA
-INSERT OR IGNORE INTO Item (id, name, description, weightCentigrams)
+INSERT OR IGNORE INTO Item (id, name)
 VALUES
-    (0, "Sliced Peaches in Water", "Can", 145000),
-    (1, "Cut Green Beans", "Can", 150000),
-    (2, "Tuna in Water", "Can", 11340),
-    (3, "Fresh Green Beans", "Bulk", NULL),
-    (4, "Bananas", "Bunch", 90000),
-    (5, "Frozen Peas", NULL, 240000),
-    (6, "Chunk White Chicken", NULL, 125000),
-    (7, "Low Sodium Tomato Soup", NULL,107500),
-    (8, "Lettuce", "Head", NULL),
-    (9, "Corn", "Ear", 120000),
-    (10, "Broccoli", NULL, NULL)
+    (0, "Sliced Peaches in Water"),
+    (1, "Cut Green Beans"),
+    (2, "Tuna in Water"),
+    (3, "Fresh Green Beans")
 ;
