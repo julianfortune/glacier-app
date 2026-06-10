@@ -24,6 +24,7 @@ import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.util.formatCents
+import com.julianfortune.glacier.view.shared.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
@@ -213,7 +214,7 @@ fun DeliveryView(
                                 Row(
                                     modifier = Modifier.width(32.dp)
                                 ) {
-                                    EntryOptionsDropdownMenu(
+                                    EntityOptionsDropdownMenu(
                                         edit = {
                                             viewModel.showEditEntry(index, entry)
                                         },

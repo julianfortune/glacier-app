@@ -8,6 +8,7 @@ import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
 import com.julianfortune.glacier.viewModel.CategoryViewModel
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
+import com.julianfortune.glacier.viewModel.ItemViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
@@ -21,10 +22,10 @@ val appModule = module {
     }
     single { Database(get()) }
 
+    single { CategoryRepository(get()) }
+    single { DeliveryRepository(get()) }
     single { ItemRepository(get()) }
     single { SupplierRepository(get()) }
-    single { DeliveryRepository(get()) }
-    single { CategoryRepository(get()) }
 
     factory { (coroutineScope: CoroutineScope) ->
         // TODO: Use `coroutineScope` ?
@@ -32,10 +33,14 @@ val appModule = module {
     }
     factory { (coroutineScope: CoroutineScope) ->
         // TODO: Use `coroutineScope` ?
-        SupplierViewModel(get())
+        DeliveryViewModel(get(), get(), get())
     }
     factory { (coroutineScope: CoroutineScope) ->
         // TODO: Use `coroutineScope` ?
-        DeliveryViewModel(get(), get(), get())
+        ItemViewModel(get())
+    }
+    factory { (coroutineScope: CoroutineScope) ->
+        // TODO: Use `coroutineScope` ?
+        SupplierViewModel(get())
     }
 }

@@ -15,8 +15,9 @@ import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.view.shared.CollectionView
+import com.julianfortune.glacier.view.shared.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import com.julianfortune.glacier.viewModel.data.DeliveryAction
+import com.julianfortune.glacier.viewModel.data.EntityOperation
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import kotlinx.coroutines.launch
 
@@ -33,7 +34,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
     val supplierMap by viewModel.supplierMap.collectAsState()
 
     val deliveryDetail by viewModel.selectedDeliveryDetail.collectAsState()
-    val deliveryAction by viewModel.deliveryAction
+    val deliveryAction by viewModel.deliveryOperation
     val deliveryEntryAction by viewModel.deliveryEntryAction
 
     if (deliveryAction != null) {
@@ -47,7 +48,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                 shape = RoundedCornerShape(16.dp),
             ) {
                 when (deliveryAction) {
-                    is DeliveryAction.CreateNew -> {
+                    is EntityOperation.CreateNew -> {
                         NewDeliveryForm(
                             viewModel,
                             "New Delivery",
@@ -67,8 +68,8 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                             })
                     }
 
-                    is DeliveryAction.Edit -> {
-                        val delivery = (deliveryAction as DeliveryAction.Edit).delivery
+                    is EntityOperation.Edit -> {
+                        val delivery = (deliveryAction as EntityOperation.Edit).entity
                         val headline = DeliveryHeadline(
                             delivery.data.receivedDate,
                             delivery.data.supplierId,
@@ -98,11 +99,14 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                         )
                     }
 
-                    is DeliveryAction.Delete -> {
-                        val deliveryId = (deliveryAction as DeliveryAction.Delete).deliveryId
-                        DeleteDeliveryForm(
+                    is EntityOperation.Delete -> {
+                        val deliveryId = (deliveryAction as EntityOperation.Delete).id
+                        ConfirmDeleteEntityForm(
                             deliveryId,
-                            viewModel,
+                            "Delete Delivery",
+                            onCancel = {
+                                viewModel.cancelDeliveryAction()
+                            },
                             onConfirm = {
                                 coroutineScope.launch {
                                     viewModel.deleteDelivery(deliveryId)

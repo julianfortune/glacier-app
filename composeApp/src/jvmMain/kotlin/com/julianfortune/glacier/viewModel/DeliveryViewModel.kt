@@ -13,7 +13,7 @@ import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
-import com.julianfortune.glacier.viewModel.data.DeliveryAction
+import com.julianfortune.glacier.viewModel.data.EntityOperation
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -25,8 +25,8 @@ class DeliveryViewModel(
     private val supplierRepository: SupplierRepository
 ) : ViewModel() {
 
-    private val _deliveryAction = mutableStateOf<DeliveryAction?>(null)
-    val deliveryAction: State<DeliveryAction?> = _deliveryAction
+    private val _deliveryOperation = mutableStateOf<EntityOperation<DeliveryDetail>?>(null)
+    val deliveryOperation: State<EntityOperation<DeliveryDetail>?> = _deliveryOperation
 
     private val _newEntryDialogIsVisible = mutableStateOf<DeliveryEntryAction?>(null)
     val deliveryEntryAction: State<DeliveryEntryAction?> = _newEntryDialogIsVisible
@@ -99,10 +99,6 @@ class DeliveryViewModel(
         return itemRepository.getById(itemId)
     }
 
-//    suspend fun getSupplierById(supplierId: Long): Entity<Supplier> {
-//        return supplierRepository.getById(supplierId)
-//    }
-
     fun selectDelivery(deliveryId: Long) {
         _selectedDeliveryId.value = deliveryId
     }
@@ -124,28 +120,28 @@ class DeliveryViewModel(
     }
 
     fun showNewDelivery() {
-        _deliveryAction.value = DeliveryAction.CreateNew
+        _deliveryOperation.value = EntityOperation.CreateNew
     }
 
     fun showEditDelivery(delivery: Entity<DeliveryDetail>) {
-        _deliveryAction.value = DeliveryAction.Edit(delivery)
+        _deliveryOperation.value = EntityOperation.Edit(delivery)
     }
 
     fun showDeleteDelivery(delivery: Entity<DeliveryDetail>) {
-        _deliveryAction.value = DeliveryAction.Delete(delivery.id)
+        _deliveryOperation.value = EntityOperation.Delete(delivery.id)
     }
 
     fun cancelDeliveryAction() {
-        _deliveryAction.value = null
+        _deliveryOperation.value = null
     }
 
     fun newDeliveryCreated(id: Long) {
-        _deliveryAction.value = null
+        _deliveryOperation.value = null
         _selectedDeliveryId.value = id
     }
 
     fun deliveryDeleted(id: Long) {
-        _deliveryAction.value = null
+        _deliveryOperation.value = null
         _selectedDeliveryId.update { currentId ->
             when {
                 currentId == id -> null

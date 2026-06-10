@@ -32,8 +32,8 @@ fun <T> CollectionView(
     title: String,
     entities: List<Entity<T>>,
     selectedId: Long?,
-    content: @Composable (Entity<T>, Modifier, Dp) -> Unit,
     onClickCreateNew: (() -> Unit)? = null,
+    content: @Composable (Entity<T>, Modifier, Dp) -> Unit,
 ) {
     Column {
         Surface(
@@ -50,19 +50,21 @@ fun <T> CollectionView(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FilledTonalButton(
-                        onClick = {
-                            onClickCreateNew?.invoke()
-                        },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                    ) {
-                        Text("New")
+                    if (onClickCreateNew != null) {
+                        FilledTonalButton(
+                            onClick = {
+                                onClickCreateNew.invoke()
+                            },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors().copy(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                        ) {
+                            Text("New")
+                        }
                     }
                 }
             }

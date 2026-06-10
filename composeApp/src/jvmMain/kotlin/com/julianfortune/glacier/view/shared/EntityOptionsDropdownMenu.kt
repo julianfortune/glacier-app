@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view.delivery
+package com.julianfortune.glacier.view.shared
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -12,7 +12,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EntryOptionsDropdownMenu(
+fun EntityOptionsDropdownMenu(
     edit: () -> Unit,
     delete: () -> Unit,
 ) {

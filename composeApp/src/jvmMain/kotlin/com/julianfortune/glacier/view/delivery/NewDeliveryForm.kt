@@ -20,7 +20,6 @@ import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 
 
-// TODO(P2): Update this component to handle editing in addition to creating new
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewDeliveryForm(

@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view.delivery
+package com.julianfortune.glacier.view.shared
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,20 +19,20 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.viewModel.DeliveryViewModel
 
 @Composable
-fun DeleteDeliveryForm(
-    deliveryId: Long,
-    viewModel: DeliveryViewModel,
-    onConfirm: (deliveryId: Long) -> Unit
+fun ConfirmDeleteEntityForm(
+    id: Long,
+    text: String,
+    onCancel: () -> Unit,
+    onConfirm: (id: Long) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
-            text = "Delete Delivery",
+            text = text,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -46,9 +46,7 @@ fun DeleteDeliveryForm(
         ) {
             TextButton(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = {
-                    viewModel.cancelDeliveryAction()
-                }
+                onClick = onCancel
             ) {
                 Text("Cancel")
             }
@@ -62,7 +60,7 @@ fun DeleteDeliveryForm(
                     contentColor = MaterialTheme.colorScheme.onError,
                 ),
                 onClick = {
-                    onConfirm(deliveryId)
+                    onConfirm(id)
                 },
             ) {
                 Text("Delete")

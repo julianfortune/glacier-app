@@ -15,8 +15,11 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import com.julianfortune.glacier.view.category.CategoryListView
 import com.julianfortune.glacier.view.delivery.DeliveriesListDetailView
+import com.julianfortune.glacier.view.item.ItemListView
+import com.julianfortune.glacier.view.supplier.SupplierListView
 import com.julianfortune.glacier.viewModel.CategoryViewModel
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
+import com.julianfortune.glacier.viewModel.ItemViewModel
 import com.julianfortune.glacier.viewModel.SupplierViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,12 +44,16 @@ fun App() {
     val categoryViewModel = koinInject<CategoryViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
-    val supplierViewModel = koinInject<SupplierViewModel> {
-        parametersOf(CoroutineScope(Dispatchers.Main))
-    }
     val deliveriesViewModel = koinInject<DeliveryViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
+    val itemViewModel = koinInject<ItemViewModel> {
+        parametersOf(CoroutineScope(Dispatchers.Main))
+    }
+    val supplierViewModel = koinInject<SupplierViewModel> {
+        parametersOf(CoroutineScope(Dispatchers.Main))
+    }
+
 
     var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
@@ -78,8 +85,8 @@ fun App() {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> CategoryListView(categoryViewModel)
                     NavigationPage.DELIVERIES -> DeliveriesListDetailView(deliveriesViewModel)
-                    // NavigationPage.ITEMS -> TODO(P1)
-                    // NavigationPage.SUPPLIERS -> TODO(P1)
+                     NavigationPage.ITEMS -> ItemListView(itemViewModel)
+                     NavigationPage.SUPPLIERS -> SupplierListView(supplierViewModel)
                     else -> Column(
                         Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
