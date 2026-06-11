@@ -13,25 +13,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
-import com.julianfortune.glacier.view.category.CategoryListView
+import com.julianfortune.glacier.data.domain.Category
+import com.julianfortune.glacier.data.domain.Program
+import com.julianfortune.glacier.data.domain.PurchasingAccount
+import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.view.delivery.DeliveriesListDetailView
 import com.julianfortune.glacier.view.item.ItemListView
-import com.julianfortune.glacier.view.supplier.SupplierListView
-import com.julianfortune.glacier.viewModel.CategoryViewModel
+import com.julianfortune.glacier.view.namedentity.NamedEntityListView
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.ItemViewModel
-import com.julianfortune.glacier.viewModel.SupplierViewModel
+import com.julianfortune.glacier.viewModel.NamedEntityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
 enum class NavigationPage(val title: String, val icon: ImageVector) {
     DELIVERIES("Deliveries", Icons.Outlined.LocalShipping),
     ITEMS("Items", Icons.Outlined.FoodBank),
     SUPPLIERS("Suppliers", Icons.Outlined.Storefront),
     PROGRAMS("Programs", Icons.Outlined.Cases),
-    SUBACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
+    PURCHASING_ACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
     CATEGORIES("Categories", Icons.Outlined.Category),
     REPORTS("Reports", Icons.Outlined.Analytics),
 }
@@ -41,19 +44,17 @@ enum class NavigationPage(val title: String, val icon: ImageVector) {
 fun App() {
     // TODO: Can this be simplified ..?
     // Probably should look at: https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-viewmodel.html#using-viewmodel-in-common-code
-    val categoryViewModel = koinInject<CategoryViewModel> {
-        parametersOf(CoroutineScope(Dispatchers.Main))
-    }
+    val categoryViewModel: NamedEntityViewModel<Category> = koinInject(named("categoryViewModel"))
     val deliveriesViewModel = koinInject<DeliveryViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
     val itemViewModel = koinInject<ItemViewModel> {
         parametersOf(CoroutineScope(Dispatchers.Main))
     }
-    val supplierViewModel = koinInject<SupplierViewModel> {
-        parametersOf(CoroutineScope(Dispatchers.Main))
-    }
-
+    val programViewModel: NamedEntityViewModel<Program> = koinInject(named("programViewModel"))
+    val purchasingAccountViewModel: NamedEntityViewModel<PurchasingAccount> =
+        koinInject(named("purchasingAccountViewModel"))
+    val supplierViewModel: NamedEntityViewModel<Supplier> = koinInject(named("supplierViewModel"))
 
     var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
@@ -83,10 +84,32 @@ fun App() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 when (selectedNavigationItem) {
-                    NavigationPage.CATEGORIES -> CategoryListView(categoryViewModel)
+                    NavigationPage.CATEGORIES -> NamedEntityListView(
+                        categoryViewModel,
+                        "Categories",
+                        "Category"
+                    ) { Category(it) }
+
                     NavigationPage.DELIVERIES -> DeliveriesListDetailView(deliveriesViewModel)
-                     NavigationPage.ITEMS -> ItemListView(itemViewModel)
-                     NavigationPage.SUPPLIERS -> SupplierListView(supplierViewModel)
+                    NavigationPage.ITEMS -> ItemListView(itemViewModel)
+                    NavigationPage.PROGRAMS -> NamedEntityListView(
+                        programViewModel,
+                        "Programs",
+                        "Program"
+                    ) { Program(it) }
+
+                    NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityListView(
+                        purchasingAccountViewModel,
+                        "Accounts",
+                        "Account"
+                    ) { PurchasingAccount(it) }
+
+                    NavigationPage.SUPPLIERS -> NamedEntityListView(
+                        supplierViewModel,
+                        "Suppliers",
+                        "Supplier"
+                    ) { Supplier(it) }
+
                     else -> Column(
                         Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,

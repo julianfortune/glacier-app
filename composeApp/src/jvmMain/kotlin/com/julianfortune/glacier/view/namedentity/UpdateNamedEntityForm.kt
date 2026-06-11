@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view.supplier
+package com.julianfortune.glacier.view.namedentity
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -10,19 +10,19 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.viewModel.SupplierViewModel
+import com.julianfortune.glacier.data.domain.NamedEntity
+import com.julianfortune.glacier.viewModel.NamedEntityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SupplierForm(
-    viewModel: SupplierViewModel,
+fun <T: NamedEntity> UpdateNamedEntityForm(
+    viewModel: NamedEntityViewModel<T>,
     title: String,
     submitButtonText: String,
-    initialSupplier: Supplier? = null,
-    onSubmit: (supplier: Supplier) -> Unit
+    initialData: T? = null,
+    onSubmit: (updatedName: String) -> Unit
 ) {
-    var name by remember { mutableStateOf(initialSupplier?.name ?: "") }
+    var name by remember { mutableStateOf(initialData?.name ?: "") }
 
     val isValid = remember(name) {
         name != ""
@@ -64,7 +64,7 @@ fun SupplierForm(
             TextButton(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    viewModel.cancelSupplierOperation()
+                    viewModel.dismissOperation()
                 }
             ) {
                 Text("Cancel")
@@ -76,7 +76,7 @@ fun SupplierForm(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 enabled = isValid,
                 onClick = {
-                    onSubmit(Supplier(name))
+                    onSubmit(name)
                 },
             ) {
                 Text(submitButtonText)

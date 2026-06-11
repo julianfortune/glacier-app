@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS PurchasingAccount (
 
 -- QUERIES
 getAll:
-SELECT * FROM PurchasingAccount;
+SELECT * FROM PurchasingAccount ORDER BY name ASC;
 
 getById:
 SELECT * FROM PurchasingAccount WHERE id = :id LIMIT 1;
@@ -17,7 +17,12 @@ deleteAll:
 DELETE FROM PurchasingAccount;
 
 insert:
-INSERT INTO PurchasingAccount (name) VALUES (:name);
+INSERT INTO PurchasingAccount (name) VALUES (:name) RETURNING id;
+
+updateById:
+UPDATE PurchasingAccount
+SET name = :name
+WHERE id = :id;
 
 -- SEED DATA
 INSERT OR IGNORE INTO PurchasingAccount (name)

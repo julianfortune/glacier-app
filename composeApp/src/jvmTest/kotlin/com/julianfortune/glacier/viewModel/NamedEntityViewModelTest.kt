@@ -9,15 +9,15 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class CategoryViewModelTest {
+class NamedEntityViewModelTest {
 
-    lateinit var viewModel: CategoryViewModel
+    lateinit var viewModel: NamedEntityViewModel<Category>
     lateinit var categoryRepository: CategoryRepository
 
     @BeforeEach
     fun setUp() {
         categoryRepository = mockk(relaxed = true)
-        viewModel = CategoryViewModel(categoryRepository)
+        viewModel = NamedEntityViewModel(categoryRepository)
     }
 
     @Test
@@ -26,7 +26,9 @@ class CategoryViewModelTest {
         val target = Entity(1L, Category("Foo"))
 
         // WHEN
-        viewModel.deleteCategory(target)
+        runBlocking {
+            viewModel.delete(target.id)
+        }
 
         // THEN
         verify {

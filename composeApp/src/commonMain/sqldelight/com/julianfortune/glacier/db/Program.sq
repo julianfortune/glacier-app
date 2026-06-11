@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Program (
 
 -- QUERIES
 getAll:
-SELECT * FROM Program;
+SELECT * FROM Program ORDER BY name ASC;
 
 getById:
 SELECT * FROM Program WHERE id = :id LIMIT 1;
@@ -18,7 +18,12 @@ deleteAll:
 DELETE FROM Program;
 
 insert:
-INSERT INTO Program (name) VALUES (:name);
+INSERT INTO Program (name) VALUES (:name) RETURNING id;
+
+updateById:
+UPDATE Program
+SET name = :name
+WHERE id = :id;
 
 -- SEED DATA
 INSERT OR IGNORE INTO Program (name)

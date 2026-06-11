@@ -10,10 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class SupplierRepository(private val database: Database) {
+class SupplierRepository(private val database: Database) : NamedEntityRepository<Supplier> {
 
     // TODO: Understand Flows and coroutine contexts
-    fun getAll(): Flow<List<Entity<Supplier>>> {
+    override fun getAll(): Flow<List<Entity<Supplier>>> {
         return database.supplierQueries.getAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
@@ -24,15 +24,15 @@ class SupplierRepository(private val database: Database) {
             }
     }
 
-    suspend fun insert(supplier: Supplier): Long {
-        return database.supplierQueries.insert(supplier.name).awaitAsOne()
+    override suspend fun insert(data: Supplier): Long {
+        return database.supplierQueries.insert(data.name).awaitAsOne()
     }
 
-    suspend fun update(supplier: Entity<Supplier>) {
-        database.supplierQueries.updateById(supplier.data.name, supplier.id)
+    override suspend fun update(entity: Entity<Supplier>) {
+        database.supplierQueries.updateById(entity.data.name, entity.id)
     }
 
-    suspend fun deleteById(id: Long): Boolean {
+    override suspend fun deleteById(id: Long): Boolean {
         val rowsUpdated = database.supplierQueries.deleteById(id)
 
         return rowsUpdated > 1

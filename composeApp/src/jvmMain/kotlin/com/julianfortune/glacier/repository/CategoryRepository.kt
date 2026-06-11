@@ -4,17 +4,15 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Category
-
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class CategoryRepository(private val database: Database) {
+class CategoryRepository(private val database: Database) : NamedEntityRepository<Category> {
 
-    // TODO: Probably need pagination ...?
     // TODO: Understand Flows and coroutine contexts
-    fun getAll(): Flow<List<Entity<Category>>> {
+    override fun getAll(): Flow<List<Entity<Category>>> {
         return database.categoryQueries.getAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
@@ -25,15 +23,15 @@ class CategoryRepository(private val database: Database) {
             }
     }
 
-    suspend fun insert(category: Category): Long {
-        return database.categoryQueries.insert(category.name)
+    override suspend fun insert(data: Category): Long {
+        return database.categoryQueries.insert(data.name)
     }
 
-    suspend fun update(category: Entity<Category>) {
-        database.categoryQueries.updateById(category.data.name, category.id)
+    override suspend fun update(entity: Entity<Category>) {
+        database.categoryQueries.updateById(entity.data.name, entity.id)
     }
 
-    suspend fun deleteById(id: Long): Boolean {
+    override suspend fun deleteById(id: Long): Boolean {
         val deletedId = database.categoryQueries.deleteById(id)
 
         return deletedId == id
