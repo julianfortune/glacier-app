@@ -10,7 +10,6 @@ import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
-import com.julianfortune.glacier.data.domain.entry.Allocation
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.db.Database
 import dev.forkhandles.result4k.orThrow

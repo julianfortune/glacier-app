@@ -236,7 +236,7 @@ fun DeliveryView(
                                 }
                             }
 
-                            // TODO(P2): Purchasing Account & Program allocations
+                            // TODO(P2): Purchasing Accounts & Programs
                         }
                     }
                 }
