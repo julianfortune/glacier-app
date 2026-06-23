@@ -39,8 +39,12 @@ data class Weight(val centigrams: Long) {
         }
     }
 
+    fun times(multiple: Long): Weight {
+        return ofCentigrams(centigrams * multiple)
+    }
+
     fun times(multiple: Number): Weight {
-        return ofCentigrams(centigrams * multiple.toLong())
+        return times(multiple.toLong())
     }
 
     fun toImperial(): Pair<Long, Float> {
