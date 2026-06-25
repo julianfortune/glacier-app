@@ -3,7 +3,6 @@ package com.julianfortune.glacier.view.delivery
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -11,12 +10,8 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
-import com.julianfortune.glacier.view.shared.AutoCompleteDropdownField
-import com.julianfortune.glacier.view.shared.CurrencyInput
-import com.julianfortune.glacier.view.shared.CurrencyInputTextField
-import com.julianfortune.glacier.view.shared.LocalDateInput
-import com.julianfortune.glacier.view.shared.LocalDateInputTextField
 import com.julianfortune.glacier.view.data.Option
+import com.julianfortune.glacier.view.shared.*
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 
 

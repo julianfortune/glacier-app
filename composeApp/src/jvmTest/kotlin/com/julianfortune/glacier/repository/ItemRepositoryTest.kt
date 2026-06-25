@@ -5,7 +5,6 @@ import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat

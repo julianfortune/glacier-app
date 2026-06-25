@@ -3,7 +3,6 @@ package com.julianfortune.glacier.view.delivery
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -12,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
+import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.view.shared.AutoCompleteDropdownField
 import com.julianfortune.glacier.view.shared.CurrencyInput
 import com.julianfortune.glacier.view.shared.CurrencyInputTextField
 import com.julianfortune.glacier.view.shared.Selection
-import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

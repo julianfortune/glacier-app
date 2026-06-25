@@ -5,7 +5,6 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.PurchasingAccount
-import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

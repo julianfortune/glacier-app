@@ -1,16 +1,16 @@
 [versions]
 androidx-lifecycle = "2.9.1"
 assertj = "3.27.6"
-composeHotReload = "1.0.0-beta04"
-composeMultiplatform = "1.8.2"
+composeHotReload = "1.1.1"
+composeMultiplatform = "1.11.1"
 forkhandles = "2.25.6.0"
 jackson = "2.22.0"
 junit = "6.0.0"
 koin = "4.1.1"
-kotlin = "2.2.0"
+kotlin = "2.4.0"
 kotlinx-coroutines = "1.10.2"
 mockk = "1.14.6"
-sqldelight = "2.2.1"
+sqldelight = "2.3.2"
 
 [libraries]
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }

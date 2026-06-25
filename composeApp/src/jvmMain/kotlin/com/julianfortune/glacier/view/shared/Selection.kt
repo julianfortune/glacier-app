@@ -30,7 +30,7 @@ fun <ID> Selection(
     ) {
         Surface(
             modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryEditable, enabled = true)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
                 .pointerHoverIcon(PointerIcon.Hand),
             shape = MaterialTheme.shapes.small,
             color = MaterialTheme.colorScheme.surfaceVariant,

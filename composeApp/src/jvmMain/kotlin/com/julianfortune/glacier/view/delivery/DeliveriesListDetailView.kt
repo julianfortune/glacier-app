@@ -17,8 +17,8 @@ import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.view.shared.CollectionView
 import com.julianfortune.glacier.view.shared.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import com.julianfortune.glacier.viewModel.data.EntityOperation
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
+import com.julianfortune.glacier.viewModel.data.EntityOperation
 import kotlinx.coroutines.launch
 
 

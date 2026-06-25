@@ -15,7 +15,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.view.data.Option
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // TODO(P4): Implement async fetching...? (w debounce, see: https://stackoverflow.com/a/78908108)
 //  For performance probably won't be able to load all `item`s into memory at once ..
@@ -26,7 +25,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun <ID> AutoCompleteDropdownField(
     selectedOptionId: Option<ID>?,
     options: List<Option<ID>>,
@@ -94,7 +92,7 @@ fun <ID> AutoCompleteDropdownField(
                 }
             },
             modifier = modifier
-                .menuAnchor(MenuAnchorType.PrimaryEditable)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .onFocusChanged {
                     expanded = it.isFocused
                     if (!it.isFocused && input != null) {
@@ -143,7 +141,6 @@ fun <ID> AutoCompleteDropdownField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun NoOptionsMenuItem() {
     DropdownMenuItem(
         text = { Text("No matches found") },

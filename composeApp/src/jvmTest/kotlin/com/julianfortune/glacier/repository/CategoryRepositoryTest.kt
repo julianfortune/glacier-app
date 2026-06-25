@@ -4,7 +4,6 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat

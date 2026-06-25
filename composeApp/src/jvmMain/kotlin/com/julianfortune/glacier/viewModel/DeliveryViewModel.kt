@@ -13,8 +13,8 @@ import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
-import com.julianfortune.glacier.viewModel.data.EntityOperation
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
+import com.julianfortune.glacier.viewModel.data.EntityOperation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 

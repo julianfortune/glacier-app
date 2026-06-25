@@ -15,7 +15,6 @@ import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import java.nio.file.Paths
-import kotlin.io.path.Path
 
 fun main() {
     // Makes app bar match system theme on macOS
