@@ -7,10 +7,15 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.julianfortune.glacier.config.Configuration
 import com.julianfortune.glacier.config.Environment
+import com.julianfortune.glacier.config.FileLocation
 import com.julianfortune.glacier.db.DatabaseDriverFactory
+import com.julianfortune.glacier.system.AppDataManager
+import com.julianfortune.glacier.system.Platform
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import java.nio.file.Paths
+import kotlin.io.path.Path
 
 fun main() {
     // Makes app bar match system theme on macOS
@@ -21,12 +26,23 @@ fun main() {
     val environment = Environment.fromSystem(Environment.RELEASE)
     val configuration = Configuration.load(mapper, environment)
 
+    val adm = AppDataManager(Platform.current)
+
+    val databaseDirectory = when (configuration.db.location) {
+        FileLocation.APP_DATA -> {
+            adm.initialize()
+            adm.appDataPath
+        }
+        FileLocation.WORKING_DIRECTORY -> Paths.get("")
+    }
+
     // Debug output
+    println("osName=${Platform.osName}")
     println("environment=$environment")
     println("configuration=$configuration")
 
     val driver = runBlocking {
-        DatabaseDriverFactory().createDriver()
+        DatabaseDriverFactory(databaseDirectory).createDriver()
     }
 
     startKoin {
