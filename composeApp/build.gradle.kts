@@ -56,14 +56,11 @@ kotlin {
             runtimeOnly(libs.junit.platform.launcher)
         }
     }
+}
 
-    targets.configureEach {
-        compilations.configureEach {
-            // TODO: Use newer API for added args
-            compilerOptions.configure {
-                freeCompilerArgs.add("-Xexpect-actual-classes")
-            }
-        }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
 
