@@ -1,0 +1,25 @@
+package com.julianfortune.glacier.config
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.julianfortune.glacier.system.Resources
+
+data class Configuration(
+    val db: Db
+) {
+    data class Db(val location: FileLocation)
+
+    companion object {
+        fun getFileName(environment: Environment): String {
+            return when (environment) {
+                Environment.DEVELOPMENT -> "configuration-dev.yaml"
+                Environment.RELEASE -> "configuration-release.yaml"
+            }
+        }
+
+        fun load(mapper: ObjectMapper, environment: Environment): Configuration {
+            val fileName = getFileName(environment)
+            return Resources.load(mapper, fileName)
+        }
+    }
+
+}

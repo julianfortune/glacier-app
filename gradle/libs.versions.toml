@@ -4,6 +4,7 @@ assertj = "3.27.6"
 composeHotReload = "1.0.0-beta04"
 composeMultiplatform = "1.8.2"
 forkhandles = "2.25.6.0"
+jackson = "2.22.0"
 junit = "6.0.0"
 koin = "4.1.1"
 kotlin = "2.2.0"
@@ -16,6 +17,9 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 forkhandles-bom = { module = "dev.forkhandles:forkhandles-bom", version.ref = "forkhandles" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson"}
+jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson"}
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }

@@ -41,6 +41,9 @@ kotlin {
             implementation(libs.sqldelight.coroutines)
         }
         jvmMain.dependencies {
+            implementation(libs.jackson.core)
+            implementation(libs.jackson.yaml)
+            implementation(libs.jackson.kotlin)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.sqldelight.driver)
@@ -74,6 +77,11 @@ compose.desktop {
             packageVersion = "1.0.0"
 
             modules("java.sql")
+        }
+
+        // When running the application directly set the environment to 'development'
+        if (gradle.startParameter.taskNames.contains("run")) {
+            jvmArgs += listOf("-Denv=DEVELOPMENT")
         }
     }
 }

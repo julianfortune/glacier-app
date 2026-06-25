@@ -47,3 +47,6 @@ gradle-app.setting
 .idea
 
 .DS_Store
+
+# Sqlite dbs
+*.db
