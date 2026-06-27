@@ -22,14 +22,14 @@ import kotlinx.coroutines.flow.*
 class DeliveryViewModel(
     private val deliveryRepository: DeliveryRepository,
     private val itemRepository: ItemRepository,
-    private val supplierRepository: SupplierRepository
+    supplierRepository: SupplierRepository
 ) : ViewModel() {
 
     private val _deliveryOperation = mutableStateOf<EntityOperation<DeliveryDetail>?>(null)
     val deliveryOperation: State<EntityOperation<DeliveryDetail>?> = _deliveryOperation
 
-    private val _newEntryDialogIsVisible = mutableStateOf<DeliveryEntryAction?>(null)
-    val deliveryEntryAction: State<DeliveryEntryAction?> = _newEntryDialogIsVisible
+    private val _deliveryEntryAction = mutableStateOf<DeliveryEntryAction?>(null)
+    val deliveryEntryAction: State<DeliveryEntryAction?> = _deliveryEntryAction
 
     // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
     // TODO(P5): Filtering, e.g., by time period
@@ -151,15 +151,15 @@ class DeliveryViewModel(
     }
 
     fun showNewEntry() {
-        _newEntryDialogIsVisible.value = DeliveryEntryAction.CreateNew
+        _deliveryEntryAction.value = DeliveryEntryAction.CreateNew
     }
 
     fun showEditEntry(index: Int, entry: Entry) {
-        _newEntryDialogIsVisible.value = DeliveryEntryAction.Edit(index, entry)
+        _deliveryEntryAction.value = DeliveryEntryAction.Edit(index, entry)
     }
 
     fun dismissEntryModal() {
-        _newEntryDialogIsVisible.value = null
+        _deliveryEntryAction.value = null
     }
 
 }
