@@ -181,115 +181,120 @@ fun DeliveryView(
 
                     else -> {
                         entries.mapIndexed { index, entry ->
-                            SelectionContainer {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-                                ) {
-                                    Text(
-                                        text = itemMap[entry.itemId]?.data?.name ?: "...",
-                                        modifier = Modifier.weight(1f),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-
-                                    Text(
-                                        text = "$${formatCents(entry.unitCostCents)}",
-                                        modifier = Modifier.width(80.dp),
-                                        textAlign = TextAlign.End,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-
-                                    Text(
-                                        text = "${entry.unitCount}",
-                                        modifier = Modifier.width(60.dp),
-                                        textAlign = TextAlign.End,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-
-                                    val totalWeightInPounds = entry.unitWeight.times(entry.unitCount).toPounds()
-                                    Text(
-                                        text = "%.2f".format(totalWeightInPounds),
-                                        modifier = Modifier.width(104.dp),
-                                        textAlign = TextAlign.End,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-
-                                    val totalEntryCostCents = calculateEntryTotalCostCents(entry)
-                                    Text(
-                                        text = "$${formatCents(totalEntryCostCents)}",
-                                        modifier = Modifier.width(80.dp),
-                                        textAlign = TextAlign.End,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                            ) {
+                                SelectionContainer {
                                     Row(
-                                        modifier = Modifier.width(32.dp)
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                                     ) {
-                                        EntityOptionsDropdownMenu(
-                                            edit = {
-                                                viewModel.showEditEntry(index, entry)
-                                            },
-                                            delete = {
-                                                // TODO(P4): Revisit this code to try to make more fluent
-                                                val currentDeliveryDetail: Entity<DeliveryDetail> = deliveryDetail
-
-                                                val updatedDelivery = currentDeliveryDetail.copy(
-                                                    data = currentDeliveryDetail.data.copy(
-                                                        entries = currentDeliveryDetail.data.entries?.filterIndexed { i, _ -> i != index }
-                                                    )
-                                                )
-
-                                                coroutineScope.launch {
-                                                    viewModel.updateDelivery(updatedDelivery)
-                                                }
-                                            },
+                                        Text(
+                                            text = itemMap[entry.itemId]?.data?.name ?: "...",
+                                            modifier = Modifier.weight(1f),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
-                                    }
-                                }
 
-                                // TODO(P2): Purchasing Accounts & Programs
+                                        Text(
+                                            text = "$${formatCents(entry.unitCostCents)}",
+                                            modifier = Modifier.width(80.dp),
+                                            textAlign = TextAlign.End,
+                                            fontFamily = FontFamily.Monospace
+                                        )
+
+                                        Text(
+                                            text = "${entry.unitCount}",
+                                            modifier = Modifier.width(60.dp),
+                                            textAlign = TextAlign.End,
+                                            fontFamily = FontFamily.Monospace
+                                        )
+
+                                        val totalWeightInPounds = entry.unitWeight.times(entry.unitCount).toPounds()
+                                        Text(
+                                            text = "%.2f".format(totalWeightInPounds),
+                                            modifier = Modifier.width(104.dp),
+                                            textAlign = TextAlign.End,
+                                            fontFamily = FontFamily.Monospace
+                                        )
+
+                                        val totalEntryCostCents = calculateEntryTotalCostCents(entry)
+                                        Text(
+                                            text = "$${formatCents(totalEntryCostCents)}",
+                                            modifier = Modifier.width(80.dp),
+                                            textAlign = TextAlign.End,
+                                            fontFamily = FontFamily.Monospace
+                                        )
+
+                                        Row(
+                                            modifier = Modifier.width(32.dp)
+                                        ) {
+                                            EntityOptionsDropdownMenu(
+                                                edit = {
+                                                    viewModel.showEditEntry(index, entry)
+                                                },
+                                                delete = {
+                                                    // TODO(P4): Revisit this code to try to make more fluent
+                                                    val currentDeliveryDetail: Entity<DeliveryDetail> = deliveryDetail
+
+                                                    val updatedDelivery = currentDeliveryDetail.copy(
+                                                        data = currentDeliveryDetail.data.copy(
+                                                            entries = currentDeliveryDetail.data.entries?.filterIndexed { i, _ -> i != index }
+                                                        )
+                                                    )
+
+                                                    coroutineScope.launch {
+                                                        viewModel.updateDelivery(updatedDelivery)
+                                                    }
+                                                },
+                                            )
+                                        }
+                                    }
+                                    // TODO(P2): Purchasing Accounts & Programs
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            Row {
-                Button(
-                    onClick = { viewModel.showNewEntry() },
-                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
-                ) {
-                    Text("New Entry")
+                Row {
+                    Button(
+                        onClick = { viewModel.showNewEntry() },
+                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
+                    ) {
+                        Text("New Entry")
+                    }
                 }
-            }
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            SelectionContainer {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // Total weight of delivery
-                    val totalWeightPounds = calculateDeliveryTotalWeightPounds(deliveryDetail.data)
-                    Text(
-                        text = "${totalWeightPounds} lbs",
-                        textAlign = TextAlign.End,
-                        fontFamily = FontFamily.Monospace
-                    )
+                SelectionContainer {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // Total weight of delivery
+                        val totalWeightPounds = calculateDeliveryTotalWeightPounds(deliveryDetail.data)
+                        Text(
+                            text = "${totalWeightPounds} lbs",
+                            textAlign = TextAlign.End,
+                            fontFamily = FontFamily.Monospace
+                        )
 
-                    Spacer(Modifier.width(32.dp))
+                        Spacer(Modifier.width(32.dp))
 
-                    // Total cost of delivery
-                    val totalCostCents = calculateDeliveryTotalCostCents(deliveryDetail.data)
-                    Text(
-                        text = "$${formatCents(totalCostCents)}",
-                        textAlign = TextAlign.End,
-                        fontFamily = FontFamily.Monospace
-                    )
+                        // Total cost of delivery
+                        val totalCostCents = calculateDeliveryTotalCostCents(deliveryDetail.data)
+                        Text(
+                            text = "$${formatCents(totalCostCents)}",
+                            textAlign = TextAlign.End,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
                 }
             }
         }
