@@ -16,6 +16,7 @@ import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.view.shared.CollectionView
 import com.julianfortune.glacier.view.shared.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.view.shared.SideSheet
 import com.julianfortune.glacier.viewModel.DeliveryViewModel
 import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
 import com.julianfortune.glacier.viewModel.data.EntityOperation
@@ -123,18 +124,17 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
     }
 
     if (deliveryEntryAction != null) {
-        if (selectedDeliveryId == null) {
-            throw IllegalStateException("Unable to create an entry without a delivery selected")
-        }
-
-        BasicAlertDialog(
-            onDismissRequest = { }, // Ignore implicit attempts to close the dialog
-        ) {
-            Card(
+        SideSheet(
+            onClose = {
+                viewModel.dismissEntryModal()
+            },
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 1.dp,
+        ) { dismissSheet ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(640.dp)
                     .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
             ) {
                 when (deliveryEntryAction) {
                     is DeliveryEntryAction.CreateNew -> {
@@ -142,10 +142,13 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                             viewModel,
                             "New Entry",
                             "Create",
+                            onCancel = {
+                                dismissSheet()
+                            },
                             onSubmit = { entry ->
                                 coroutineScope.launch {
                                     viewModel.saveEntry(selectedDeliveryId!!, entry)
-                                    viewModel.dismissEntryModal()
+                                    dismissSheet()
                                 }
                             }
                         )
@@ -157,6 +160,9 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
                             "Edit Entry",
                             "Update",
                             initialEntry = (deliveryEntryAction as DeliveryEntryAction.Edit).entry,
+                            onCancel = {
+                                dismissSheet()
+                            },
                             onSubmit = { newEntry ->
                                 val currentDeliveryDetail: Entity<DeliveryDetail> =
                                     deliveryDetail
@@ -175,7 +181,7 @@ fun DeliveriesListDetailView(viewModel: DeliveryViewModel) {
 
                                 coroutineScope.launch {
                                     viewModel.updateDelivery(updatedDelivery)
-                                    viewModel.dismissEntryModal()
+                                    dismissSheet()
                                 }
                             }
                         )

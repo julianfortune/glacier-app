@@ -25,6 +25,7 @@ fun NewEntryForm(
     title: String,
     submitButtonText: String,
     initialEntry: Entry? = null,
+    onCancel: () -> Unit,
     onSubmit: (entry: Entry) -> Unit
 ) {
     val items by viewModel.allItems.collectAsState()
@@ -235,7 +236,7 @@ fun NewEntryForm(
         ) {
             TextButton(
                 onClick = {
-                    viewModel.dismissEntryModal()
+                    onCancel()
                 }) {
                 Text("Cancel")
             }
