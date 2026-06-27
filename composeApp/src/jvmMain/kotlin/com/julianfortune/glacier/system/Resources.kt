@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 object Resources {
     inline fun <reified T> load(mapper: ObjectMapper, fileName: String): T {
         val inputStream = this::class.java.classLoader.getResourceAsStream(fileName)
-            ?: throw IllegalArgumentException("Configuration file '$fileName' not found in resources.")
+            ?: throw IllegalArgumentException("Resource with name '$fileName' could not be found.")
 
         return inputStream.use { mapper.readValue<T>(it) }
     }
