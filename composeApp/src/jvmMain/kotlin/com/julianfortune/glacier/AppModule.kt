@@ -21,15 +21,10 @@ val appModule = module {
     single { PurchasingAccountRepository(get()) }
 
     viewModel(named("categoryViewModel")) {
-        val categoryRepository: CategoryRepository = get()
-        NamedEntityViewModel(categoryRepository)
+        NamedEntityViewModel(get<CategoryRepository>())
     }
     viewModel {
-        DeliveryViewModel(
-            get(),
-            get(),
-            get(),
-        )
+        DeliveryViewModel(get(), get(), get())
     }
     viewModel {
         DeliveryListViewModel(get(), get(), get())
@@ -38,16 +33,13 @@ val appModule = module {
         ItemViewModel(get())
     }
     viewModel(named("programViewModel")) {
-        val programRepository: ProgramRepository = get()
-        NamedEntityViewModel(programRepository)
+        NamedEntityViewModel(get<ProgramRepository>())
     }
     viewModel(named("purchasingAccountViewModel")) {
-        val purchasingAccountRepository: PurchasingAccountRepository = get()
-        NamedEntityViewModel(purchasingAccountRepository)
+        NamedEntityViewModel(get<PurchasingAccountRepository>())
     }
     viewModel(named("supplierViewModel")) {
-        val supplierRepository: SupplierRepository = get()
-        NamedEntityViewModel(supplierRepository)
+        NamedEntityViewModel(get<SupplierRepository>())
     }
 
 }
