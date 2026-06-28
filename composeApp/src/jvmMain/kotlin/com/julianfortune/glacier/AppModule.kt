@@ -1,11 +1,16 @@
 package com.julianfortune.glacier
 
+import com.julianfortune.glacier.data.repository.CategoryRepository
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.data.repository.ProgramRepository
+import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
-import com.julianfortune.glacier.repository.*
-import com.julianfortune.glacier.viewModel.DeliveryListViewModel
-import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import com.julianfortune.glacier.viewModel.ItemViewModel
-import com.julianfortune.glacier.viewModel.NamedEntityViewModel
+import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineListViewModel
+import com.julianfortune.glacier.feature.delivery.detail.DeliveryDetailViewModel
+import com.julianfortune.glacier.feature.item.ItemViewModel
+import com.julianfortune.glacier.feature.namedentity.NamedEntityViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -24,10 +29,10 @@ val appModule = module {
         NamedEntityViewModel(get<CategoryRepository>())
     }
     viewModel {
-        DeliveryViewModel(get(), get(), get())
+        DeliveryDetailViewModel(get(), get(), get())
     }
     viewModel {
-        DeliveryListViewModel(get(), get(), get())
+        DeliveryHeadlineListViewModel(get(), get(), get())
     }
     viewModel {
         ItemViewModel(get())

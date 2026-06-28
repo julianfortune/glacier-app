@@ -1,0 +1,15 @@
+package com.julianfortune.glacier.data.repository
+
+import com.julianfortune.glacier.data.common.Entity
+import kotlinx.coroutines.flow.Flow
+
+interface NamedEntityRepository<T> {
+
+    fun getAll(): Flow<List<Entity<T>>>
+
+    suspend fun insert(data: T): Long
+
+    suspend fun update(entity: Entity<T>)
+
+    suspend fun deleteById(id: Long): Boolean
+}

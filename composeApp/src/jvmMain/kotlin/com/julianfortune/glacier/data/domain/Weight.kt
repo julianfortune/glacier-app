@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.data.domain
 
-import com.julianfortune.glacier.util.dividedBy
+import com.julianfortune.glacier.core.util.dividedBy
 import java.math.BigInteger
 import java.math.RoundingMode
 

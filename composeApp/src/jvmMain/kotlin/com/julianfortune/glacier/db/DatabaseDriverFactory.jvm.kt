@@ -2,6 +2,7 @@ package com.julianfortune.glacier.db
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import com.julianfortune.glacier.db.Database
 import java.nio.file.Path
 import java.util.*
 
