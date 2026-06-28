@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.detail.ui
+package com.julianfortune.glacier.feature.delivery.page.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.detail
+package com.julianfortune.glacier.feature.delivery.page
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

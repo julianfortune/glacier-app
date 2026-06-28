@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.detail
+package com.julianfortune.glacier.feature.delivery.page
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeliveryDetailViewModel(
+class DeliveryPageViewModel(
     private val deliveryRepository: DeliveryRepository,
     itemRepository: ItemRepository,
     supplierRepository: SupplierRepository,

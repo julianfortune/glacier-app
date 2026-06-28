@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.detail
+package com.julianfortune.glacier.feature.delivery.page
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +44,7 @@ fun calculateDeliveryTotalWeightPounds(delivery: DeliveryDetail): Double {
 }
 
 @Composable
-fun DeliveryDetail(viewModel: DeliveryDetailViewModel) {
+fun DeliveryPage(viewModel: DeliveryPageViewModel) {
 
     // TODO: Use an ADT to represent the data better e.g., DeliveryUiState := Loading, Error(...), Delivery(data)
     val deliveryDetail by viewModel.deliveryDetail.collectAsState()
@@ -357,3 +357,61 @@ fun DeliveryDetail(viewModel: DeliveryDetailViewModel) {
         }
     }
 }
+
+
+// TODO: From the list view but now owned here
+
+//                    is EntityOperation.Edit -> {
+//                        val delivery = (deliveryAction as EntityOperation.Edit).entity
+//                        val headline = DeliveryHeadline(
+//                            delivery.data.receivedDate,
+//                            delivery.data.supplierId,
+//                            delivery.data.taxesCents,
+//                            delivery.data.feesCents,
+//                        )
+//                        NewDeliveryForm(
+//                            viewModel,
+//                            "Edit Delivery",
+//                            "Save",
+//                            initialDelivery = headline,
+//                            onSubmit = { updated ->
+//                                coroutineScope.launch {
+//                                    val delivery = Entity(
+//                                        delivery.id, DeliveryDetail(
+//                                            updated.receivedDate,
+//                                            updated.supplierId,
+//                                            updated.taxesCents,
+//                                            updated.feesCents,
+//                                            delivery.data.entries
+//                                        )
+//                                    )
+//                                    viewModel.updateDelivery(delivery)
+//                                    viewModel.newDeliveryCreated(delivery.id)
+//                                }
+//                            }
+//                        )
+//                    }
+//
+//                    is EntityOperation.Delete -> {
+//                        val deliveryId = (deliveryAction as EntityOperation.Delete).id
+//                        ConfirmDeleteEntityForm(
+//                            deliveryId,
+//                            "Delete Delivery",
+//                            onCancel = {
+//                                viewModel.cancelDeliveryAction()
+//                            },
+//                            onConfirm = {
+//                                coroutineScope.launch {
+//                                    viewModel.deleteDelivery(deliveryId)
+//                                    viewModel.deliveryDeleted(deliveryId)
+//                                }
+//                            }
+//                        )
+//                    }
+//
+//                    else -> throw Error("`deliveryAction` must not be `null`")
+//                }
+//            }
+//        }
+//    }
+//

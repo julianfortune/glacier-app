@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.detail.data
+package com.julianfortune.glacier.feature.delivery.page.data
 
 import com.julianfortune.glacier.data.domain.entry.Entry
 

@@ -43,7 +43,10 @@ fun <T> CollectionView(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(title, fontSize = (1.25).em)
+                Text(
+                    title,
+                    color = LocalContentColor.current.copy(alpha = 0.5f)
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
