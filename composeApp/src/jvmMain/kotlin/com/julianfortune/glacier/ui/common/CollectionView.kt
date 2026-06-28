@@ -108,7 +108,7 @@ fun <T> CollectionView(
                         .fillMaxHeight()
                         .padding(2.dp),
                     adapter = rememberScrollbarAdapter(listScrollState),
-                    style = darkScrollbarStyle() // TODO(P3): Link to the app color theme
+                    style = dynamicScrollbarStyle(MaterialTheme.colorScheme.onBackground)
                 )
             }
         }

@@ -4,9 +4,9 @@ import androidx.compose.foundation.ScrollbarStyle
 import androidx.compose.foundation.defaultScrollbarStyle
 import androidx.compose.ui.graphics.Color
 
-fun darkScrollbarStyle(): ScrollbarStyle {
+fun dynamicScrollbarStyle(onSurfaceColor: Color): ScrollbarStyle {
     return defaultScrollbarStyle().copy(
-        unhoverColor = Color.White.copy(alpha = 0.25f),
-        hoverColor = Color.White.copy(alpha = 0.65f)
+        unhoverColor = onSurfaceColor.copy(alpha = 0.2f),
+        hoverColor = onSurfaceColor.copy(alpha = 0.6f),
     )
 }
