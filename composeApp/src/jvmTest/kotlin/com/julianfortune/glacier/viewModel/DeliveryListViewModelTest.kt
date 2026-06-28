@@ -6,9 +6,9 @@ import com.julianfortune.glacier.repository.SupplierRepository
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 
-class DeliveryViewModelTest {
+class DeliveryListViewModelTest {
 
-    lateinit var viewModel: DeliveryViewModel
+    lateinit var viewModel: DeliveryListViewModel
 
     lateinit var deliveryRepository: DeliveryRepository
     lateinit var itemRepository: ItemRepository
@@ -20,7 +20,7 @@ class DeliveryViewModelTest {
         itemRepository = mockk(relaxed = true)
         supplierRepository = mockk(relaxed = true)
 
-        viewModel = DeliveryViewModel(
+        viewModel = DeliveryListViewModel(
             deliveryRepository,
             itemRepository,
             supplierRepository,

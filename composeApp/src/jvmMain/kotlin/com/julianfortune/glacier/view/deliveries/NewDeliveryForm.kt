@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view.delivery
+package com.julianfortune.glacier.view.deliveries
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -12,13 +12,13 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.view.data.Option
 import com.julianfortune.glacier.view.shared.*
-import com.julianfortune.glacier.viewModel.DeliveryViewModel
+import com.julianfortune.glacier.viewModel.DeliveryListViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewDeliveryForm(
-    viewModel: DeliveryViewModel,
+    viewModel: DeliveryListViewModel,
     title: String,
     submitButtonText: String,
     initialDelivery: DeliveryHeadline? = null,
@@ -136,7 +136,7 @@ fun NewDeliveryForm(
             TextButton(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
-                    viewModel.cancelDeliveryAction()
+                    // TODO(!!): onCancel
                 }
             ) {
                 Text("Cancel")

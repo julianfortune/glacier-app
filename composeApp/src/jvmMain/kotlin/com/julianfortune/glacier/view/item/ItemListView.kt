@@ -19,13 +19,14 @@ import com.julianfortune.glacier.view.shared.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.viewModel.ItemViewModel
 import com.julianfortune.glacier.viewModel.data.EntityOperation
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 
 // TODO: Proactively check if `Item` is referenced by any Deliveries and prevent deleting
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemListView(viewModel: ItemViewModel) {
+fun ItemListView(viewModel: ItemViewModel = koinViewModel()) {
     val coroutineScope = rememberCoroutineScope()
 
     val items by viewModel.items.collectAsState(emptyList())

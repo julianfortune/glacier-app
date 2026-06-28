@@ -1,46 +1,44 @@
 package com.julianfortune.glacier.viewModel
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.Entity
 import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
-import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
 import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
-import com.julianfortune.glacier.viewModel.data.DeliveryEntryAction
-import com.julianfortune.glacier.viewModel.data.EntityOperation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryViewModel(
     private val deliveryRepository: DeliveryRepository,
-    private val itemRepository: ItemRepository,
-    supplierRepository: SupplierRepository
-) : ViewModel() {
+    itemRepository: ItemRepository,
+    supplierRepository: SupplierRepository,
+) : ViewModel(), ControllableEntityViewModel {
+    private val _selectedDeliveryId = MutableStateFlow<Long?>(null)
+    val selectedDeliveryId: StateFlow<Long?> = _selectedDeliveryId
 
-    private val _deliveryOperation = mutableStateOf<EntityOperation<DeliveryDetail>?>(null)
-    val deliveryOperation: State<EntityOperation<DeliveryDetail>?> = _deliveryOperation
-
-    private val _deliveryEntryAction = mutableStateOf<DeliveryEntryAction?>(null)
-    val deliveryEntryAction: State<DeliveryEntryAction?> = _deliveryEntryAction
-
-    // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
-    // TODO(P5): Filtering, e.g., by time period
-    val allDeliveries: StateFlow<List<Entity<DeliveryHeadline>>> =
-        deliveryRepository
-            .getAllAsHeadlines()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyList()
-            )
+    // Derived flow for selected item details
+    val deliveryDetail: StateFlow<Entity<DeliveryDetail>?> = _selectedDeliveryId
+        .flatMapLatest { id ->
+            id?.let { deliveryRepository.getDeliveryDetailById(it) } ?: flowOf(null)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     val allSuppliers: StateFlow<List<Entity<Supplier>>> =
         supplierRepository.getAll()
@@ -80,86 +78,26 @@ class DeliveryViewModel(
                 initialValue = emptyMap()
             )
 
-
-    private val _selectedDeliveryId = MutableStateFlow<Long?>(null)
-    val selectedDeliveryId: StateFlow<Long?> = _selectedDeliveryId
-
-    // Derived flow for selected item details
-    val selectedDeliveryDetail: StateFlow<Entity<DeliveryDetail>?> = _selectedDeliveryId
-        .flatMapLatest { id ->
-            id?.let { deliveryRepository.getDeliveryDetailById(it) } ?: flowOf(null)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
-
-    suspend fun getItemById(itemId: Long): Entity<Item> {
-        return itemRepository.getById(itemId)
-    }
-
-    fun selectDelivery(deliveryId: Long) {
-        _selectedDeliveryId.value = deliveryId
-    }
-
-    suspend fun saveDelivery(delivery: DeliveryDetail): Long {
-        return deliveryRepository.insert(delivery)
-    }
-
-    suspend fun updateDelivery(delivery: Entity<DeliveryDetail>) {
-        return deliveryRepository.update(delivery)
-    }
-
-    suspend fun deleteDelivery(deliveryId: Long): Boolean {
-        return deliveryRepository.deleteById(deliveryId)
-    }
-
-    suspend fun saveEntry(deliveryId: Long, entry: Entry) {
-        deliveryRepository.insertDeliveryEntry(deliveryId, entry)
-    }
-
-    fun showNewDelivery() {
-        _deliveryOperation.value = EntityOperation.CreateNew
-    }
-
-    fun showEditDelivery(delivery: Entity<DeliveryDetail>) {
-        _deliveryOperation.value = EntityOperation.Edit(delivery)
-    }
-
-    fun showDeleteDelivery(delivery: Entity<DeliveryDetail>) {
-        _deliveryOperation.value = EntityOperation.Delete(delivery.id)
-    }
-
-    fun cancelDeliveryAction() {
-        _deliveryOperation.value = null
-    }
-
-    fun newDeliveryCreated(id: Long) {
-        _deliveryOperation.value = null
+    override fun setCurrentId(id: Long?) {
         _selectedDeliveryId.value = id
     }
 
-    fun deliveryDeleted(id: Long) {
-        _deliveryOperation.value = null
-        _selectedDeliveryId.update { currentId ->
-            when {
-                currentId == id -> null
-                else -> currentId
-            }
+    fun updateDelivery(delivery: Entity<DeliveryDetail>) {
+        viewModelScope.launch {
+            deliveryRepository.update(delivery)
         }
     }
 
-    fun showNewEntry() {
-        _deliveryEntryAction.value = DeliveryEntryAction.CreateNew
+    fun deleteDelivery(deliveryId: Long) {
+        viewModelScope.launch {
+            deliveryRepository.deleteById(deliveryId)
+        }
     }
 
-    fun showEditEntry(index: Int, entry: Entry) {
-        _deliveryEntryAction.value = DeliveryEntryAction.Edit(index, entry)
-    }
-
-    fun dismissEntryModal() {
-        _deliveryEntryAction.value = null
+    fun saveEntry(deliveryId: Long, entry: Entry) {
+        viewModelScope.launch {
+            deliveryRepository.insertDeliveryEntry(deliveryId, entry)
+        }
     }
 
 }

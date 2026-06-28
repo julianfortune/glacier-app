@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.view.delivery
+package com.julianfortune.glacier.view.shared
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

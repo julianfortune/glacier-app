@@ -16,12 +16,12 @@ import com.julianfortune.glacier.view.shared.AutoCompleteDropdownField
 import com.julianfortune.glacier.view.shared.CurrencyInput
 import com.julianfortune.glacier.view.shared.CurrencyInputTextField
 import com.julianfortune.glacier.view.shared.Selection
-import com.julianfortune.glacier.viewModel.DeliveryViewModel
+import com.julianfortune.glacier.viewModel.DeliveryListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewEntryForm(
-    viewModel: DeliveryViewModel,
+    viewModel: DeliveryListViewModel,
     title: String,
     submitButtonText: String,
     initialEntry: Entry? = null,

@@ -17,16 +17,10 @@ import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Program
 import com.julianfortune.glacier.data.domain.PurchasingAccount
 import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.view.delivery.DeliveriesListDetailView
+import com.julianfortune.glacier.view.deliveries.DeliveryListDetailView
 import com.julianfortune.glacier.view.item.ItemListView
 import com.julianfortune.glacier.view.namedentity.NamedEntityListView
-import com.julianfortune.glacier.viewModel.DeliveryViewModel
-import com.julianfortune.glacier.viewModel.ItemViewModel
-import com.julianfortune.glacier.viewModel.NamedEntityViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import org.koin.compose.koinInject
-import org.koin.core.parameter.parametersOf
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
 
 enum class NavigationPage(val title: String, val icon: ImageVector) {
@@ -42,20 +36,6 @@ enum class NavigationPage(val title: String, val icon: ImageVector) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    // TODO: Can this be simplified ..?
-    // Probably should look at: https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-viewmodel.html#using-viewmodel-in-common-code
-    val categoryViewModel: NamedEntityViewModel<Category> = koinInject(named("categoryViewModel"))
-    val deliveriesViewModel = koinInject<DeliveryViewModel> {
-        parametersOf(CoroutineScope(Dispatchers.Main))
-    }
-    val itemViewModel = koinInject<ItemViewModel> {
-        parametersOf(CoroutineScope(Dispatchers.Main))
-    }
-    val programViewModel: NamedEntityViewModel<Program> = koinInject(named("programViewModel"))
-    val purchasingAccountViewModel: NamedEntityViewModel<PurchasingAccount> =
-        koinInject(named("purchasingAccountViewModel"))
-    val supplierViewModel: NamedEntityViewModel<Supplier> = koinInject(named("supplierViewModel"))
-
     var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
     MaterialTheme(
@@ -85,27 +65,27 @@ fun App() {
             ) {
                 when (selectedNavigationItem) {
                     NavigationPage.CATEGORIES -> NamedEntityListView(
-                        categoryViewModel,
+                        koinViewModel(named("categoryViewModel")),
                         "Categories",
                         "Category"
                     ) { Category(it) }
 
-                    NavigationPage.DELIVERIES -> DeliveriesListDetailView(deliveriesViewModel)
-                    NavigationPage.ITEMS -> ItemListView(itemViewModel)
+                    NavigationPage.DELIVERIES -> DeliveryListDetailView()
+                    NavigationPage.ITEMS -> ItemListView()
                     NavigationPage.PROGRAMS -> NamedEntityListView(
-                        programViewModel,
+                        koinViewModel(named("programViewModel")),
                         "Programs",
                         "Program"
                     ) { Program(it) }
 
                     NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityListView(
-                        purchasingAccountViewModel,
+                        koinViewModel(named("purchasingAccountViewModel")),
                         "Accounts",
                         "Account"
                     ) { PurchasingAccount(it) }
 
                     NavigationPage.SUPPLIERS -> NamedEntityListView(
-                        supplierViewModel,
+                        koinViewModel(named("supplierViewModel")),
                         "Suppliers",
                         "Supplier"
                     ) { Supplier(it) }
