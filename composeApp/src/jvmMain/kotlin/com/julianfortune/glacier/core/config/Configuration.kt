@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.julianfortune.glacier.core.system.Resources
 
 data class Configuration(
+    val windowTitle: String,
     val db: Db
 ) {
     data class Db(val location: FileLocation)

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.julianfortune.glacier.core.config.Configuration
+import com.julianfortune.glacier.core.config.Constants
 import com.julianfortune.glacier.core.config.Environment
 import com.julianfortune.glacier.core.config.FileLocation
 import com.julianfortune.glacier.db.DatabaseDriverFactory
@@ -54,7 +55,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Glacier (Dev build)",
+            title = configuration.windowTitle,
         ) {
             App()
         }

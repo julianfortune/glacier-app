@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.core.system
 
+import com.julianfortune.glacier.core.config.Constants
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.createDirectory
@@ -8,8 +9,6 @@ import kotlin.io.path.exists
 class AppDataManager(platform: Platform) {
 
     companion object {
-        const val DIRECTORY_NAME = "Glacier"
-
         // Path to the directory for application data relative to the user's home
         // Source: https://platformdirs.readthedocs.io/en/latest/platforms.html
         val relativePathByPlatform = mapOf(
@@ -21,7 +20,7 @@ class AppDataManager(platform: Platform) {
 
     private val userHome = System.getProperty("user.home")
     private val relativePath = relativePathByPlatform[platform]
-    val appDataPath: Path = Paths.get(userHome, relativePath, DIRECTORY_NAME)
+    val appDataPath: Path = Paths.get(userHome, relativePath, Constants.APP_DATA_DIRECTORY_NAME)
 
     fun initialize() {
         if (!appDataPath.exists()) {

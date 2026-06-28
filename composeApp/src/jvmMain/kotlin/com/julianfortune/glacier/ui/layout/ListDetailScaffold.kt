@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +24,7 @@ fun ListDetailScaffold(
     listWidth: Dp,
     listView: @Composable (selectedId: Long?, onSelect: (id: Long) -> Unit) -> Unit,
     separator: @Composable (() -> Unit)? = null,
-    emptyDetail: @Composable () -> Unit = { Text("Nothing selected") },
+    emptyContent: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     var selectedId by remember { mutableStateOf<Long?>(null) }
@@ -46,7 +48,11 @@ fun ListDetailScaffold(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                emptyDetail()
+                emptyContent?.invoke() ?: Text(
+                    "Nothing selected",
+                    color = LocalContentColor.current.copy(alpha = 0.5f),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         } else {
             content()

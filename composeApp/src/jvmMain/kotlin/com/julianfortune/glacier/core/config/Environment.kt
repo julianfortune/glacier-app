@@ -9,7 +9,7 @@ enum class Environment {
         val nameToEntry = entries.associateBy { it.name }
 
         fun fromSystem(fallback: Environment): Environment {
-            return System.getProperty("env")?.let { nameToEntry.getValue(it) } ?: fallback
+            return System.getProperty(CustomProperties.ENV)?.let { nameToEntry.getValue(it) } ?: fallback
         }
     }
 
