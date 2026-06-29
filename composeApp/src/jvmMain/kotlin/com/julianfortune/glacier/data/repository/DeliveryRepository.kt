@@ -115,6 +115,19 @@ class DeliveryRepository(private val database: Database) {
         }
     }
 
+    suspend fun updateDetailsOnly(delivery: Entity<DeliveryDetail>) {
+        val now = Instant.now()
+
+        database.deliveryQueries.updateById(
+            LocalDateCodec.serialize(delivery.data.receivedDate),
+            delivery.data.supplierId,
+            delivery.data.taxesCents,
+            delivery.data.feesCents,
+            now.toString(),
+            delivery.id,
+        )
+    }
+
     suspend fun insertDeliveryEntry(deliveryId: Long, entry: Entry) {
         val costStatus = CostStatusCodec.serialize(entry.costStatus)
         database.deliveryEntryQueries.insert(

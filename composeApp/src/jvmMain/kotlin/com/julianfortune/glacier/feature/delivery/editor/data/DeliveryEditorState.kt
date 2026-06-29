@@ -9,7 +9,7 @@ data class DeliveryEditorState(
     val suppliers: List<Option<Long>> = emptyList(),
     val receivedDate: LocalDateInput? = LocalDateInput.ofToday(),
     val receivedDateError: Boolean = false,
-    val selectedSupplier: Option<Long>? = null,
+    val selectedSupplierId: Long? = null,
     val fees: CurrencyInput? = null,
     val taxes: CurrencyInput? = null,
     val validated: Validated? = null,

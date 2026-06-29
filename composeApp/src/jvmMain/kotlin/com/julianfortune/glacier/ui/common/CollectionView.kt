@@ -20,10 +20,9 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.ui.theme.darkScrollbarStyle
+import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -31,7 +30,7 @@ import com.julianfortune.glacier.ui.theme.darkScrollbarStyle
 fun <T> CollectionView(
     title: String,
     entities: List<Entity<T>>,
-    selectedId: Long?,
+    selectedId: Long? = null,
     onClickCreateNew: (() -> Unit)? = null,
     content: @Composable (Entity<T>, Modifier, Dp) -> Unit,
 ) {
@@ -39,17 +38,8 @@ fun <T> CollectionView(
         Surface(
             color = MaterialTheme.colorScheme.surface,
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp).fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    title,
-                    color = LocalContentColor.current.copy(alpha = 0.5f)
-                )
-
+            TopBar(title) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -72,8 +62,6 @@ fun <T> CollectionView(
                 }
             }
         }
-
-        HorizontalDivider(thickness = 1.dp)
 
         Box(
             modifier = Modifier.fillMaxSize()

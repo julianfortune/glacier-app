@@ -30,9 +30,9 @@ class DeliveryEditorStateHolder(initialState: DeliveryEditorState = DeliveryEdit
         }
     }
 
-    fun updateSelectedSupplier(supplier: Option<Long>?) {
+    fun updateSelectedSupplier(supplierId: Long?) {
         updateState {
-            it.copy(selectedSupplier = supplier)
+            it.copy(selectedSupplierId = supplierId)
         }
     }
 
@@ -52,9 +52,9 @@ class DeliveryEditorStateHolder(initialState: DeliveryEditorState = DeliveryEdit
     }
 
     private fun validate(state: DeliveryEditorState): DeliveryEditorState.Validated? {
-        if (state.selectedSupplier != null && state.receivedDate is LocalDateInput.Valid) {
+        if (state.selectedSupplierId != null && state.receivedDate is LocalDateInput.Valid) {
             return DeliveryEditorState.Validated(
-                state.selectedSupplier.id,
+                state.selectedSupplierId,
                 state.receivedDate.parsed,
                 state.taxes?.toLong(),
                 state.fees?.toLong()

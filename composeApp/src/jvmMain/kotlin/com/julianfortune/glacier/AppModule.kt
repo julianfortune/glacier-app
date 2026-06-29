@@ -10,6 +10,7 @@ import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.feature.delivery.headline.ui.NewDeliveryViewModel
 import com.julianfortune.glacier.feature.delivery.page.DeliveryPageViewModel
+import com.julianfortune.glacier.feature.delivery.page.ui.EditDeliveryViewModel
 import com.julianfortune.glacier.feature.item.ItemViewModel
 import com.julianfortune.glacier.feature.namedentity.NamedEntityViewModel
 import org.koin.core.module.dsl.viewModel
@@ -30,6 +31,9 @@ val appModule = module {
         NamedEntityViewModel(get<CategoryRepository>())
     }
     viewModel {
+        EditDeliveryViewModel(get(), get())
+    }
+    viewModel {
         DeliveryPageViewModel(get(), get(), get())
     }
     viewModel {
@@ -37,6 +41,9 @@ val appModule = module {
     }
     viewModel {
         ItemViewModel(get())
+    }
+    viewModel {
+        NewDeliveryViewModel(get(), get())
     }
     viewModel(named("programViewModel")) {
         NamedEntityViewModel(get<ProgramRepository>())
@@ -46,9 +53,6 @@ val appModule = module {
     }
     viewModel(named("supplierViewModel")) {
         NamedEntityViewModel(get<SupplierRepository>())
-    }
-    viewModel {
-        NewDeliveryViewModel(get(), get())
     }
 
 }

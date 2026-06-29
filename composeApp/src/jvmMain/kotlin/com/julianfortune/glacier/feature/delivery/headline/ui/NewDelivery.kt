@@ -32,7 +32,7 @@ fun NewDelivery(
         state,
         onReceivedDateChange = { stateHolder.updateReceivedDate(it) },
         onReceivedDateFocusLost = { stateHolder.handleReceivedDateFocusLost() },
-        onSelectedSupplierChange = { stateHolder.updateSelectedSupplier(it) },
+        onSelectedSupplierChange = { stateHolder.updateSelectedSupplier(it?.id) },
         onFeesChange = { stateHolder.updateFees(it) },
         onTaxesChange = { stateHolder.updateTaxes(it) },
         onClickCancel = {

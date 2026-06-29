@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.namedentity.ui
+package com.julianfortune.glacier.feature.namedentity
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,8 +17,8 @@ import com.julianfortune.glacier.data.common.NamedEntity
 import com.julianfortune.glacier.ui.common.CollectionView
 import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
-import com.julianfortune.glacier.feature.namedentity.NamedEntityViewModel
 import com.julianfortune.glacier.feature.namedentity.data.EntityOperation
+import com.julianfortune.glacier.feature.namedentity.ui.UpdateNamedEntityForm
 import kotlinx.coroutines.launch
 
 

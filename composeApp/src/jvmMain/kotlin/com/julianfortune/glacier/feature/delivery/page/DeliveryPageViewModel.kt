@@ -1,5 +1,7 @@
 package com.julianfortune.glacier.feature.delivery.page
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.common.Entity
@@ -10,6 +12,7 @@ import com.julianfortune.glacier.data.domain.entry.Entry
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
+import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
 import com.julianfortune.glacier.ui.layout.ListDetailControllable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,11 +30,13 @@ class DeliveryPageViewModel(
     itemRepository: ItemRepository,
     supplierRepository: SupplierRepository,
 ) : ViewModel(), ListDetailControllable {
-    private val _selectedDeliveryId = MutableStateFlow<Long?>(null)
-    val selectedDeliveryId: StateFlow<Long?> = _selectedDeliveryId
+    private val selectedDeliveryId = MutableStateFlow<Long?>(null)
+
+    private val _deliveryEntryAction = mutableStateOf<DeliveryEntryAction?>(null)
+    val deliveryEntryAction: State<DeliveryEntryAction?> = _deliveryEntryAction
 
     // Derived flow for selected item details
-    val deliveryDetail: StateFlow<Entity<DeliveryDetail>?> = _selectedDeliveryId
+    val deliveryDetail: StateFlow<Entity<DeliveryDetail>?> = selectedDeliveryId
         .flatMapLatest { id ->
             id?.let { deliveryRepository.getDeliveryDetailById(it) } ?: flowOf(null)
         }
@@ -80,16 +85,11 @@ class DeliveryPageViewModel(
             )
 
     override fun setCurrentId(id: Long?) {
-        _selectedDeliveryId.value = id
-    }
-
-    fun updateDelivery(delivery: Entity<DeliveryDetail>) {
-        viewModelScope.launch {
-            deliveryRepository.update(delivery)
-        }
+        selectedDeliveryId.value = id
     }
 
     fun deleteDelivery(deliveryId: Long) {
+        selectedDeliveryId.value = null
         viewModelScope.launch {
             deliveryRepository.deleteById(deliveryId)
         }
@@ -99,6 +99,18 @@ class DeliveryPageViewModel(
         viewModelScope.launch {
             deliveryRepository.insertDeliveryEntry(deliveryId, entry)
         }
+    }
+
+    fun showNewEntry() {
+        _deliveryEntryAction.value = DeliveryEntryAction.CreateNew
+    }
+
+    fun showEditEntry(index: Int, entry: Entry) {
+        _deliveryEntryAction.value = DeliveryEntryAction.Edit(index, entry)
+    }
+
+    fun cancelEntryOperation() {
+        _deliveryEntryAction.value = null
     }
 
 }

@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.data.common.Entity
+import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
@@ -21,15 +23,13 @@ import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineListV
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewEntryForm(
-    viewModel: DeliveryHeadlineListViewModel,
     title: String,
     submitButtonText: String,
+    items: List<Entity<Item>>,
     initialEntry: Entry? = null,
     onCancel: () -> Unit,
     onSubmit: (entry: Entry) -> Unit
 ) {
-    val items by viewModel.allItems.collectAsState()
-
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
 
     var unitName by remember { mutableStateOf(initialEntry?.unitName ?: "") }
@@ -97,11 +97,15 @@ fun NewEntryForm(
 
         Column {
             AutoCompleteDropdownField(
-                selectedOptionId = selectedItem, options = items.map {
+                selectedOptionId = selectedItem?.id,
+                options = items.map {
                     Option(it.id, it.data.name)
-                }, onSelectedChange = { newItem ->
+                },
+                onSelectedChange = { newItem ->
                     selectedItem = newItem
-                }, label = { Text("Item") }, modifier = Modifier.fillMaxWidth()
+                },
+                label = { Text("Item") },
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))

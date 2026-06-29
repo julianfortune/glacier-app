@@ -5,6 +5,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -24,12 +25,20 @@ import kotlin.collections.get
 fun DeliveryHeadlineList(
     selectedId: Long?,
     onSelect: (id: Long) -> Unit,
+    clearSelection: () -> Unit,
     viewModel: DeliveryHeadlineListViewModel = koinViewModel(),
 ) {
     val deliveryHeadlines by viewModel.allDeliveries.collectAsState(emptyList())
     val supplierMap by viewModel.supplierMap.collectAsState()
 
     var creationDialogIsOpen by remember { mutableStateOf(false) }
+
+    // Allow the detail view model to notify the scaffold if an entity is deleted
+    LaunchedEffect(selectedId, deliveryHeadlines) {
+        if (selectedId != null && deliveryHeadlines.none { it.id == selectedId }) {
+            clearSelection()
+        }
+    }
 
     CollectionView(
         "Deliveries",

@@ -83,7 +83,7 @@ fun DeliveryEditor(
 
         // Supplier Field
         AutoCompleteDropdownField(
-            selectedOptionId = state.selectedSupplier,
+            selectedOptionId = state.selectedSupplierId,
             options = state.suppliers,
             onSelectedChange = onSelectedSupplierChange,
             label = { Text("Supplier*") },

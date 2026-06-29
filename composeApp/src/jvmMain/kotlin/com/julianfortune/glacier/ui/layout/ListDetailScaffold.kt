@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 fun ListDetailScaffold(
     detailViewModel: ListDetailControllable,
     listWidth: Dp,
-    listView: @Composable (selectedId: Long?, onSelect: (id: Long) -> Unit) -> Unit,
+    listView: @Composable (selectedId: Long?, onSelect: (id: Long) -> Unit, clearSelection: () -> Unit) -> Unit,
     separator: @Composable (() -> Unit)? = null,
     emptyContent: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -30,25 +30,27 @@ fun ListDetailScaffold(
     var selectedId by remember { mutableStateOf<Long?>(null) }
 
     val onSelect = { id: Long -> selectedId = id }
+    val clearSelection = { selectedId = null }
 
+    // Push selected ID to the detail view model to update what is shown
     LaunchedEffect(selectedId) {
         detailViewModel.setCurrentId(selectedId)
     }
 
     Row(horizontalArrangement = Arrangement.SpaceEvenly) {
         Column(modifier = Modifier.width(listWidth)) {
-            listView(selectedId, onSelect)
+            listView(selectedId, onSelect, clearSelection)
         }
 
         separator?.invoke()
 
         if (selectedId == null) {
-            Column(
+            emptyContent?.invoke() ?: Column(
                 Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                emptyContent?.invoke() ?: Text(
+                Text(
                     "Nothing selected",
                     color = LocalContentColor.current.copy(alpha = 0.5f),
                     style = MaterialTheme.typography.bodyMedium

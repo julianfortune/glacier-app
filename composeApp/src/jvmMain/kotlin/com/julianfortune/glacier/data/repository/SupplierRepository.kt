@@ -3,12 +3,14 @@ package com.julianfortune.glacier.data.repository
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.singleOrNull
 
 class SupplierRepository(private val database: Database) : NamedEntityRepository<Supplier> {
 

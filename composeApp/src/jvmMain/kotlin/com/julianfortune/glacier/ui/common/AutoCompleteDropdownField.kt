@@ -26,7 +26,7 @@ import com.julianfortune.glacier.ui.common.data.Option
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <ID> AutoCompleteDropdownField(
-    selectedOptionId: Option<ID>?,
+    selectedOptionId: ID?,
     options: List<Option<ID>>,
     onSelectedChange: (Option<ID>?) -> Unit,
     label: @Composable (() -> Unit)? = null,
@@ -35,8 +35,15 @@ fun <ID> AutoCompleteDropdownField(
     var input by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
 
-    val textFieldValue = remember(input, selectedOptionId) {
-        input ?: selectedOptionId?.title ?: ""
+    val selectedOptionName: String = remember(selectedOptionId, options) {
+        when (selectedOptionId) {
+            null -> ""
+            else -> options.first { it.id == selectedOptionId }.title
+        }
+    }
+
+    val textFieldValue = remember(input, selectedOptionName) {
+        input ?: selectedOptionName
     }
 
     val filteredOptions = remember(input, options) {
@@ -108,7 +115,7 @@ fun <ID> AutoCompleteDropdownField(
             when {
                 filteredOptions.isEmpty() -> NoOptionsMenuItem()
                 else -> filteredOptions.map { option ->
-                    val isSelected = option.id == selectedOptionId?.id
+                    val isSelected = option.id == selectedOptionId
 
                     // Use colors to highlight selected item
                     val backgroundColor = if (isSelected) {

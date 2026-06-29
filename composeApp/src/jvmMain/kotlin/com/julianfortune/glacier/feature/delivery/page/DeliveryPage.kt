@@ -1,22 +1,28 @@
 package com.julianfortune.glacier.feature.delivery.page
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.core.util.formatCents
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.core.util.formatCents
+import com.julianfortune.glacier.feature.delivery.page.data.*
+import com.julianfortune.glacier.feature.delivery.page.ui.DeliveryPageContent
+import com.julianfortune.glacier.feature.delivery.page.ui.DeliveryTopBar
+import com.julianfortune.glacier.feature.delivery.page.ui.EditDelivery
+import com.julianfortune.glacier.feature.delivery.page.ui.NewEntryForm
+import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.ui.common.Dialog
+import com.julianfortune.glacier.ui.common.SideSheet
 import com.julianfortune.glacier.ui.common.formatLocalDate
 import java.time.format.FormatStyle
-import kotlin.collections.get
 
 
 fun calculateEntryTotalCostCents(entry: Entry): Long {
@@ -25,6 +31,12 @@ fun calculateEntryTotalCostCents(entry: Entry): Long {
     }
 
     return entry.unitCount * entry.unitCostCents
+}
+
+fun calculateDeliverySubTotalCostCents(delivery: DeliveryDetail): Long {
+    val totalUnitsCost = delivery.entries?.map { calculateEntryTotalCostCents(it) }?.reduceOrNull { a, b -> a + b } ?: 0
+
+    return totalUnitsCost
 }
 
 fun calculateDeliveryTotalCostCents(delivery: DeliveryDetail): Long {
@@ -48,46 +60,152 @@ fun DeliveryPage(viewModel: DeliveryPageViewModel) {
 
     // TODO: Use an ADT to represent the data better e.g., DeliveryUiState := Loading, Error(...), Delivery(data)
     val deliveryDetail by viewModel.deliveryDetail.collectAsState()
+    val deliveryEntryAction by viewModel.deliveryEntryAction
 
     val itemMap by viewModel.itemMap.collectAsState()
     val supplierMap by viewModel.supplierMap.collectAsState()
 
-//    if (deliveryEntryAction != null) {
-//        SideSheet(
-//            onClose = {
-//                viewModel.dismissEntryModal()
-//            },
-//            color = MaterialTheme.colorScheme.surface,
-//            tonalElevation = 1.dp,
-//        ) { dismissSheet ->
-//            Column(
-//                modifier = Modifier
-//                    .width(640.dp)
-//                    .padding(16.dp),
-//            ) {
-//                when (deliveryEntryAction) {
-//                    is DeliveryEntryAction.CreateNew -> {
-//                        NewEntryForm(
-//                            viewModel,
-//                            "New Entry",
-//                            "Create",
-//                            onCancel = {
-//                                dismissSheet()
-//                            },
-//                            onSubmit = { entry ->
-//                                coroutineScope.launch {
-//                                    viewModel.saveEntry(selectedDeliveryId!!, entry)
-//                                    dismissSheet()
-//                                }
-//                            }
-//                        )
-//                    }
-//
+    var editDetailsDialogIsOpen by remember { mutableStateOf(false) }
+    var deleteDialogIsOpen by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        deliveryDetail?.let { delivery ->
+            // TODO: This should live in ViewModel or some other layer for business logic
+            val supplierName = delivery.data.supplierId?.let { supplierMap[it] }?.data?.name
+
+            var pageTitle = "Delivery " + formatLocalDate(delivery.data.receivedDate, FormatStyle.MEDIUM)
+            supplierName?.let { pageTitle += " • ${it}" }
+
+            DeliveryTopBar(
+                pageTitle,
+                onClickDelete = {
+                    deleteDialogIsOpen = true
+                }
+            )
+
+            // TODO: This should live in ViewModel or some other layer for business logic
+            val totalCount = (delivery.data.entries?.sumOf { it.unitCount } ?: 0).toString()
+            val totalWeight = calculateDeliveryTotalWeightPounds(delivery.data).toString()
+            val subtotal = "$" + formatCents(calculateDeliverySubTotalCostCents(delivery.data))
+            val fees = "$" + formatCents(delivery.data.feesCents ?: 0)
+            val taxes = "$" + formatCents(delivery.data.taxesCents ?: 0)
+            val total = "$" + formatCents(calculateDeliveryTotalCostCents(delivery.data))
+            val pageState = DeliveryPageState(
+                DeliveryPageDetailsState(
+                    formatLocalDate(delivery.data.receivedDate, FormatStyle.MEDIUM),
+                    supplierName ?: "",
+                    fees,
+                    taxes,
+                ),
+                DeliveryPageEntryState(
+                    delivery.data.entries?.map { e ->
+                        val itemName = itemMap[e.itemId]!!.data.name
+                        val totalWeight = calculateEntryTotalWeight(e)
+                        val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
+                        EntryRowState(
+                            itemName,
+                            null,
+                            null,
+                            e.unitCount.toString(),
+                            totalWeight.toString(),
+                            totalCostCents,
+                        )
+                    } ?: emptyList(),
+                    totalCount,
+                    totalWeight,
+                    total,
+                ),
+                DeliveryPageSummaryState(
+                    subtotal,
+                    fees,
+                    taxes,
+                    total,
+                )
+            )
+
+            DeliveryPageContent(
+                pageState,
+                onClickEditDetails = {
+                    editDetailsDialogIsOpen = true
+                },
+                onClickAddEntry = {
+                    viewModel.showNewEntry()
+                }
+            )
+        }
+    }
+
+    if (editDetailsDialogIsOpen) {
+        Dialog(
+            onDismissRequest = { editDetailsDialogIsOpen = false },
+        ) {
+            EditDelivery(
+                delivery = deliveryDetail ?: throw NoSuchElementException("`deliveryDetail` must be defined"),
+                supplierName = supplierMap[deliveryDetail!!.data.supplierId]?.data?.name
+                    ?: throw NoSuchElementException("No supplier found for id=${deliveryDetail!!.data.supplierId}"),
+                onCancel = {
+                    editDetailsDialogIsOpen = false
+                },
+                onSuccess = {
+                    editDetailsDialogIsOpen = false
+                }
+            )
+        }
+    }
+
+    if (deleteDialogIsOpen) {
+        Dialog(
+            onDismissRequest = { deleteDialogIsOpen = false },
+        ) {
+            // TODO(?): Move into own component like EditDelivery
+            ConfirmDeleteEntityForm(
+                deliveryDetail!!.id,
+                "Delete Delivery",
+                onCancel = {
+                    deleteDialogIsOpen = false
+                },
+                onConfirm = { id ->
+                    deleteDialogIsOpen = false
+                    viewModel.deleteDelivery(id)
+                }
+            )
+        }
+    }
+
+    if (deliveryEntryAction != null) {
+        SideSheet(
+            onClose = {
+                viewModel.cancelEntryOperation()
+            },
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 1.dp,
+        ) { dismissSheet ->
+            Column(
+                modifier = Modifier
+                    .width(640.dp)
+                    .padding(16.dp),
+            ) {
+                when (deliveryEntryAction) {
+                    is DeliveryEntryAction.CreateNew -> {
+                        NewEntryForm(
+                            "New Entry",
+                            "Create",
+                            viewModel.allItems.collectAsState(initial = emptyList()).value,
+                            onCancel = {
+                                dismissSheet()
+                            },
+                            onSubmit = { entry ->
+                                viewModel.saveEntry(deliveryDetail!!.id, entry)
+                                dismissSheet()
+                            }
+                        )
+                    }
+
 //                    is DeliveryEntryAction.Edit -> {
 //                        NewEntryForm(
-//                            viewModel,
 //                            "Edit Entry",
 //                            "Update",
+//                            viewModel.allItems.collectAsState(initial = emptyList()).value,
 //                            initialEntry = (deliveryEntryAction as DeliveryEntryAction.Edit).entry,
 //                            onCancel = {
 //                                dismissSheet()
@@ -115,243 +233,8 @@ fun DeliveryPage(viewModel: DeliveryPageViewModel) {
 //                            }
 //                        )
 //                    }
-//
-//                    else -> throw Error("`deliveryEntryAction` must not be `null`")
-//                }
-//            }
-//        }
-//    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-            deliveryDetail?.let {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        Spacer(Modifier.height(4.dp)) // Better align with icon buttons
-                        Text(
-                            formatLocalDate(it.data.receivedDate, FormatStyle.FULL),
-                            style = MaterialTheme.typography.headlineMedium,
-                        )
-
-                        Text("${supplierMap[it.data.supplierId]?.data?.name}")
-                        Text("Fees: $${formatCents(it.data.feesCents ?: 0)}")
-                        Text("Taxes: $${formatCents(it.data.taxesCents ?: 0)}")
-                    }
-//                Row {
-//                    IconButton(
-//                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-//                        onClick = {
-//                            viewModel.showEditDelivery(deliveryDetail)
-//                        }
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Outlined.Edit,
-//                            contentDescription = "Edit delivery details"
-//                        )
-//                    }
-//                    IconButton(
-//                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-//                        onClick = {
-//                            viewModel.showDeleteDelivery(deliveryDetail)
-//                        }
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Outlined.Delete,
-//                            contentDescription = "Delete delivery"
-//                        )
-//                    }
-//                }
-//            }
-//
-//            Spacer(Modifier.height(16.dp))
-//
-//            Text(
-//                "Entries",
-//                style = MaterialTheme.typography.headlineSmall,
-//            )
-//
-//            Column(
-//                verticalArrangement = Arrangement.spacedBy(16.dp),
-//                modifier = Modifier.padding(vertical = 24.dp)
-//            ) {
-//                // Header row
-//                Surface(
-//                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-//                    modifier = Modifier
-//                ) {
-//                    Row(
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//                        modifier = Modifier.padding(horizontal = 16.dp).padding(vertical = 8.dp)
-//                            .fillMaxWidth(),
-//                    ) {
-//                        Text(
-//                            text = "Item",
-//                            modifier = Modifier.weight(1f),
-//                            maxLines = 1,
-//                            overflow = TextOverflow.Ellipsis
-//                        )
-//
-//                        // TODO(P2): (?) Add `Unit`
-//
-//                        Text(
-//                            text = "Unit Cost",
-//                            modifier = Modifier.width(80.dp),
-//                            textAlign = TextAlign.End
-//                        )
-//
-//                        Text(
-//                            text = "Count",
-//                            modifier = Modifier.width(60.dp),
-//                            textAlign = TextAlign.End
-//                        )
-//
-//                        Text(
-//                            text = "Weight (lbs)",
-//                            modifier = Modifier.width(104.dp),
-//                            textAlign = TextAlign.End
-//                        )
-//
-//                        Text(
-//                            text = "Total",
-//                            modifier = Modifier.width(80.dp),
-//                            textAlign = TextAlign.End
-//                        )
-//
-//                        Row(modifier = Modifier.width(32.dp)) {}
-//                    }
-//                }
-//
-//                val entries = deliveryDetail.data.entries
-//                when {
-//                    entries == null || entries.isEmpty() -> Row(
-//                        modifier = Modifier.padding(horizontal = 16.dp)
-//                    ) {
-//                        Text("None", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-//                    }
-//
-//                    else -> {
-//                        entries.mapIndexed { index, entry ->
-//                            Row(
-//                                verticalAlignment = Alignment.CenterVertically,
-//                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-//                                modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-//                            ) {
-//                                SelectionContainer {
-//                                    Row(
-//                                        verticalAlignment = Alignment.CenterVertically,
-//                                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-//                                        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-//                                    ) {
-//                                        Text(
-//                                            text = itemMap[entry.itemId]?.data?.name ?: "...",
-//                                            modifier = Modifier.weight(1f),
-//                                            maxLines = 1,
-//                                            overflow = TextOverflow.Ellipsis
-//                                        )
-//
-//                                        Text(
-//                                            text = "$${formatCents(entry.unitCostCents)}",
-//                                            modifier = Modifier.width(80.dp),
-//                                            textAlign = TextAlign.End,
-//                                            fontFamily = FontFamily.Monospace
-//                                        )
-//
-//                                        Text(
-//                                            text = "${entry.unitCount}",
-//                                            modifier = Modifier.width(60.dp),
-//                                            textAlign = TextAlign.End,
-//                                            fontFamily = FontFamily.Monospace
-//                                        )
-//
-//                                        val totalWeightInPounds = entry.unitWeight.times(entry.unitCount).toPounds()
-//                                        Text(
-//                                            text = "%.2f".format(totalWeightInPounds),
-//                                            modifier = Modifier.width(104.dp),
-//                                            textAlign = TextAlign.End,
-//                                            fontFamily = FontFamily.Monospace
-//                                        )
-//
-//                                        val totalEntryCostCents = calculateEntryTotalCostCents(entry)
-//                                        Text(
-//                                            text = "$${formatCents(totalEntryCostCents)}",
-//                                            modifier = Modifier.width(80.dp),
-//                                            textAlign = TextAlign.End,
-//                                            fontFamily = FontFamily.Monospace
-//                                        )
-//
-//                                        Row(
-//                                            modifier = Modifier.width(32.dp)
-//                                        ) {
-//                                            EntityOptionsDropdownMenu(
-//                                                edit = {
-//                                                    viewModel.showEditEntry(index, entry)
-//                                                },
-//                                                delete = {
-//                                                    // TODO(P4): Revisit this code to try to make more fluent
-//                                                    val currentDeliveryDetail: Entity<DeliveryDetail> = deliveryDetail
-//
-//                                                    val updatedDelivery = currentDeliveryDetail.copy(
-//                                                        data = currentDeliveryDetail.data.copy(
-//                                                            entries = currentDeliveryDetail.data.entries?.filterIndexed { i, _ -> i != index }
-//                                                        )
-//                                                    )
-//
-//                                                    viewModel.updateDelivery(updatedDelivery)
-//                                                },
-//                                            )
-//                                        }
-//                                    }
-//                                    // TODO(P2): Purchasing Accounts & Programs
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                Row {
-//                    Button(
-//                        onClick = { viewModel.showNewEntry() },
-//                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
-//                    ) {
-//                        Text("New Entry")
-//                    }
-//                }
-//
-//                Spacer(Modifier.height(16.dp))
-//
-//                SelectionContainer {
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.End,
-//                        verticalAlignment = Alignment.CenterVertically,
-//                    ) {
-//                        // Total weight of delivery
-//                        val totalWeightPounds = calculateDeliveryTotalWeightPounds(deliveryDetail.data)
-//                        Text(
-//                            text = "${totalWeightPounds} lbs",
-//                            textAlign = TextAlign.End,
-//                            fontFamily = FontFamily.Monospace
-//                        )
-//
-//                        Spacer(Modifier.width(32.dp))
-//
-//                        // Total cost of delivery
-//                        val totalCostCents = calculateDeliveryTotalCostCents(deliveryDetail.data)
-//                        Text(
-//                            text = "$${formatCents(totalCostCents)}",
-//                            textAlign = TextAlign.End,
-//                            fontFamily = FontFamily.Monospace
-//                        )
-//                    }
-//                }
+                    else -> throw Error("`deliveryEntryAction` must not be `null`")
                 }
             }
         }
@@ -359,59 +242,3 @@ fun DeliveryPage(viewModel: DeliveryPageViewModel) {
 }
 
 
-// TODO: From the list view but now owned here
-
-//                    is EntityOperation.Edit -> {
-//                        val delivery = (deliveryAction as EntityOperation.Edit).entity
-//                        val headline = DeliveryHeadline(
-//                            delivery.data.receivedDate,
-//                            delivery.data.supplierId,
-//                            delivery.data.taxesCents,
-//                            delivery.data.feesCents,
-//                        )
-//                        NewDeliveryForm(
-//                            viewModel,
-//                            "Edit Delivery",
-//                            "Save",
-//                            initialDelivery = headline,
-//                            onSubmit = { updated ->
-//                                coroutineScope.launch {
-//                                    val delivery = Entity(
-//                                        delivery.id, DeliveryDetail(
-//                                            updated.receivedDate,
-//                                            updated.supplierId,
-//                                            updated.taxesCents,
-//                                            updated.feesCents,
-//                                            delivery.data.entries
-//                                        )
-//                                    )
-//                                    viewModel.updateDelivery(delivery)
-//                                    viewModel.newDeliveryCreated(delivery.id)
-//                                }
-//                            }
-//                        )
-//                    }
-//
-//                    is EntityOperation.Delete -> {
-//                        val deliveryId = (deliveryAction as EntityOperation.Delete).id
-//                        ConfirmDeleteEntityForm(
-//                            deliveryId,
-//                            "Delete Delivery",
-//                            onCancel = {
-//                                viewModel.cancelDeliveryAction()
-//                            },
-//                            onConfirm = {
-//                                coroutineScope.launch {
-//                                    viewModel.deleteDelivery(deliveryId)
-//                                    viewModel.deliveryDeleted(deliveryId)
-//                                }
-//                            }
-//                        )
-//                    }
-//
-//                    else -> throw Error("`deliveryAction` must not be `null`")
-//                }
-//            }
-//        }
-//    }
-//

@@ -19,7 +19,7 @@ import com.julianfortune.glacier.data.domain.PurchasingAccount
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.feature.delivery.DeliveryListDetailView
 import com.julianfortune.glacier.feature.item.ItemListView
-import com.julianfortune.glacier.feature.namedentity.ui.NamedEntityListView
+import com.julianfortune.glacier.feature.namedentity.NamedEntityListView
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
 
