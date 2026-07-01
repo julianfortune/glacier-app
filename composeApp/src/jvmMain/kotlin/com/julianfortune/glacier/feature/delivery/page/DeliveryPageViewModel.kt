@@ -101,8 +101,12 @@ class DeliveryPageViewModel(
         }
     }
 
-    fun deleteEntry(entryId: Long) {
-        
+    fun deleteEntryByIndex(delivery: Entity<DeliveryDetail>, index: Int) {
+        val updatedDelivery = delivery.copy(
+            data = delivery.data.copy(
+                entries = delivery.data.entries?.filterIndexed { i, _ -> i != index }
+            )
+        )
     }
 
     fun showNewEntry() {

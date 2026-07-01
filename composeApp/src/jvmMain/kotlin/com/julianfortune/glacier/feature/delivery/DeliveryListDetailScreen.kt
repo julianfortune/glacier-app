@@ -19,7 +19,7 @@ import com.julianfortune.glacier.ui.common.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun DeliveryListDetailView(
+fun DeliveryListDetailScreen(
     detailViewModel: DeliveryPageViewModel = koinViewModel(),
 ) {
     ListDetailScaffold(

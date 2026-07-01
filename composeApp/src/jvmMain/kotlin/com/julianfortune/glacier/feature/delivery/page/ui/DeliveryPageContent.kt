@@ -27,6 +27,7 @@ import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageEntrySta
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageState
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageSummaryState
 import com.julianfortune.glacier.feature.delivery.page.data.EntryRowState
+import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
@@ -34,8 +35,8 @@ import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 fun DeliveryPageContent(
     state: DeliveryPageState,
     onClickEditDetails: () -> Unit,
-    onClickEditEntry: () -> Unit,
-    onClickDeleteEntry: () -> Unit,
+    onClickEditEntry: (entryId: Long) -> Unit,
+    onClickDeleteEntry: (index: Int) -> Unit,
     onClickAddEntry: () -> Unit,
 ) {
     val contentMaxWidth = 960.dp
@@ -115,29 +116,6 @@ fun DeliveryPageContent(
                     }
                 }
 
-//                data class CellStyle(
-//                    val textAlign: TextAlign = TextAlign.End,
-//                    val maxWidth: Dp? = null,
-//                    val weight: Float? = null,
-//                )
-//
-//                data class RowStyle(
-//                    val spaceBetween: Dp,
-//                    val cells: List<CellStyle>
-//                )
-//
-//                val entryRowStyle = RowStyle(
-//                    spaceBetween = 12.dp,
-//                    cells = listOf(
-//                        CellStyle(),
-//                        CellStyle(),
-//                        CellStyle(),
-//                        CellStyle(),
-//                        CellStyle(),
-//                        CellStyle(),
-//                        CellStyle()
-//                    )
-//                )
                 val spaceBetweenCells = 16.dp
 
                 stickyHeader {
@@ -268,11 +246,16 @@ fun DeliveryPageContent(
                                 textAlign = TextAlign.End,
                                 modifier = Modifier.weight(rowWeights("cost")),
                             )
-                            Row(
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .background(Color.Red)
-                            ) { }
+                            Row(modifier = Modifier.width(24.dp)) {
+                                EntityOptionsDropdownMenu(
+                                    edit = {
+                                        // TODO ...
+                                    },
+                                    delete = {
+                                        // TODO ...
+                                    }
+                                )
+                            }
                         }
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.outlineVariant,
@@ -343,13 +326,7 @@ fun DeliveryPageContent(
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.weight(rowWeights("cost")),
                             )
-                            Row(
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .background(Color.Red)
-                            ) {
-
-                            }
+                            Row(modifier = Modifier.width(24.dp)) { }
                         }
                     }
                 }
