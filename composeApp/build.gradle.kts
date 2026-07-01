@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.core)
             implementation(libs.sqldelight.coroutines)
         }
@@ -77,6 +78,7 @@ compose.desktop {
         }
 
         // When running the application directly set the environment to 'development'
+        // NOTE: Env flag doesn't work with `hotRun*` for some weird reason
         if (gradle.startParameter.taskNames.contains("run")) {
             jvmArgs += listOf("-Denv=DEVELOPMENT")
         }

@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.repository
 
-import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.common.Entity
 import kotlinx.coroutines.flow.Flow
 
 interface NamedEntityRepository<T> {

@@ -5,12 +5,13 @@ import androidx.compose.ui.window.application
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.julianfortune.glacier.config.Configuration
-import com.julianfortune.glacier.config.Environment
-import com.julianfortune.glacier.config.FileLocation
+import com.julianfortune.glacier.core.config.Configuration
+import com.julianfortune.glacier.core.config.Constants
+import com.julianfortune.glacier.core.config.Environment
+import com.julianfortune.glacier.core.config.FileLocation
 import com.julianfortune.glacier.db.DatabaseDriverFactory
-import com.julianfortune.glacier.system.AppDataManager
-import com.julianfortune.glacier.system.Platform
+import com.julianfortune.glacier.core.system.AppDataManager
+import com.julianfortune.glacier.core.system.Platform
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -54,7 +55,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Glacier (Dev build)",
+            title = configuration.windowTitle,
         ) {
             App()
         }

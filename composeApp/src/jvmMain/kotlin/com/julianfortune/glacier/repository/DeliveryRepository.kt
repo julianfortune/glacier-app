@@ -4,9 +4,9 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.julianfortune.glacier.codec.CostStatusCodec
-import com.julianfortune.glacier.codec.LocalDateCodec
-import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.core.codec.CostStatusCodec
+import com.julianfortune.glacier.core.codec.LocalDateCodec
+import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
@@ -113,6 +113,19 @@ class DeliveryRepository(private val database: Database) {
         delivery.data.entries?.forEach { entry ->
             insertDeliveryEntry(delivery.id, entry)
         }
+    }
+
+    suspend fun updateDetailsOnly(delivery: Entity<DeliveryDetail>) {
+        val now = Instant.now()
+
+        database.deliveryQueries.updateById(
+            LocalDateCodec.serialize(delivery.data.receivedDate),
+            delivery.data.supplierId,
+            delivery.data.taxesCents,
+            delivery.data.feesCents,
+            now.toString(),
+            delivery.id,
+        )
     }
 
     suspend fun insertDeliveryEntry(deliveryId: Long, entry: Entry) {

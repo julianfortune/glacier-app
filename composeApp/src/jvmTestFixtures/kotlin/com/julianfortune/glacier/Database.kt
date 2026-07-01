@@ -19,7 +19,7 @@ suspend fun createTestDatabase(): Database {
         sql = "PRAGMA foreign_keys;",
         mapper = { cursor ->
             val isEnabled = if (cursor.next().value) cursor.getLong(0) == 1L else false
-            println("⚙️ [Database Connection Startup] PRAGMA foreign_keys = $isEnabled")
+            println("⚙️ [Database] foreign_keys = $isEnabled")
             QueryResult.Unit
         },
         parameters = 0

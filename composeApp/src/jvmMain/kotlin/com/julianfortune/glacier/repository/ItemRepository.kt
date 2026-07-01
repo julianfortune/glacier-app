@@ -4,7 +4,7 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.julianfortune.glacier.data.Entity
+import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.Dispatchers
