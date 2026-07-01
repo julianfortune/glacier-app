@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.feature.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

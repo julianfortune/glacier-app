@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.repository.NamedEntityRepository
+import com.julianfortune.glacier.repository.NamedEntityRepository
 import com.julianfortune.glacier.feature.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

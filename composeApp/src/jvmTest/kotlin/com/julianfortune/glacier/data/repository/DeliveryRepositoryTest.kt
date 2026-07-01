@@ -8,7 +8,7 @@ import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat

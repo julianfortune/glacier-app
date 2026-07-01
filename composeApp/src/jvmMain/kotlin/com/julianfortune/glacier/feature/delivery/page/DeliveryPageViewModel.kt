@@ -9,9 +9,9 @@ import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.data.repository.ItemRepository
-import com.julianfortune.glacier.data.repository.SupplierRepository
+import com.julianfortune.glacier.repository.DeliveryRepository
+import com.julianfortune.glacier.repository.ItemRepository
+import com.julianfortune.glacier.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
 import com.julianfortune.glacier.ui.layout.ListDetailControllable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -99,6 +99,10 @@ class DeliveryPageViewModel(
         viewModelScope.launch {
             deliveryRepository.insertDeliveryEntry(deliveryId, entry)
         }
+    }
+
+    fun deleteEntry(entryId: Long) {
+        
     }
 
     fun showNewEntry() {

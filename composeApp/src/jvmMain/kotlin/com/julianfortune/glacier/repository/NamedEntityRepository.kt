@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.data.repository
+package com.julianfortune.glacier.repository
 
 import com.julianfortune.glacier.data.common.Entity
 import kotlinx.coroutines.flow.Flow

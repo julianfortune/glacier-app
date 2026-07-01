@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.data.repository
+package com.julianfortune.glacier.repository
 
 import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne

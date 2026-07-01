@@ -7,9 +7,9 @@ import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.domain.delivery.DeliveryHeadline
-import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.data.repository.ItemRepository
-import com.julianfortune.glacier.data.repository.SupplierRepository
+import com.julianfortune.glacier.repository.DeliveryRepository
+import com.julianfortune.glacier.repository.ItemRepository
+import com.julianfortune.glacier.repository.SupplierRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

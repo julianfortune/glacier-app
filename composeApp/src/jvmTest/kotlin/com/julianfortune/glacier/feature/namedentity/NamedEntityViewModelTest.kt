@@ -2,7 +2,7 @@ package com.julianfortune.glacier.feature.namedentity
 
 import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.repository.CategoryRepository
+import com.julianfortune.glacier.repository.CategoryRepository
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking

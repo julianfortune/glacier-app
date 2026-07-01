@@ -5,8 +5,8 @@ import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.repository.CategoryRepository
-import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.repository.CategoryRepository
+import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
