@@ -10,7 +10,6 @@ import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditor
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.LocalDateInput
-import com.julianfortune.glacier.ui.common.data.Option
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -18,7 +17,6 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun EditDelivery(
     delivery: Entity<DeliveryDetail>,
-    supplierName: String, // TODO: This is a total hack, in reality probably need to change the dropdown API to accept ID
     onCancel: () -> Unit,
     onSuccess: () -> Unit,
     viewModel: EditDeliveryViewModel = koinViewModel(),

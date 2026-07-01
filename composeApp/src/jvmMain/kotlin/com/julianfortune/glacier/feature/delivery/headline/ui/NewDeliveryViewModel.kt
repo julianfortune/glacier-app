@@ -6,7 +6,7 @@ import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorStateHolder
-import com.julianfortune.glacier.feature.delivery.editor.data.DeliveryEditorState
+import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorState
 import com.julianfortune.glacier.ui.common.data.Option
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow

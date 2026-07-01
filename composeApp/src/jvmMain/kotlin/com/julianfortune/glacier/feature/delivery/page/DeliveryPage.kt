@@ -107,7 +107,7 @@ fun DeliveryPage(viewModel: DeliveryPageViewModel) {
                             null,
                             null,
                             e.unitCount.toString(),
-                            totalWeight.toString(),
+                            totalWeight.toPounds().toString(),
                             totalCostCents,
                         )
                     } ?: emptyList(),
@@ -130,7 +130,13 @@ fun DeliveryPage(viewModel: DeliveryPageViewModel) {
                 },
                 onClickAddEntry = {
                     viewModel.showNewEntry()
-                }
+                },
+                onClickEditEntry = {
+                    // TODO ...
+                },
+                onClickDeleteEntry = {
+                    // TODO ...
+                },
             )
         }
     }
@@ -141,8 +147,6 @@ fun DeliveryPage(viewModel: DeliveryPageViewModel) {
         ) {
             EditDelivery(
                 delivery = deliveryDetail ?: throw NoSuchElementException("`deliveryDetail` must be defined"),
-                supplierName = supplierMap[deliveryDetail!!.data.supplierId]?.data?.name
-                    ?: throw NoSuchElementException("No supplier found for id=${deliveryDetail!!.data.supplierId}"),
                 onCancel = {
                     editDetailsDialogIsOpen = false
                 },

@@ -13,12 +13,11 @@ import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.entry.CostStatus
 import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.CurrencyInputTextField
 import com.julianfortune.glacier.ui.common.Selection
-import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineListViewModel
+import com.julianfortune.glacier.ui.common.data.Option
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

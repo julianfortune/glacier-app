@@ -15,11 +15,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageDetailsState
+import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageEntryState
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageState
+import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageSummaryState
+import com.julianfortune.glacier.feature.delivery.page.data.EntryRowState
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
@@ -27,6 +34,8 @@ import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 fun DeliveryPageContent(
     state: DeliveryPageState,
     onClickEditDetails: () -> Unit,
+    onClickEditEntry: () -> Unit,
+    onClickDeleteEntry: () -> Unit,
     onClickAddEntry: () -> Unit,
 ) {
     val contentMaxWidth = 960.dp
@@ -96,6 +105,41 @@ fun DeliveryPageContent(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
+                val rowWeights = { column: String ->
+                    when (column) {
+                        "item" -> 2f
+                        "program" -> 1.5f
+                        "account" -> 1.5f
+                        "cost" -> 1f
+                        else -> 0.8f
+                    }
+                }
+
+//                data class CellStyle(
+//                    val textAlign: TextAlign = TextAlign.End,
+//                    val maxWidth: Dp? = null,
+//                    val weight: Float? = null,
+//                )
+//
+//                data class RowStyle(
+//                    val spaceBetween: Dp,
+//                    val cells: List<CellStyle>
+//                )
+//
+//                val entryRowStyle = RowStyle(
+//                    spaceBetween = 12.dp,
+//                    cells = listOf(
+//                        CellStyle(),
+//                        CellStyle(),
+//                        CellStyle(),
+//                        CellStyle(),
+//                        CellStyle(),
+//                        CellStyle(),
+//                        CellStyle()
+//                    )
+//                )
+                val spaceBetweenCells = 16.dp
+
                 stickyHeader {
                     Column(
                         modifier = Modifier
@@ -134,18 +178,52 @@ fun DeliveryPageContent(
                                     top = 4.dp
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
                         ) {
                             Text(
                                 text = "Item",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(rowWeights("item")),
                             )
                             Text(
-                                text = "Total",
+                                text = "Program",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(rowWeights("program")),
                             )
+                            Text(
+                                text = "Account",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(rowWeights("account")),
+                            )
+                            Text(
+                                text = "Count",
+                                textAlign = TextAlign.End,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(rowWeights("count")),
+                            )
+                            Text(
+                                text = "Weight",
+                                textAlign = TextAlign.End,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(rowWeights("weight")),
+                            )
+                            Text(
+                                text = "Cost",
+                                textAlign = TextAlign.End,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                                modifier = Modifier.weight(rowWeights("cost")),
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .background(Color.Red)
+                            ) { }
                         }
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.outlineVariant,
@@ -156,18 +234,46 @@ fun DeliveryPageContent(
 
                 items(state.entry.entryRows) { entryRow ->
                     Column(modifier = Modifier.padding(horizontal = horizontalContentPadding)) {
-                        ListItem(
-                            headlineContent = {
-                                Text(text = entryRow.itemName)
-                            },
-                            trailingContent = {
-                                Text(
-                                    text = entryRow.totalCost,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp, horizontal = horizontalTextPadding),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                        ) {
+                            Text(
+                                text = entryRow.itemName,
+                                modifier = Modifier.weight(rowWeights("item")),
+                            )
+                            Text(
+                                text = entryRow.programName ?: "",
+                                modifier = Modifier.weight(rowWeights("program")),
+                            )
+                            Text(
+                                text = entryRow.accountName ?: "",
+                                modifier = Modifier.weight(rowWeights("account")),
+                            )
+                            Text(
+                                text = entryRow.unitCount,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.weight(rowWeights("count")),
+                            )
+                            Text(
+                                text = entryRow.totalWeight,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.weight(rowWeights("weight")),
+                            )
+                            Text(
+                                text = entryRow.totalCost,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.weight(rowWeights("cost")),
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .background(Color.Red)
+                            ) { }
+                        }
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.outlineVariant,
                             thickness = 0.5.dp
@@ -197,14 +303,54 @@ fun DeliveryPageContent(
 
                 item {
                     Column(
-                        modifier = Modifier.padding(horizontal = horizontalContentPadding + horizontalTextPadding),
+                        modifier = Modifier.padding(horizontal = horizontalContentPadding),
                         horizontalAlignment = Alignment.End
                     ) {
-                        Text(
-                            "Foo bar blah blah",
-                            Modifier.padding(vertical = 16.dp),
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = horizontalTextPadding),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                        ) {
+                            Text(
+                                text = "",
+                                modifier = Modifier.weight(rowWeights("item")),
+                            )
+                            Text(
+                                text = "",
+                                modifier = Modifier.weight(rowWeights("program")),
+                            )
+                            Text(
+                                text = "",
+                                modifier = Modifier.weight(rowWeights("account")),
+                            )
+                            Text(
+                                text = state.entry.totalCount,
+                                textAlign = TextAlign.End,
+                                fontFamily = FontFamily.Monospace,
+                                modifier = Modifier.weight(rowWeights("count")),
+                            )
+                            Text(
+                                text = state.entry.totalWeight,
+                                textAlign = TextAlign.End,
+                                fontFamily = FontFamily.Monospace,
+                                modifier = Modifier.weight(rowWeights("weight")),
+                            )
+                            Text(
+                                text = state.entry.totalCost,
+                                textAlign = TextAlign.End,
+                                fontFamily = FontFamily.Monospace,
+                                modifier = Modifier.weight(rowWeights("cost")),
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .background(Color.Red)
+                            ) {
+
+                            }
+                        }
                     }
                 }
 
@@ -278,28 +424,40 @@ fun DeliveryPageContent(
     }
 }
 
-//@Preview
-//@Composable
-//fun DeliveryPageContentPreview() {
-//    MaterialTheme(colorScheme = darkColorScheme()) {
-//        DeliveryPageContent(
-//            DeliveryPageContentState(
-//                "09/10/2998",
-//                "ABC Foods",
-//                listOf(
-//                    EntryRowState(
-//                        "Green Beans", null, null, "4", "40.0", "$28"
-//                    ),
-//                    EntryRowState(
-//                        "Lettuce", null, null, "7", "70.0", "$43"
-//                    )
-//                ),
-//                "$800.00",
-//                "$0.00",
-//                "$0.00",
-//                "$800.00",
-//            ),
-//            {}
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun DeliveryPageContentPreview() {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface {
+            DeliveryPageContent(
+                DeliveryPageState(
+                    details = DeliveryPageDetailsState(
+                        "09/10/2998",
+                        "ABC Foods",
+                        "$0.00",
+                        "$0.00",
+                    ),
+                    entry = DeliveryPageEntryState(
+                        listOf(
+                            EntryRowState("Green Beans", null, null, "4", "40.0", "$28"),
+                            EntryRowState("Lettuce", null, null, "7", "70.0", "$43")
+                        ),
+                        totalCount = "2",
+                        totalWeight = "320.0",
+                        totalCost = "$800.00",
+                    ),
+                    summary = DeliveryPageSummaryState(
+                        "$800.00",
+                        "$0.00",
+                        "$0.00",
+                        "$800.00",
+                    ),
+                ),
+                {},
+                onClickEditEntry = {},
+                onClickDeleteEntry = {},
+                onClickAddEntry = {},
+            )
+        }
+    }
+}

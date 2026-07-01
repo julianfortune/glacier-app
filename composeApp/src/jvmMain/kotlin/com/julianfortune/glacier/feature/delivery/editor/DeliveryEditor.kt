@@ -20,7 +20,6 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.feature.delivery.editor.data.DeliveryEditorState
 import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.CurrencyInputTextField

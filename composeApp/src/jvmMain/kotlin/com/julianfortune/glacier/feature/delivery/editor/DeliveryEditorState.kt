@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.editor.data
+package com.julianfortune.glacier.feature.delivery.editor
 
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.LocalDateInput
