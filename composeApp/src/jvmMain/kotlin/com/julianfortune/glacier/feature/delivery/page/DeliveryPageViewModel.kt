@@ -13,7 +13,6 @@ import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.ItemRepository
 import com.julianfortune.glacier.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
-import com.julianfortune.glacier.ui.layout.ListDetailControllable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +28,7 @@ class DeliveryPageViewModel(
     private val deliveryRepository: DeliveryRepository,
     itemRepository: ItemRepository,
     supplierRepository: SupplierRepository,
-) : ViewModel(), ListDetailControllable {
+) : ViewModel() {
     private val selectedDeliveryId = MutableStateFlow<Long?>(null)
 
     private val _deliveryEntryAction = mutableStateOf<DeliveryEntryAction?>(null)
@@ -84,7 +83,7 @@ class DeliveryPageViewModel(
                 initialValue = emptyMap()
             )
 
-    override fun setCurrentId(id: Long?) {
+    fun setCurrentId(id: Long?) {
         selectedDeliveryId.value = id
     }
 

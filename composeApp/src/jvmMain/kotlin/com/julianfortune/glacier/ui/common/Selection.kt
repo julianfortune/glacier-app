@@ -16,12 +16,17 @@ import com.julianfortune.glacier.ui.common.data.Option
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <ID> Selection(
-    selectedOption: Option<ID>,
+    selectedId: ID,
     options: List<Option<ID>>,
     onSelectedChange: (Option<ID>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val selectedOption = remember(selectedId, options) {
+        options.firstOrNull { it.id == selectedId }
+            ?: throw IndexOutOfBoundsException("SelectedId ($selectedId) does not correspond to any value in `options`")
+    }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

@@ -18,12 +18,10 @@ import com.julianfortune.glacier.feature.delivery.page.DeliveryPageViewModel
 import com.julianfortune.glacier.ui.common.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 
+
 @Composable
-fun DeliveryListDetailScreen(
-    detailViewModel: DeliveryPageViewModel = koinViewModel(),
-) {
+fun DeliveriesScreen() {
     ListDetailScaffold(
-        detailViewModel,
         listWidth = 320.dp,
         listView = { selectedId, onSelect, clearSelection ->
             DeliveryHeadlineList(selectedId, onSelect, clearSelection)
@@ -48,7 +46,7 @@ fun DeliveryListDetailScreen(
                 }
             }
         }
-    ) {
-        DeliveryPage(detailViewModel)
+    ) { selectedId ->
+        DeliveryPage(selectedId)
     }
 }

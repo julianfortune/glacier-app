@@ -22,6 +22,7 @@ import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.Dialog
 import com.julianfortune.glacier.ui.common.SideSheet
 import com.julianfortune.glacier.ui.common.formatLocalDate
+import org.koin.compose.viewmodel.koinViewModel
 import java.time.format.FormatStyle
 
 
@@ -56,7 +57,13 @@ fun calculateDeliveryTotalWeightPounds(delivery: DeliveryDetail): Double {
 }
 
 @Composable
-fun DeliveryPage(viewModel: DeliveryPageViewModel) {
+fun DeliveryPage(
+    selectedId: Long,
+    viewModel: DeliveryPageViewModel = koinViewModel(),
+) {
+    LaunchedEffect(selectedId) {
+        viewModel.setCurrentId(selectedId)
+    }
 
     // TODO: Use an ADT to represent the data better e.g., DeliveryUiState := Loading, Error(...), Delivery(data)
     val deliveryDetail by viewModel.deliveryDetail.collectAsState()

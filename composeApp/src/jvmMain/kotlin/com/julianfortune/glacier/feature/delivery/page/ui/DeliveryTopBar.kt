@@ -13,6 +13,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.tooling.preview.Preview
 import com.julianfortune.glacier.ui.common.TopBar
+import com.julianfortune.glacier.ui.theme.AppPreview
 
 
 @Composable
@@ -40,7 +41,7 @@ fun DeliveryTopBar(
 @Preview
 @Composable
 fun DeliveryPageTopBarPreview() {
-    MaterialTheme(colorScheme = darkColorScheme()) {
+    AppPreview {
         DeliveryTopBar(title = "Title", onClickDelete = {})
     }
 }

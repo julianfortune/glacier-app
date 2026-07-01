@@ -28,6 +28,7 @@ import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageState
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageSummaryState
 import com.julianfortune.glacier.feature.delivery.page.data.EntryRowState
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
@@ -401,40 +402,38 @@ fun DeliveryPageContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun DeliveryPageContentPreview() {
-    MaterialTheme(colorScheme = darkColorScheme()) {
-        Surface {
-            DeliveryPageContent(
-                DeliveryPageState(
-                    details = DeliveryPageDetailsState(
-                        "09/10/2998",
-                        "ABC Foods",
-                        "$0.00",
-                        "$0.00",
-                    ),
-                    entry = DeliveryPageEntryState(
-                        listOf(
-                            EntryRowState("Green Beans", null, null, "4", "40.0", "$28"),
-                            EntryRowState("Lettuce", null, null, "7", "70.0", "$43")
-                        ),
-                        totalCount = "2",
-                        totalWeight = "320.0",
-                        totalCost = "$800.00",
-                    ),
-                    summary = DeliveryPageSummaryState(
-                        "$800.00",
-                        "$0.00",
-                        "$0.00",
-                        "$800.00",
-                    ),
+    AppPreview {
+        DeliveryPageContent(
+            DeliveryPageState(
+                details = DeliveryPageDetailsState(
+                    "09/10/2998",
+                    "ABC Foods",
+                    "$0.00",
+                    "$0.00",
                 ),
-                {},
-                onClickEditEntry = {},
-                onClickDeleteEntry = {},
-                onClickAddEntry = {},
-            )
-        }
+                entry = DeliveryPageEntryState(
+                    listOf(
+                        EntryRowState("Green Beans", null, null, "4", "40.0", "$28"),
+                        EntryRowState("Lettuce", null, null, "7", "70.0", "$43")
+                    ),
+                    totalCount = "2",
+                    totalWeight = "320.0",
+                    totalCost = "$800.00",
+                ),
+                summary = DeliveryPageSummaryState(
+                    "$800.00",
+                    "$0.00",
+                    "$0.00",
+                    "$800.00",
+                ),
+            ),
+            {},
+            onClickEditEntry = {},
+            onClickDeleteEntry = {},
+            onClickAddEntry = {},
+        )
     }
 }

@@ -184,7 +184,7 @@ fun NewEntryForm(
 
                 Selection(
                     options = listOf(paidOption, noCostOption),
-                    selectedOption = if (costStatusIsNoCost) noCostOption else paidOption,
+                    selectedId = costStatusIsNoCost,
                     onSelectedChange = { selection ->
                         costStatusIsNoCost = selection.id
                     },

@@ -26,11 +26,12 @@ import com.julianfortune.glacier.ui.common.CurrencyInputTextField
 import com.julianfortune.glacier.ui.common.LocalDateInput
 import com.julianfortune.glacier.ui.common.LocalDateInputTextField
 import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.theme.AppPreview
 
 @Preview
 @Composable
 fun DeliveriesEditorPreview() {
-    MaterialTheme(colorScheme = darkColorScheme()) {
+    AppPreview {
         DeliveryEditor(
             "New Delivery",
             "Create",
