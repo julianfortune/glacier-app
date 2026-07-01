@@ -1,0 +1,77 @@
+
+CREATE TABLE IF NOT EXISTS BasicReport (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+
+    -- Date range (inclusive, ISO-8601 date, e.g., "YYYY-MM-DD") (required)
+    startDate TEXT NOT NULL,
+    endDate TEXT NOT NULL,
+
+    -- Filters (optional)
+    itemId INTEGER,
+    itemCategoryId INTEGER,
+    costStatus TEXT CHECK( costStatus IN ('PURCHASED', 'NO_COST') ),
+    programId INTEGER,
+    purchasingAccountId INTEGER,
+    supplierId INTEGER,
+
+    -- Metadata
+    createdAtEpochSeconds INTEGER NOT NULL,
+    updatedAtEpochSeconds INTEGER NOT NULL
+);
+
+-- QUERIES
+getAll:
+SELECT * FROM BasicReport ORDER BY createdAtEpochSeconds DESC;
+
+getById:
+SELECT * FROM BasicReport WHERE id = :id LIMIT 1;
+
+deleteById:
+DELETE FROM BasicReport WHERE id = :id;
+
+deleteAll:
+DELETE FROM BasicReport;
+
+insert:
+INSERT INTO BasicReport (
+    name,
+    startDate,
+    endDate,
+    itemId,
+    itemCategoryId,
+    costStatus,
+    programId,
+    purchasingAccountId,
+    supplierId,
+    createdAtEpochSeconds,
+    updatedAtEpochSeconds
+) VALUES (
+    :name,
+    :startDate,
+    :endDate,
+    :itemId,
+    :itemCategoryId,
+    :costStatus,
+    :programId,
+    :purchasingAccountId,
+    :supplierId,
+    :createdAtEpochSeconds,
+    :updatedAtEpochSeconds
+)
+RETURNING id;
+
+updateById:
+UPDATE BasicReport
+SET
+    name = :name,
+    startDate = :startDate,
+    endDate = :endDate,
+    itemId = :itemId,
+    itemCategoryId = :itemCategoryId,
+    costStatus = :costStatus,
+    programId = :programId,
+    purchasingAccountId = :purchasingAccountId,
+    supplierId = :supplierId,
+    updatedAtEpochSeconds = :updatedAtEpochSeconds
+WHERE id = :id;

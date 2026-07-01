@@ -31,7 +31,6 @@ fun NewEntryForm(
 ) {
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
 
-    var unitName by remember { mutableStateOf(initialEntry?.unitName ?: "") }
     var unitWeightPoundsInput by remember {
         mutableStateOf(
             initialEntry?.unitWeight?.toImperial()?.first?.toString() ?: ""
@@ -110,7 +109,7 @@ fun NewEntryForm(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Unit",
+                text = "Unit (e.g., Case)",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -120,22 +119,6 @@ fun NewEntryForm(
             Row(
                 verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedTextField(
-                    value = unitName,
-                    onValueChange = { unitName = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.height(64.dp).weight(2f).onFocusChanged({ state ->
-                        if (!state.isFocused) {
-                            // Check for error
-                        }
-                    }),
-                    singleLine = true,
-                    isError = false,
-                    colors = OutlinedTextFieldDefaults.colors(),
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
                 OutlinedTextField(
                     value = unitWeightPoundsInput,
                     onValueChange = { unitWeightPoundsInput = it },
@@ -261,7 +244,6 @@ fun NewEntryForm(
                     val entry = Entry(
                         selectedItem!!.id,
                         unitCount!!,
-                        unitName,
                         unitWeight!!,
                         costStatus,
                         costCents,

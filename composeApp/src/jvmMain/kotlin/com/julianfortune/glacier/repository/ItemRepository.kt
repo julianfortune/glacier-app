@@ -18,6 +18,7 @@ class ItemRepository(private val database: Database) {
             .asFlow()
             .mapToList(Dispatchers.IO)
             .map { items ->
+                println(items)
                 items.map { i ->
                     // TODO(P1): Fetch categories as well
                     val categoryIds = emptyList<Long>()

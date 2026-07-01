@@ -1,6 +1,7 @@
 -- Join table: items --[1:many]--> category
 CREATE TABLE IF NOT EXISTS ItemCategory (
     id INTEGER PRIMARY KEY,
+
     itemId INTEGER NOT NULL,
     categoryId INTEGER NOT NULL,
 
@@ -37,12 +38,3 @@ INSERT INTO ItemCategory (
     :itemId,
     :categoryId
 );
-
--- SEED DATA
-INSERT OR IGNORE INTO ItemCategory (itemId, categoryId)
-VALUES
-    (0, 0),
-    (1, 1),
-    (1, 2)
-    -- ...
-;

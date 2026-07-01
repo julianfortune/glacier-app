@@ -24,11 +24,3 @@ updateById:
 UPDATE Program
 SET name = :name
 WHERE id = :id;
-
--- SEED DATA
-INSERT OR IGNORE INTO Program (name)
-VALUES
-    ('Example Program A'),
-    ('Example Grant I'),
-    ('Example Project 1')
-;

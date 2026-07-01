@@ -2,8 +2,9 @@
 CREATE TABLE IF NOT EXISTS Item (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
+
     -- JSON list of integers in centigrams representing possible weights for the item
-    savedWeightListInCentigrams TEXT,
+    savedWeightInCentigramsListJson TEXT,
 
     UNIQUE(name)
 );
@@ -24,10 +25,10 @@ DELETE FROM Item;
 insert:
 INSERT INTO Item (
     name,
-    savedWeightListInCentigrams
+    savedWeightInCentigramsListJson
 ) VALUES (
     :name,
-    :savedWeightListInCentigrams
+    :savedWeightInCentigramsListJson
 )
 RETURNING id;
 
@@ -35,14 +36,5 @@ updateById:
 UPDATE Item
 SET
     name = :name,
-    savedWeightListInCentigrams = :savedWeightListInCentigrams
+    savedWeightInCentigramsListJson = :savedWeightInCentigramsListJson
 WHERE id = :id;
-
--- SEED DATA
-INSERT OR IGNORE INTO Item (id, name)
-VALUES
-    (0, "Sliced Peaches in Water"),
-    (1, "Cut Green Beans"),
-    (2, "Tuna in Water"),
-    (3, "Fresh Green Beans")
-;

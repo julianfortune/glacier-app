@@ -23,11 +23,3 @@ updateById:
 UPDATE PurchasingAccount
 SET name = :name
 WHERE id = :id;
-
--- SEED DATA
-INSERT OR IGNORE INTO PurchasingAccount (name)
-VALUES
-    ('Account I'),
-    ('Account II'),
-    ('Account III')
-;

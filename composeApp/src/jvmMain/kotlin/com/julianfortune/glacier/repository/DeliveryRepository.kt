@@ -49,7 +49,6 @@ class DeliveryRepository(private val database: Database) {
                 Entry(
                     entry.itemId,
                     entry.unitCount,
-                    entry.unitName,
                     unitWeight,
                     costStatus,
                     entry.unitCostCents,
@@ -83,8 +82,8 @@ class DeliveryRepository(private val database: Database) {
             delivery.supplierId,
             delivery.taxesCents,
             delivery.feesCents,
-            now.toString(),
-            now.toString(),
+            now.epochSecond,
+            now.epochSecond,
         ).awaitAsOne()
 
         delivery.entries?.forEach { entry ->
@@ -102,7 +101,7 @@ class DeliveryRepository(private val database: Database) {
             delivery.data.supplierId,
             delivery.data.taxesCents,
             delivery.data.feesCents,
-            now.toString(),
+            now.epochSecond,
             delivery.id,
         )
 
@@ -123,18 +122,19 @@ class DeliveryRepository(private val database: Database) {
             delivery.data.supplierId,
             delivery.data.taxesCents,
             delivery.data.feesCents,
-            now.toString(),
+            now.epochSecond,
             delivery.id,
         )
     }
 
     suspend fun insertDeliveryEntry(deliveryId: Long, entry: Entry) {
+        val now = Instant.now()
+
         val costStatus = CostStatusCodec.serialize(entry.costStatus)
         database.deliveryEntryQueries.insert(
             deliveryId,
             entry.itemId,
             entry.unitCount,
-            entry.unitName,
             entry.itemsPerUnit,
             entry.itemWeight?.centigrams,
             entry.unitWeight.centigrams,
@@ -142,6 +142,8 @@ class DeliveryRepository(private val database: Database) {
             entry.unitCostCents,
             entry.programId,
             entry.purchasingAccountId,
+            now.epochSecond,
+            now.epochSecond,
         )
     }
 

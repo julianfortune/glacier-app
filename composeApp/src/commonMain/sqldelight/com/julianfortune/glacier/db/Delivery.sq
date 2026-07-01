@@ -7,18 +7,16 @@ CREATE TABLE IF NOT EXISTS Delivery (
     taxesCents INTEGER,
     feesCents INTEGER,
 
-    creationDateTime TEXT NOT NULL,
-    updateDateTime TEXT NOT NULL,
-    -- TODO: Replace with created/updated unix epoch timestamps
-    -- createdAt INTEGER NOT NULL, -- Unix epoch timestamp seconds
-    -- updatedAt INTEGER NOT NULL, -- Unix epoch timestamp seconds
+    -- Metadata
+    createdAtEpochSeconds INTEGER NOT NULL,
+    updatedAtEpochSeconds INTEGER NOT NULL,
 
     FOREIGN KEY(supplierId) REFERENCES Supplier(id)
 );
 
 -- QUERIES
 getAll: -- Sorted by delivery date and then by creation datetime
-SELECT * FROM Delivery ORDER BY receivedDate DESC, creationDateTime DESC;
+SELECT * FROM Delivery ORDER BY receivedDate DESC, createdAtEpochSeconds DESC;
 
 getById:
 SELECT * FROM Delivery WHERE id = :id LIMIT 1;
@@ -35,17 +33,16 @@ INSERT INTO Delivery (
     supplierId,
     taxesCents,
     feesCents,
-    creationDateTime,
-    updateDateTime
+    createdAtEpochSeconds,
+    updatedAtEpochSeconds
 ) VALUES (
     :receivedDate,
     :supplierId,
     :taxesCents,
     :feesCents,
-    :creationDateTime,
-    :updateDateTime
+    :createdAtEpochSeconds,
+    :updatedAtEpochSeconds
 )
--- NOTE: The error is due to a bug in intelliJ, see https://github.com/sqldelight/sqldelight/issues/5725
 RETURNING id;
 
 updateById:
@@ -55,6 +52,5 @@ SET
     supplierId = :supplierId,
     taxesCents = :taxesCents,
     feesCents = :feesCents,
-    updateDateTime = :updateDateTime
+    updatedAtEpochSeconds = :updatedAtEpochSeconds
 WHERE id = :id;
-

@@ -106,7 +106,8 @@ fun DeliveryPage(
                 ),
                 DeliveryPageEntryState(
                     delivery.data.entries?.map { e ->
-                        val itemName = itemMap[e.itemId]!!.data.name
+                        // TODO: Need to fetch all the data from the DB atomically
+                        val itemName = itemMap[e.itemId]?.data?.name ?: "..."
                         val totalWeight = calculateEntryTotalWeight(e)
                         val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
                         EntryRowState(

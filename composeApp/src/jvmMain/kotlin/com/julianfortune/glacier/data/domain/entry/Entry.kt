@@ -5,7 +5,6 @@ import com.julianfortune.glacier.data.domain.Weight
 data class Entry(
     val itemId: Long,
     val unitCount: Long,
-    val unitName: String,
     val unitWeight: Weight,
     val costStatus: CostStatus,
     val unitCostCents: Long,
