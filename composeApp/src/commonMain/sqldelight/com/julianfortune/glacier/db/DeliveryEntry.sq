@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS DeliveryEntry (
     deliveryId INTEGER NOT NULL,
     itemId INTEGER NOT NULL,
 
-    -- Quanity of goods
+    -- Quantity of goods
     unitCount INTEGER NOT NULL,
     itemWeightCentigrams INTEGER, -- Optional value for the weight of a single item
     itemsPerUnit INTEGER, -- Optional value for 'pack' size

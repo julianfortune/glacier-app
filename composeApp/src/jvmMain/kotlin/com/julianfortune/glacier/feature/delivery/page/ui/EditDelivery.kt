@@ -6,7 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
+import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditor
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.LocalDateInput
@@ -16,7 +16,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDelivery(
-    delivery: Entity<DeliveryDetail>,
+    delivery: Delivery,
     onCancel: () -> Unit,
     onSuccess: () -> Unit,
     viewModel: EditDeliveryViewModel = koinViewModel(),
@@ -32,12 +32,12 @@ fun EditDelivery(
     }
 
     LaunchedEffect(delivery) {
-        stateHolder.updateReceivedDate(LocalDateInput.of(delivery.data.receivedDate))
-        stateHolder.updateSelectedSupplier(delivery.data.supplierId!!)
-        delivery.data.feesCents?.let {
+        stateHolder.updateReceivedDate(LocalDateInput.of(delivery.received))
+        stateHolder.updateSelectedSupplier(delivery.supplier?.id)
+        delivery.feesCents?.let {
             stateHolder.updateFees(CurrencyInput.fromLong(it))
         }
-        delivery.data.taxesCents?.let {
+        delivery.taxesCents?.let {
             stateHolder.updateTaxes(CurrencyInput.fromLong(it))
         }
     }

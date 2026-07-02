@@ -6,7 +6,7 @@ import com.julianfortune.glacier.repository.SupplierRepository
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 
-class DeliveryHeadlineListViewModelTest {
+class DeliveryHeaderListViewModelTest {
 
     lateinit var viewModel: DeliveryHeadlineListViewModel
 

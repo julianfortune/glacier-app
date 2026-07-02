@@ -77,12 +77,13 @@ fun ItemForm(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 enabled = isValid,
                 onClick = {
-                    val item = Item(
-                        name,
-                        // TODO(P0): Save category links
-                        emptyList(),
-                    )
-                    onSubmit(item)
+                    TODO()
+//                    val item = Item(
+//                        name,
+//                        // TODO(P0): Save category links
+//                        emptyList(),
+//                    )
+//                    onSubmit(item)
                 },
             ) {
                 Text(submitButtonText)

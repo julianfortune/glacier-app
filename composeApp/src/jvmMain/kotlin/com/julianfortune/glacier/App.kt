@@ -64,31 +64,31 @@ fun App() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 when (selectedNavigationItem) {
-                    NavigationPage.CATEGORIES -> NamedEntityListView(
+                    NavigationPage.CATEGORIES -> NamedEntityListView<Category>(
                         koinViewModel(named("categoryViewModel")),
                         "Categories",
                         "Category"
-                    ) { Category(it) }
+                    )
 
                     NavigationPage.DELIVERIES -> DeliveriesScreen()
                     NavigationPage.ITEMS -> ItemListView()
-                    NavigationPage.PROGRAMS -> NamedEntityListView(
+                    NavigationPage.PROGRAMS -> NamedEntityListView<Program>(
                         koinViewModel(named("programViewModel")),
                         "Programs",
                         "Program"
-                    ) { Program(it) }
+                    )
 
-                    NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityListView(
+                    NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityListView<PurchasingAccount>(
                         koinViewModel(named("purchasingAccountViewModel")),
                         "Accounts",
                         "Account"
-                    ) { PurchasingAccount(it) }
+                    )
 
-                    NavigationPage.SUPPLIERS -> NamedEntityListView(
+                    NavigationPage.SUPPLIERS -> NamedEntityListView<Supplier>(
                         koinViewModel(named("supplierViewModel")),
                         "Suppliers",
                         "Supplier"
-                    ) { Supplier(it) }
+                    )
 
                     else -> Column(
                         Modifier.fillMaxSize(),

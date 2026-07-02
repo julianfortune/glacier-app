@@ -29,7 +29,6 @@ fun DeliveryHeadlineList(
     viewModel: DeliveryHeadlineListViewModel = koinViewModel(),
 ) {
     val deliveryHeadlines by viewModel.allDeliveries.collectAsState(emptyList())
-    val supplierMap by viewModel.supplierMap.collectAsState()
 
     var creationDialogIsOpen by remember { mutableStateOf(false) }
 
@@ -45,7 +44,7 @@ fun DeliveryHeadlineList(
         deliveryHeadlines,
         selectedId,
         content = { c, modifier, elevation ->
-            val dateString = formatLocalDate(c.data.receivedDate)
+            val dateString = formatLocalDate(c.received)
             // Prevent re-draws when inserting a new delivery at the top
             key(c.id) {
                 ListItem(
@@ -53,8 +52,7 @@ fun DeliveryHeadlineList(
                         Text(dateString)
                     },
                     supportingContent = {
-                        val supplier = (c.data.supplierId).let { supplierMap[it] }
-                        Text(supplier?.data?.name ?: "Unknown Supplier")
+                        Text(c.supplier?.name ?: "None")
                     },
                     modifier = modifier.clickable(
                         enabled = true,

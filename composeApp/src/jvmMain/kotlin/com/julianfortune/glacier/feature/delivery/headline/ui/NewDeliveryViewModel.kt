@@ -2,7 +2,7 @@ package com.julianfortune.glacier.feature.delivery.headline.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
+import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorStateHolder
@@ -29,7 +29,7 @@ class NewDeliveryViewModel(
     init {
         viewModelScope.launch {
             supplierRepository.getAll().collect { supplierList ->
-                val suppliers = supplierList.map { Option(it.id, it.data.name) }
+                val suppliers = supplierList.map { Option(it.id, it.name) }
                 stateHolder.updateSuppliers(suppliers)
             }
         }
@@ -42,16 +42,17 @@ class NewDeliveryViewModel(
         )
 
         viewModelScope.launch {
-            val delivery = DeliveryDetail(
-                validated.receivedDate,
-                validated.supplierId,
-                validated.taxesCents,
-                validated.feesCents,
-                emptyList()
-            )
-            val newDeliveryId = deliveryRepository.insert(delivery)
-
-            _channel.send(DeliveryCreated(newDeliveryId))
+            TODO("Not implemented")
+//            val delivery = Delivery(
+//                validated.receivedDate,
+//                validated.supplierId,
+//                validated.taxesCents,
+//                validated.feesCents,
+//                emptyList()
+//            )
+//            val newDeliveryId = deliveryRepository.insert(delivery)
+//
+//            _channel.send(DeliveryCreated(newDeliveryId))
         }
     }
 

@@ -24,27 +24,27 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
             initialValue = emptyList()
         )
 
-    suspend fun saveItem(item: Item) {
-        itemRepository.insert(item)
-    }
-
-    suspend fun updateItem(item: Entity<Item>) {
-        itemRepository.update(item)
-    }
-
-    suspend fun deleteItem(itemId: Long) {
-        itemRepository.deleteById(itemId)
-    }
+//    suspend fun saveItem(item: Item) {
+//        itemRepository.insert(item)
+//    }
+//
+//    suspend fun updateItem(item: Item) {
+//        itemRepository.update(item)
+//    }
+//
+//    suspend fun deleteItem(itemId: Long) {
+//        itemRepository.deleteById(itemId)
+//    }
 
     fun showNewItem() {
         _itemOperation.value = EntityOperation.CreateNew
     }
 
-    fun showEditItem(item: Entity<Item>) {
+    fun showEditItem(item: Item) {
         _itemOperation.value = EntityOperation.Edit(item)
     }
 
-    fun showDeleteItem(item: Entity<Item>) {
+    fun showDeleteItem(item: Item) {
         _itemOperation.value = EntityOperation.Delete(item.id)
     }
 

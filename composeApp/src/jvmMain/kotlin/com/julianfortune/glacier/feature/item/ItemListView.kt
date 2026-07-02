@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.common.Entity
+import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.ui.common.CollectionView
 import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
@@ -43,7 +44,7 @@ fun ItemListView(viewModel: ItemViewModel = koinViewModel()) {
         ) { item, modifier, elevation ->
             ListItem(
                 headlineContent = {
-                    Text(item.data.name)
+                    Text(item.name)
                 },
                 modifier = modifier.clickable(
                     enabled = true,
@@ -80,21 +81,23 @@ fun ItemListView(viewModel: ItemViewModel = koinViewModel()) {
                 when (itemOperation) {
                     is EntityOperation.CreateNew -> {
                         ItemForm(viewModel, "Create Item", "Create") { item ->
-                            coroutineScope.launch {
-                                viewModel.saveItem(item)
-                                viewModel.dismissItemModal()
-                            }
+                            TODO()
+//                            coroutineScope.launch {
+//                                viewModel.saveItem(item)
+//                                viewModel.dismissItemModal()
+//                            }
                         }
                     }
 
                     is EntityOperation.Edit -> {
                         val originalItem = (itemOperation as EntityOperation.Edit).entity
 
-                        ItemForm(viewModel, "Edit Item", "Save", originalItem.data) { item ->
-                            coroutineScope.launch {
-                                viewModel.updateItem(Entity(originalItem.id, item))
-                                viewModel.dismissItemModal()
-                            }
+                        ItemForm(viewModel, "Edit Item", "Save", originalItem) { item ->
+                            TODO()
+//                            coroutineScope.launch {
+//                                viewModel.updateItem(Entity(originalItem.id, item))
+//                                viewModel.dismissItemModal()
+//                            }
                         }
                     }
 
@@ -107,10 +110,11 @@ fun ItemListView(viewModel: ItemViewModel = koinViewModel()) {
                                 viewModel.cancelItemOperation()
                             },
                             onConfirm = {
-                                coroutineScope.launch {
-                                    viewModel.deleteItem(itemId)
-                                    viewModel.dismissItemModal()
-                                }
+                                TODO()
+//                                coroutineScope.launch {
+//                                    viewModel.deleteItem(itemId)
+//                                    viewModel.dismissItemModal()
+//                                }
                             }
                         )
                     }

@@ -5,9 +5,9 @@ import com.julianfortune.glacier.core.codec.CostStatusCodec
 import com.julianfortune.glacier.core.codec.LocalDateCodec
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.domain.Weight
-import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
-import com.julianfortune.glacier.data.domain.entry.CostStatus
-import com.julianfortune.glacier.data.domain.entry.Entry
+import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.domain.Entry
 import com.julianfortune.glacier.repository.DeliveryRepository
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
@@ -55,7 +55,7 @@ class DeliveryRepositoryTest {
             null,
             null,
         )
-        val delivery = DeliveryDetail(
+        val delivery = Delivery(
             LocalDate.of(2025, 10, 26),
             supplierId,
             2000L,
