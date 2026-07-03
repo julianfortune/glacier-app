@@ -2,9 +2,8 @@ package com.julianfortune.glacier.feature.delivery.headline.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorStateHolder
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorState
 import com.julianfortune.glacier.ui.common.data.Option
@@ -42,17 +41,16 @@ class NewDeliveryViewModel(
         )
 
         viewModelScope.launch {
-            TODO("Not implemented")
-//            val delivery = Delivery(
-//                validated.receivedDate,
-//                validated.supplierId,
-//                validated.taxesCents,
-//                validated.feesCents,
-//                emptyList()
-//            )
-//            val newDeliveryId = deliveryRepository.insert(delivery)
-//
-//            _channel.send(DeliveryCreated(newDeliveryId))
+            deliveryRepository.insertDelivery(
+                validated.receivedDate,
+                validated.supplierId,
+                validated.taxesCents,
+                validated.feesCents,
+            ).map { newDeliveryId ->
+                // Emit event on success
+                _channel.send(DeliveryCreated(newDeliveryId))
+            }
+            // TODO: Handle failure
         }
     }
 

@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.core.util.formatCents
 import com.julianfortune.glacier.data.domain.*
-import com.julianfortune.glacier.feature.delivery.page.*
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageDetailsState
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageEntryState
@@ -69,14 +68,14 @@ fun DeliveryPage(
     }
 
     // TODO: Use an ADT to represent the data better e.g., DeliveryUiState := Loading, Error(...), Delivery(data)
-    val deliveryDetail by viewModel.delivery.collectAsState()
+    val delivery by viewModel.delivery.collectAsState()
     val deliveryEntryAction by viewModel.deliveryEntryAction
 
     var editDetailsDialogIsOpen by remember { mutableStateOf(false) }
     var deleteDialogIsOpen by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        deliveryDetail?.let { delivery ->
+        delivery?.let { delivery ->
             // TODO: This should live in ViewModel or some other layer for business logic
             val supplierName = delivery.supplier?.name
 
@@ -138,11 +137,11 @@ fun DeliveryPage(
                 onClickAddEntry = {
                     viewModel.showNewEntry()
                 },
-                onClickEditEntry = {
-                    // TODO ...
+                onClickEditEntry = { entry ->
+                    viewModel.showEditEntry(entry)
                 },
-                onClickDeleteEntry = {
-                    // TODO ...
+                onClickDeleteEntry = { entryId ->
+                    TODO()
                 },
             )
         }
@@ -153,7 +152,7 @@ fun DeliveryPage(
             onDismissRequest = { editDetailsDialogIsOpen = false },
         ) {
             EditDelivery(
-                delivery = deliveryDetail ?: throw NoSuchElementException("`deliveryDetail` must be defined"),
+                delivery = delivery ?: throw NoSuchElementException("`deliveryDetail` must be defined"),
                 onCancel = {
                     editDetailsDialogIsOpen = false
                 },
@@ -170,7 +169,7 @@ fun DeliveryPage(
         ) {
             // TODO(?): Move into own component like EditDelivery
             ConfirmDeleteEntityForm(
-                deliveryDetail!!.id,
+                delivery!!.id,
                 "Delete Delivery",
                 onCancel = {
                     deleteDialogIsOpen = false
@@ -206,44 +205,29 @@ fun DeliveryPage(
                                 dismissSheet()
                             },
                             onSubmit = { entry ->
-                                viewModel.saveEntry(deliveryDetail!!.id, entry)
+                                viewModel.saveEntry(delivery!!.id, entry)
                                 dismissSheet()
                             }
                         )
                     }
 
-//                    is DeliveryEntryAction.Edit -> {
-//                        NewEntryForm(
-//                            "Edit Entry",
-//                            "Update",
-//                            viewModel.allItems.collectAsState(initial = emptyList()).value,
-//                            initialEntry = (deliveryEntryAction as DeliveryEntryAction.Edit).entry,
-//                            onCancel = {
-//                                dismissSheet()
-//                            },
-//                            onSubmit = { newEntry ->
-//                                val currentDeliveryDetail: Entity<DeliveryDetail> =
-//                                    deliveryDetail
-//                                        ?: throw AssertionError("Unable to delete an entry because `deliveryDetail` is unexpectedly null")
-//
-//                                val updatedDelivery = currentDeliveryDetail.copy(
-//                                    data = currentDeliveryDetail.copy(
-//                                        entries = currentDeliveryDetail.entries?.mapIndexed { i, e ->
-//                                            when {
-//                                                i == (deliveryEntryAction as DeliveryEntryAction.Edit).index -> newEntry
-//                                                else -> e
-//                                            }
-//                                        }
-//                                    )
-//                                )
-//
-//                                coroutineScope.launch {
-//                                    viewModel.updateDelivery(updatedDelivery)
-//                                    dismissSheet()
-//                                }
-//                            }
-//                        )
-//                    }
+                    is DeliveryEntryAction.Edit -> {
+                        NewEntryForm(
+                            "Edit Entry",
+                            "Update",
+                            viewModel.allItems.collectAsState(initial = emptyList()).value,
+                            initialEntry = (deliveryEntryAction as DeliveryEntryAction.Edit).entry,
+                            onCancel = {
+                                dismissSheet()
+                            },
+                            onSubmit = { newEntry ->
+                                val id = (deliveryEntryAction as DeliveryEntryAction.Edit).entry.id
+
+                                viewModel.updateEntry(id, newEntry)
+                                dismissSheet()
+                            }
+                        )
+                    }
 
                     else -> throw Error("`deliveryEntryAction` must not be `null`")
                 }

@@ -80,24 +80,22 @@ fun ItemListView(viewModel: ItemViewModel = koinViewModel()) {
             ) {
                 when (itemOperation) {
                     is EntityOperation.CreateNew -> {
-                        ItemForm(viewModel, "Create Item", "Create") { item ->
-                            TODO()
-//                            coroutineScope.launch {
-//                                viewModel.saveItem(item)
-//                                viewModel.dismissItemModal()
-//                            }
+                        ItemForm(viewModel, "Create Item", "Create") { name ->
+                            coroutineScope.launch {
+                                viewModel.saveItem(name)
+                                viewModel.dismissItemModal()
+                            }
                         }
                     }
 
                     is EntityOperation.Edit -> {
                         val originalItem = (itemOperation as EntityOperation.Edit).entity
 
-                        ItemForm(viewModel, "Edit Item", "Save", originalItem) { item ->
-                            TODO()
-//                            coroutineScope.launch {
-//                                viewModel.updateItem(Entity(originalItem.id, item))
-//                                viewModel.dismissItemModal()
-//                            }
+                        ItemForm(viewModel, "Edit Item", "Save", originalItem) { name ->
+                            coroutineScope.launch {
+                                viewModel.updateItem(originalItem.id, name)
+                                viewModel.dismissItemModal()
+                            }
                         }
                     }
 
@@ -110,11 +108,10 @@ fun ItemListView(viewModel: ItemViewModel = koinViewModel()) {
                                 viewModel.cancelItemOperation()
                             },
                             onConfirm = {
-                                TODO()
-//                                coroutineScope.launch {
-//                                    viewModel.deleteItem(itemId)
-//                                    viewModel.dismissItemModal()
-//                                }
+                                coroutineScope.launch {
+                                    viewModel.deleteItem(itemId)
+                                    viewModel.dismissItemModal()
+                                }
                             }
                         )
                     }

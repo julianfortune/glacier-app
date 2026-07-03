@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.core.codec
+package com.julianfortune.glacier.data.codec
 
 import dev.forkhandles.result4k.Result
 

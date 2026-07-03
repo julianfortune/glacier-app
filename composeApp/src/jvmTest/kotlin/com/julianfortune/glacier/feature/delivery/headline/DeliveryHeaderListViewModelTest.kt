@@ -1,8 +1,8 @@
 package com.julianfortune.glacier.feature.delivery.headline
 
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.ItemRepository
-import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 

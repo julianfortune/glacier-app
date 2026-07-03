@@ -2,13 +2,13 @@ package com.julianfortune.glacier.feature.delivery.headline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.data.domain.DeliveryHeadline
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.ItemRepository
-import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.data.domain.ItemHeadline
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +40,7 @@ class DeliveryHeadlineListViewModel(
                 initialValue = emptyList()
             )
 
-    val allItems: StateFlow<List<Item>> =
+    val allItems: StateFlow<List<ItemHeadline>> =
         itemRepository.getAll()
             .stateIn(
                 scope = viewModelScope,

@@ -7,7 +7,7 @@ import java.time.LocalDate
 data class DeliveryHeadline(
     override val id: Long,
     val received: LocalDate,
-    val supplier: Supplier?,
+    val supplier: Supplier,
     val taxesCents: Long?,
     val feesCents: Long?,
     val metadata: EntityMetadata,

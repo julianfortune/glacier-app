@@ -10,11 +10,34 @@ CREATE TABLE IF NOT EXISTS Item (
 );
 
 -- QUERIES
-getAll:
+getAllItems:
 SELECT * FROM Item ORDER BY name ASC;
 
-getById:
-SELECT * FROM Item WHERE id = :id LIMIT 1;
+getItemWithCategoriesById:
+SELECT
+    Item.*,
+    Category.id AS categoryId,
+    Category.name AS categoryName
+FROM Item
+    LEFT JOIN ItemCategory ON Item.id = ItemCategory.itemId
+    LEFT JOIN Category ON ItemCategory.categoryId = Category.id
+WHERE Item.id = :id
+LIMIT 1;
+
+getAllItemsWithCategoriesByQueryingName:
+SELECT
+    Item.*,
+    Category.id AS categoryId,
+    Category.name AS categoryName
+FROM Item
+    LEFT JOIN ItemCategory ON Item.id = ItemCategory.itemId
+    LEFT JOIN Category ON ItemCategory.categoryId = Category.id
+WHERE Item.name LIKE :query
+ORDER BY
+    -- Make a best effort to sort result by 'closeness' of match
+    CASE WHEN Item.name = :exactMatch THEN 0 ELSE 1 END ASC,
+    CASE WHEN Item.name LIKE :startsWith THEN 0 ELSE 1 END ASC,
+    Item.name ASC;
 
 deleteById:
 DELETE FROM Item WHERE id = :id;

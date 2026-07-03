@@ -7,7 +7,7 @@ import java.time.LocalDate
 data class Delivery(
     override val id: Long,
     val received: LocalDate,
-    val supplier: Supplier?,
+    val supplier: Supplier,
     val taxesCents: Long?,
     val feesCents: Long?,
     val entries: List<Entry>,

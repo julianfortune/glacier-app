@@ -2,12 +2,10 @@ package com.julianfortune.glacier.feature.delivery.page.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorState
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorStateHolder
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.ui.common.data.Option
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel

@@ -11,6 +11,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.Item
+import com.julianfortune.glacier.data.domain.ItemHeadline
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,8 +19,8 @@ fun ItemForm(
     viewModel: ItemViewModel,
     title: String,
     submitButtonText: String,
-    initialItem: Item? = null,
-    onSubmit: (item: Item) -> Unit
+    initialItem: ItemHeadline? = null,
+    onSubmit: (name: String) -> Unit
 ) {
     var name by remember { mutableStateOf(initialItem?.name ?: "") }
 
@@ -77,13 +78,7 @@ fun ItemForm(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 enabled = isValid,
                 onClick = {
-                    TODO()
-//                    val item = Item(
-//                        name,
-//                        // TODO(P0): Save category links
-//                        emptyList(),
-//                    )
-//                    onSubmit(item)
+                    onSubmit(name)
                 },
             ) {
                 Text(submitButtonText)

@@ -17,7 +17,7 @@ deleteAll:
 DELETE FROM Category;
 
 insert:
-INSERT INTO Category (name) VALUES (:name);
+INSERT INTO Category (name) VALUES (:name) RETURNING id;
 
 updateById:
 UPDATE Category

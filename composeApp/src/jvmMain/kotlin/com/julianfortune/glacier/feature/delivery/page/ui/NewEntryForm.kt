@@ -11,7 +11,9 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.CostStatus
 import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.data.domain.Item
+import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.feature.delivery.page.EntryBody
 import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.CurrencyInputTextField
@@ -23,10 +25,10 @@ import com.julianfortune.glacier.ui.common.data.Option
 fun NewEntryForm(
     title: String,
     submitButtonText: String,
-    items: List<Item>,
+    items: List<ItemHeadline>,
     initialEntry: Delivery.Entry? = null,
     onCancel: () -> Unit,
-    onSubmit: (entry: Delivery.Entry) -> Unit
+    onSubmit: (body: EntryBody) -> Unit
 ) {
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
 
@@ -239,20 +241,19 @@ fun NewEntryForm(
                         else -> unitCostCents!!
                     }
 
-                    TODO()
-//                    val entry = Delivery.Entry(
-//                        selectedItem!!.id,
-//                        unitCount!!,
-//                        unitWeight!!,
-//                        costStatus,
-//                        costCents,
-//                        null, // TODO(P1): Item weight
-//                        itemsPerUnit,
-//                        null,
-//                        null,
-//                    )
-//
-//                    onSubmit(entry)
+                    val body = EntryBody(
+                        selectedItem!!.id,
+                        unitCount!!,
+                        unitWeight!!,
+                        costStatus,
+                        costCents,
+                        null, // TODO(P1): Item weight
+                        itemsPerUnit,
+                        null,
+                        null,
+                    )
+
+                    onSubmit(body)
                 },
             ) {
                 Text(submitButtonText)

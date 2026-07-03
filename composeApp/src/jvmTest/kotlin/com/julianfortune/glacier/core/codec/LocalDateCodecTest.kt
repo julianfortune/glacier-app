@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.core.codec
 
-import com.julianfortune.glacier.core.codec.LocalDateCodec
+import com.julianfortune.glacier.data.codec.LocalDateCodec
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
 import dev.forkhandles.result4k.orThrow

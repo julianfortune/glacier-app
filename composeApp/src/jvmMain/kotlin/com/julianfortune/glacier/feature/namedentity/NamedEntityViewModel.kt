@@ -5,12 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.common.NamedEntity
-import com.julianfortune.glacier.repository.NamedEntityRepository
+import com.julianfortune.glacier.data.repository.NamedEntityRepository
 import com.julianfortune.glacier.feature.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-open class NamedEntityViewModel<T : NamedEntity>(private val repository: NamedEntityRepository<T>) : ViewModel() {
+open class NamedEntityViewModel<T : NamedEntity>(private val repository: NamedEntityRepository<*, T>) : ViewModel() {
 
     private val _operation = mutableStateOf<EntityOperation<T>?>(null)
     val operation: State<EntityOperation<T>?> = _operation
@@ -23,15 +23,15 @@ open class NamedEntityViewModel<T : NamedEntity>(private val repository: NamedEn
         )
 
     suspend fun save(name: String) {
-        repository.execute(NamedEntityRepository.Command.Insert(name))
+        repository.insert(name = name)
     }
 
     suspend fun update(id: Long, name: String) {
-        repository.execute(NamedEntityRepository.Command.Update(id, name))
+        repository.update(id = id, name = name)
     }
 
     suspend fun delete(id: Long) {
-        repository.execute(NamedEntityRepository.Command.Delete(id))
+        repository.delete(id = id)
     }
 
     fun showCreateNew() {

@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.core.codec
 
+import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.domain.CostStatus
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
