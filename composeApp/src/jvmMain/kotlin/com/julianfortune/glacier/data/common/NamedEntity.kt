@@ -1,5 +1,5 @@
 package com.julianfortune.glacier.data.common
 
-interface NamedEntity {
+interface NamedEntity : Entity {
     val name: String
 }

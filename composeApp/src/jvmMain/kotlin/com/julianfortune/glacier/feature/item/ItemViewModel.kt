@@ -4,17 +4,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.repository.ItemRepository
+import com.julianfortune.glacier.data.domain.ItemHeadline
+import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.feature.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
 class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
-    private val _itemOperation = mutableStateOf<EntityOperation<Item>?>(null)
-    val itemOperation: State<EntityOperation<Item>?> = _itemOperation
+    private val _itemOperation = mutableStateOf<EntityOperation<ItemHeadline>?>(null)
+    val itemOperation: State<EntityOperation<ItemHeadline>?> = _itemOperation
 
     // TODO: Understand what this is doing
     val items = itemRepository.getAll()
@@ -24,27 +23,28 @@ class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
             initialValue = emptyList()
         )
 
-    suspend fun saveItem(item: Item) {
-        itemRepository.insert(item)
+    suspend fun saveItem(name: String) {
+        // TODO: Category IDs
+        itemRepository.insert(name, emptySet())
     }
 
-    suspend fun updateItem(item: Entity<Item>) {
-        itemRepository.update(item)
+    suspend fun updateItem(id: Long, name: String) {
+        itemRepository.update(id, name, emptySet())
     }
 
-    suspend fun deleteItem(itemId: Long) {
-        itemRepository.deleteById(itemId)
+    suspend fun deleteItem(id: Long) {
+        itemRepository.deleteById(id)
     }
 
     fun showNewItem() {
         _itemOperation.value = EntityOperation.CreateNew
     }
 
-    fun showEditItem(item: Entity<Item>) {
+    fun showEditItem(item: ItemHeadline) {
         _itemOperation.value = EntityOperation.Edit(item)
     }
 
-    fun showDeleteItem(item: Entity<Item>) {
+    fun showDeleteItem(item: ItemHeadline) {
         _itemOperation.value = EntityOperation.Delete(item.id)
     }
 

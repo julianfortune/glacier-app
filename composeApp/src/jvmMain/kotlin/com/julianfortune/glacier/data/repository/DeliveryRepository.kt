@@ -1,0 +1,250 @@
+package com.julianfortune.glacier.data.repository
+
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
+import com.julianfortune.glacier.data.codec.CostStatusCodec
+import com.julianfortune.glacier.data.codec.LocalDateCodec
+import com.julianfortune.glacier.data.common.EntityMetadata
+import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.domain.DeliveryHeadline
+import com.julianfortune.glacier.data.domain.ItemHeadline
+import com.julianfortune.glacier.data.domain.Program
+import com.julianfortune.glacier.data.domain.PurchasingAccount
+import com.julianfortune.glacier.data.domain.Supplier
+import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.db.GetByDeliveryId
+import dev.forkhandles.result4k.orThrow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import java.time.Instant
+import java.time.LocalDate
+
+class DeliveryRepository(private val database: Database) {
+
+    fun getAllAsHeadlines(): Flow<List<DeliveryHeadline>> {
+        return database.deliveryQueries.getAll()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { deliveries ->
+                deliveries.map { d ->
+                    // TODO(P3): Better error handling
+                    val receivedDate = LocalDateCodec.deserialize(d.receivedDate).orThrow()
+                    val supplier = supplierFromJoinedRow(d.supplierId, d.supplierName)
+                    val metadata = EntityMetadata.ofEpochSeconds(d.createdAtEpochSeconds, d.updatedAtEpochSeconds)
+
+                    DeliveryHeadline(d.id, receivedDate, supplier, d.taxesCents, d.feesCents, metadata)
+                }
+            }
+    }
+
+    fun getDeliveryById(deliveryId: Long): Flow<Delivery> {
+        val deliveryFlow = database.deliveryQueries.getById(deliveryId)
+            .asFlow()
+            .mapToOne(Dispatchers.IO)
+
+        val entriesFlow = database.deliveryEntryQueries.getByDeliveryId(deliveryId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+
+        return combine(deliveryFlow, entriesFlow) { deliveryRow, entryRows ->
+            val supplier = supplierFromJoinedRow(deliveryRow.supplierId, deliveryRow.supplierName)
+            val entries = entryRows.map(this::entryFromRow)
+            val metadata = EntityMetadata.ofEpochSeconds(
+                deliveryRow.createdAtEpochSeconds,
+                deliveryRow.updatedAtEpochSeconds,
+            )
+
+            Delivery(
+                deliveryRow.id,
+                LocalDateCodec.deserialize(deliveryRow.receivedDate).orThrow(),
+                supplier,
+                deliveryRow.taxesCents,
+                deliveryRow.feesCents,
+                entries,
+                metadata
+            )
+        }.distinctUntilChanged() // Only emit when data actually changes
+    }
+
+    private fun supplierFromJoinedRow(supplierId: Long, supplierName: String?): Supplier {
+        require(supplierName != null) {
+            "Supplier name must be defined when supplierId is defined due to foreign key constraint"
+        }
+        return Supplier(supplierId, supplierName)
+    }
+
+    private fun entryFromRow(row: GetByDeliveryId): Delivery.Entry {
+        val item = ItemHeadline(
+            row.itemId,
+            row.itemName ?: throw Exception("`itemName` must be defined by foreign key constraints")
+        )
+        val costStatus = CostStatusCodec.deserialize(row.costStatus).orThrow()
+        val itemWeight = row.itemWeightCentigrams?.let(Weight::ofCentigrams)
+        val unitWeight = row.unitWeightCentigrams.let(Weight::ofCentigrams)
+        val program = row.programId?.let { id ->
+            Program(id, row.programName ?: throw Exception("`programName` must be defined by foreign key constraints"))
+        }
+        val account = row.purchasingAccountId?.let { id ->
+            PurchasingAccount(
+                id,
+                row.purchasingAccountName
+                    ?: throw Exception("`purchasingAccountName` must be defined by foreign key constraints")
+            )
+        }
+        val metadata = EntityMetadata.ofEpochSeconds(row.createdAtEpochSeconds, row.updatedAtEpochSeconds)
+
+        return Delivery.Entry(
+            row.id,
+            item,
+            row.unitCount,
+            unitWeight,
+            costStatus,
+            row.unitCostCents,
+            itemWeight,
+            row.itemsPerUnit,
+            program,
+            account,
+            metadata
+        )
+    }
+
+    suspend fun insertDelivery(
+        received: LocalDate,
+        supplierId: Long,
+        taxesCents: Long?,
+        feesCents: Long?,
+    ): Result<Long> {
+        val now = Instant.now()
+
+        return Result.runCatching {
+            database.deliveryQueries.insert(
+                LocalDateCodec.serialize(received),
+                supplierId,
+                taxesCents,
+                feesCents,
+                now.epochSecond,
+                now.epochSecond,
+            ).awaitAsOne()
+        }
+    }
+
+    suspend fun updateDelivery(
+        id: Long,
+        received: LocalDate,
+        supplierId: Long,
+        taxesCents: Long?,
+        feesCents: Long?,
+    ): Result<Long> {
+        val now = Instant.now()
+
+        return Result.runCatching {
+            val rowsUpdated = database.deliveryQueries.updateById(
+                LocalDateCodec.serialize(received),
+                supplierId,
+                taxesCents,
+                feesCents,
+                now.epochSecond,
+                id,
+            )
+
+            return when {
+                rowsUpdated > 0 -> Result.success(id)
+                else -> Result.failure(IllegalStateException("Delivery was not updated"))
+            }
+        }
+    }
+
+    suspend fun deleteDeliveryById(id: Long): Result<Long> {
+        val rowsDeleted = database.deliveryQueries.deleteById(id)
+
+        return when {
+            rowsDeleted > 0 -> Result.success(id)
+            else -> Result.failure(IllegalStateException("Delivery was not deleted"))
+        }
+    }
+
+    // TODO: Method for deleting an entry
+
+    suspend fun appendDeliveryEntry(
+        deliveryId: Long,
+        itemId: Long,
+        unitCount: Long,
+        unitWeight: Weight,
+        costStatus: CostStatus,
+        unitCostCents: Long,
+        itemWeight: Weight?,
+        itemsPerUnit: Long?,
+        programId: Long?,
+        purchasingAccountId: Long?,
+    ): Result<Long> {
+        val now = Instant.now()
+        val costStatus = CostStatusCodec.serialize(costStatus)
+
+        return Result.runCatching {
+            database.deliveryEntryQueries.insert(
+                deliveryId,
+                itemId,
+                unitCount,
+                itemsPerUnit,
+                itemWeight?.centigrams,
+                unitWeight.centigrams,
+                costStatus,
+                unitCostCents,
+                programId,
+                purchasingAccountId,
+                now.epochSecond,
+                now.epochSecond,
+            ).awaitAsOne()
+        }
+    }
+
+    suspend fun updateDeliveryEntry(
+        entryId: Long,
+        itemId: Long,
+        unitCount: Long,
+        unitWeight: Weight,
+        costStatus: CostStatus,
+        unitCostCents: Long,
+        itemWeight: Weight?,
+        itemsPerUnit: Long?,
+        programId: Long?,
+        purchasingAccountId: Long?,
+    ): Result<Long> {
+        val now = Instant.now()
+        val costStatus = CostStatusCodec.serialize(costStatus)
+
+        return Result.runCatching {
+            database.deliveryEntryQueries.updateById(
+                itemId,
+                unitCount,
+                itemsPerUnit,
+                itemWeight?.centigrams,
+                unitWeight.centigrams,
+                costStatus,
+                unitCostCents,
+                programId,
+                purchasingAccountId,
+                now.epochSecond,
+                entryId,
+            )
+        }.map { rowsUpdated ->
+            return when {
+                rowsUpdated > 0 -> Result.success(entryId)
+                else -> Result.failure(IllegalStateException("DeliveryEntry was not updated"))
+            }
+        }
+    }
+
+    suspend fun deleteDeliveryEntryById(id: Long): Result<Long> {
+        val rowsDeleted = database.deliveryEntryQueries.deleteById(id)
+
+        return when {
+            rowsDeleted > 0 -> Result.success(id)
+            else -> Result.failure(IllegalStateException("DeliveryEntry was not deleted"))
+        }
+    }
+}

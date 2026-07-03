@@ -4,24 +4,36 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.domain.Item
+import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
-import com.julianfortune.glacier.data.domain.entry.Entry
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.ItemRepository
-import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+
+data class DeliveryBody(
+    val received: LocalDate,
+    // ...
+)
+
+data class EntryBody(
+    val itemId: Long,
+    val unitCount: Long,
+    val unitWeight: Weight,
+    val costStatus: CostStatus,
+    val unitCostCents: Long,
+    val itemWeight: Weight?,
+    val itemsPerUnit: Long?,
+    val programId: Long?,
+    val purchasingAccountId: Long?,
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryPageViewModel(
@@ -35,9 +47,9 @@ class DeliveryPageViewModel(
     val deliveryEntryAction: State<DeliveryEntryAction?> = _deliveryEntryAction
 
     // Derived flow for selected item details
-    val deliveryDetail: StateFlow<Entity<DeliveryDetail>?> = selectedDeliveryId
+    val delivery: StateFlow<Delivery?> = selectedDeliveryId
         .flatMapLatest { id ->
-            id?.let { deliveryRepository.getDeliveryDetailById(it) } ?: flowOf(null)
+            id?.let { deliveryRepository.getDeliveryById(it) } ?: flowOf(null)
         }
         .stateIn(
             scope = viewModelScope,
@@ -45,7 +57,7 @@ class DeliveryPageViewModel(
             initialValue = null
         )
 
-    val allSuppliers: StateFlow<List<Entity<Supplier>>> =
+    val allSuppliers: StateFlow<List<Supplier>> =
         supplierRepository.getAll()
             .stateIn(
                 scope = viewModelScope,
@@ -53,34 +65,12 @@ class DeliveryPageViewModel(
                 initialValue = emptyList()
             )
 
-    val supplierMap: StateFlow<Map<Long, Entity<Supplier>>> =
-        supplierRepository.getAll()
-            .map { suppliers ->
-                suppliers.associateBy { it.id }
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyMap()
-            )
-
-    val allItems: StateFlow<List<Entity<Item>>> =
+    val allItems: StateFlow<List<ItemHeadline>> =
         itemRepository.getAll()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = emptyList()
-            )
-
-    val itemMap: StateFlow<Map<Long, Entity<Item>>> =
-        itemRepository.getAll()
-            .map { items ->
-                items.associateBy { it.id }
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyMap()
             )
 
     fun setCurrentId(id: Long?) {
@@ -90,30 +80,62 @@ class DeliveryPageViewModel(
     fun deleteDelivery(deliveryId: Long) {
         selectedDeliveryId.value = null
         viewModelScope.launch {
-            deliveryRepository.deleteById(deliveryId)
+            deliveryRepository.deleteDeliveryById(deliveryId)
         }
     }
 
-    fun saveEntry(deliveryId: Long, entry: Entry) {
+    fun saveEntry(
+        deliveryId: Long,
+        body: EntryBody,
+    ) {
         viewModelScope.launch {
-            deliveryRepository.insertDeliveryEntry(deliveryId, entry)
+            deliveryRepository.appendDeliveryEntry(
+                deliveryId,
+                body.itemId,
+                body.unitCount,
+                body.unitWeight,
+                body.costStatus,
+                body.unitCostCents,
+                body.itemWeight,
+                body.itemsPerUnit,
+                body.programId,
+                body.purchasingAccountId,
+            )
         }
     }
 
-    fun deleteEntryByIndex(delivery: Entity<DeliveryDetail>, index: Int) {
-        val updatedDelivery = delivery.copy(
-            data = delivery.data.copy(
-                entries = delivery.data.entries?.filterIndexed { i, _ -> i != index }
+    fun updateEntry(
+        entryId: Long,
+        body: EntryBody,
+    ) {
+        viewModelScope.launch {
+            deliveryRepository.updateDeliveryEntry(
+                entryId,
+                body.itemId,
+                body.unitCount,
+                body.unitWeight,
+                body.costStatus,
+                body.unitCostCents,
+                body.itemWeight,
+                body.itemsPerUnit,
+                body.programId,
+                body.purchasingAccountId,
             )
-        )
+        }
+    }
+
+    fun deleteEntryById(id: Long) {
+        viewModelScope.launch {
+            deliveryRepository.deleteDeliveryEntryById(id)
+        }
     }
 
     fun showNewEntry() {
         _deliveryEntryAction.value = DeliveryEntryAction.CreateNew
     }
 
-    fun showEditEntry(index: Int, entry: Entry) {
-        _deliveryEntryAction.value = DeliveryEntryAction.Edit(index, entry)
+    fun showEditEntry(entry: Delivery.Entry) {
+        _deliveryEntryAction.value = DeliveryEntryAction.Edit(entry)
     }
 
     fun cancelEntryOperation() {

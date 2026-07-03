@@ -1,106 +1,132 @@
 package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.createTestDatabase
-import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.repository.CategoryRepository
-import com.julianfortune.glacier.repository.ItemRepository
+import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.db.Database
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import com.julianfortune.glacier.db.Item as DbItem
 
 class ItemRepositoryTest {
 
-    lateinit var database: Database
+    val database = runBlocking { createTestDatabase() }
 
-    lateinit var itemRepository: ItemRepository
-    lateinit var categoryRepository: CategoryRepository
+    val itemRepository = ItemRepository(database)
 
-    @BeforeEach
-    fun setUp(): Unit = runBlocking {
-        database = createTestDatabase()
+    @Test
+    fun getAll(): Unit = runBlocking {
+        // GIVEN
+        val id1 = database.itemQueries.insert("Apple", null).awaitAsOne()
+        val id2 = database.itemQueries.insert("Banana", null).awaitAsOne()
 
-        // Blow away test data defined in `.sq` files
-        database.itemCategoryQueries.deleteAll()
-        database.itemQueries.deleteAll()
-        database.categoryQueries.deleteAll()
+        // WHEN
+        val result = itemRepository.getAll().first()
 
-        itemRepository = ItemRepository(database)
-        categoryRepository = CategoryRepository(database)
+        // THEN
+        assertThat(result).containsExactlyInAnyOrder(
+            ItemHeadline(id1, "Apple"),
+            ItemHeadline(id2, "Banana")
+        )
     }
 
-    // TODO: Use `runTest` instead ?
+    @Test
+    fun getById(): Unit = runBlocking {
+        // GIVEN
+        val categoryId = database.categoryQueries.insert("Produce").awaitAsOne()
+        val itemId = database.itemQueries.insert("Apple", null).awaitAsOne()
+        database.itemCategoryQueries.insert(itemId, categoryId)
+
+        // WHEN
+        val item = itemRepository.getById(itemId).first()
+
+        // THEN
+        assertThat(item.id).isEqualTo(itemId)
+        assertThat(item.name).isEqualTo("Apple")
+        assertThat(item.categories).containsExactly(Category(categoryId, "Produce"))
+    }
+
+    @Test
+    fun searchByName(): Unit = runBlocking {
+        // GIVEN
+        val categoryId = database.categoryQueries.insert("Dairy").awaitAsOne()
+        val itemId = database.itemQueries.insert("Butter", null).awaitAsOne()
+        database.itemCategoryQueries.insert(itemId, categoryId)
+
+        // Unrelated item that shouldn't match
+        database.itemQueries.insert("Apple", null).awaitAsOne()
+
+        // WHEN
+        val results = itemRepository.searchByName("But").first()
+
+        // THEN
+        assertThat(results).hasSize(1)
+        val firstResult = results.first()
+        assertThat(firstResult.id).isEqualTo(itemId)
+        assertThat(firstResult.name).isEqualTo("Butter")
+        assertThat(firstResult.categories).containsExactly(Category(categoryId, "Dairy"))
+    }
+
     @Test
     fun insert(): Unit = runBlocking {
         // GIVEN
-        val categoryId = categoryRepository.insert(Category("Dairy"))
-        val item = Item("Butter", listOf(categoryId))
+        val categoryId = database.categoryQueries.insert("Dairy").awaitAsOne()
 
         // WHEN
-        val id = itemRepository.insert(item)
+        val id = itemRepository.insert("Butter", setOf(categoryId)).getOrThrow()
 
         // THEN
-        val rows = database.itemQueries.getAll().awaitAsList()
-        assertThat(rows).containsExactly(DbItem(id, item.name, null))
+        val rows = database.itemQueries.getAllItems().awaitAsList()
+        assertThat(rows).hasSize(1)
+        assertThat(rows.first().id).isEqualTo(id)
+        assertThat(rows.first().name).isEqualTo("Butter")
 
-        val itemCategoryRows = database.itemCategoryQueries.getAll().awaitAsList()
+        // Confirm bridge table record matches mapping expectations
+        val itemCategoryRows = database.itemCategoryQueries.getAllByItemId(id).awaitAsList()
         assertThat(itemCategoryRows).hasSize(1)
-        assertThat(itemCategoryRows).matches { rows ->
-            rows.first().itemId == id && rows.first().categoryId == categoryId
-        }
+        assertThat(itemCategoryRows.first().categoryId).isEqualTo(categoryId)
     }
 
     @Test
     fun update(): Unit = runBlocking {
         // GIVEN
-        val categoryId = categoryRepository.insert(Category("Dairy"))
-        val item = Item("Butter", listOf(categoryId))
-        val id = itemRepository.insert(item)
+        val initialCategoryId = database.categoryQueries.insert("Dairy").awaitAsOne()
+        val itemId = database.itemQueries.insert("Butter", null).awaitAsOne()
+        database.itemCategoryQueries.insert(itemId, initialCategoryId)
 
-        val updatedCategoryId = categoryRepository.insert(Category("Perishable"))
-        val updatedItem = Item("Margerine", listOf(updatedCategoryId))
+        val newCategoryId = database.categoryQueries.insert("Perishable").awaitAsOne()
 
         // WHEN
-        itemRepository.update(Entity(id, updatedItem))
+        val id = itemRepository.update(itemId, "Margarine", setOf(newCategoryId)).getOrThrow()
 
         // THEN
-        val rows = database.itemQueries.getAll().awaitAsList()
-        assertThat(rows).containsExactly(
-            DbItem(
-                id,
-                updatedItem.name,
-                null,
-            )
-        )
+        assertThat(id).isEqualTo(itemId)
 
-        val itemCategoryRows = database.itemCategoryQueries.getAll().awaitAsList()
-        assertThat(itemCategoryRows).hasSize(1)
-        assertThat(itemCategoryRows).matches { rows ->
-            rows.first().itemId == id && rows.first().categoryId == updatedCategoryId
-        }
+        val item = itemRepository.getById(itemId).first()
+        assertThat(item.name).isEqualTo("Margarine")
+        assertThat(item.categories).containsExactly(Category(newCategoryId, "Perishable"))
     }
 
     @Test
     fun deleteById(): Unit = runBlocking {
         // GIVEN
-        val categoryId = categoryRepository.insert(Category("Dairy"))
-        val item = Item("Butter", listOf(categoryId))
-        val itemId = itemRepository.insert(item)
+        val categoryId = database.categoryQueries.insert("Dairy").awaitAsOne()
+        val itemId = database.itemQueries.insert("Butter", null).awaitAsOne()
+        database.itemCategoryQueries.insert(itemId, categoryId)
 
         // WHEN
-        val result = itemRepository.deleteById(itemId)
+        itemRepository.deleteById(itemId)
 
         // THEN
-        val rows = database.itemQueries.getAll().awaitAsList()
-        assertThat(rows).hasSize(0)
+        val items = database.itemQueries.getAllItems().awaitAsList()
+        assertThat(items).isEmpty()
 
-        val itemCategoryRows = database.itemCategoryQueries.getAll().awaitAsList()
-        assertThat(itemCategoryRows).hasSize(0)
+        // Cascade rule check: deleting an item should orphan and clear bridge items automatically
+        val bridgeRows = database.itemCategoryQueries.getAllByItemId(itemId).awaitAsList()
+        assertThat(bridgeRows).isEmpty()
     }
-
 }

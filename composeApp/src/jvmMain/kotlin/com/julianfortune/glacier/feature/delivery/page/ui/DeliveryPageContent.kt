@@ -22,11 +22,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageDetailsState
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageEntryState
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageState
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageSummaryState
-import com.julianfortune.glacier.feature.delivery.page.data.EntryRowState
+import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.feature.delivery.page.data.*
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
@@ -36,7 +33,7 @@ import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 fun DeliveryPageContent(
     state: DeliveryPageState,
     onClickEditDetails: () -> Unit,
-    onClickEditEntry: (entryId: Long) -> Unit,
+    onClickEditEntry: (entry: Delivery.Entry) -> Unit,
     onClickDeleteEntry: (index: Int) -> Unit,
     onClickAddEntry: () -> Unit,
 ) {
@@ -250,10 +247,10 @@ fun DeliveryPageContent(
                             Row(modifier = Modifier.width(24.dp)) {
                                 EntityOptionsDropdownMenu(
                                     edit = {
-                                        // TODO ...
+                                        TODO()
                                     },
                                     delete = {
-                                        // TODO ...
+                                        TODO()
                                     }
                                 )
                             }

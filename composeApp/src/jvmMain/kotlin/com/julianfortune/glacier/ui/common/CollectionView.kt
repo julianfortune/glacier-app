@@ -27,12 +27,12 @@ import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun <T> CollectionView(
+fun <T : Entity> CollectionView(
     title: String,
-    entities: List<Entity<T>>,
+    entities: List<T>,
     selectedId: Long? = null,
     onClickCreateNew: (() -> Unit)? = null,
-    content: @Composable (Entity<T>, Modifier, Dp) -> Unit,
+    content: @Composable (T, Modifier, Dp) -> Unit,
 ) {
     Column {
         Surface(

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS Delivery (
     id INTEGER PRIMARY KEY,
 
     receivedDate TEXT NOT NULL, -- ISO-8601 date, e.g., "YYYY-MM-DD"
-    supplierId INTEGER,
+    supplierId INTEGER NOT NULL,
 
     taxesCents INTEGER,
     feesCents INTEGER,
@@ -16,10 +16,25 @@ CREATE TABLE IF NOT EXISTS Delivery (
 
 -- QUERIES
 getAll: -- Sorted by delivery date and then by creation datetime
-SELECT * FROM Delivery ORDER BY receivedDate DESC, createdAtEpochSeconds DESC;
+SELECT
+    Delivery.*,
+    Supplier.name AS supplierName
+FROM Delivery
+    LEFT JOIN Supplier
+    ON Delivery.supplierId = Supplier.id
+ORDER BY
+    receivedDate DESC,
+    createdAtEpochSeconds DESC;
 
 getById:
-SELECT * FROM Delivery WHERE id = :id LIMIT 1;
+SELECT
+    Delivery.*,
+    Supplier.name AS supplierName
+FROM Delivery
+    LEFT JOIN Supplier
+    ON Delivery.supplierId = Supplier.id
+WHERE Delivery.id = :id
+LIMIT 1;
 
 deleteById:
 DELETE FROM Delivery WHERE id = :id;

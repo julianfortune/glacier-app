@@ -1,75 +1,59 @@
 package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import com.julianfortune.glacier.createTestDatabase
-import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.repository.SupplierRepository
-import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import com.julianfortune.glacier.db.Supplier as DbSupplier
 
 class SupplierRepositoryTest {
 
-    lateinit var database: Database
+    val database = runBlocking { createTestDatabase() }
 
-    lateinit var repository: SupplierRepository
+    val repository = SupplierRepository(database)
 
-    @BeforeEach
-    fun setUp(): Unit = runBlocking {
-        database = createTestDatabase()
-
-        // Blow away test data defined in `.sq` files
-        database.supplierQueries.deleteAll()
-
-        repository = SupplierRepository(database)
-    }
-
-    // TODO: Use `runTest` instead ?
     @Test
     fun insert(): Unit = runBlocking {
         // GIVEN
-        val supplier = Supplier("FoodSource LLC")
+        val supplierName = "FoodSource LLC"
 
         // WHEN
-        val id = repository.insert(supplier)
+        val id = repository.insert(supplierName).getOrThrow()
 
         // THEN
         val rows = database.supplierQueries.getAll().awaitAsList()
-        assertThat(rows).containsExactly(DbSupplier(id, supplier.name))
+        assertThat(rows).containsExactly(DbSupplier(id, supplierName))
     }
 
     @Test
     fun update(): Unit = runBlocking {
         // GIVEN
-        val supplier = Supplier("FoodSource LLC")
-        val id = repository.insert(supplier)
-
-        val updatedSupplier = Supplier("FoodSource, LLC.")
+        val id = repository.insert("FoodSource LLC").getOrThrow()
+        val updatedSupplierName = "FoodSource, LLC."
 
         // WHEN
-        repository.update(Entity(id, updatedSupplier))
+        repository.update(id, updatedSupplierName)
 
         // THEN
         val rows = database.supplierQueries.getAll().awaitAsList()
-        assertThat(rows).containsExactly(DbSupplier(id, updatedSupplier.name))
+        assertThat(rows).containsExactly(DbSupplier(id, updatedSupplierName))
     }
 
     @Test
-    fun deleteById(): Unit = runBlocking {
+    fun delete(): Unit = runBlocking {
         // GIVEN
-        val supplier = Supplier("FoodSource LLC")
-        val id = repository.insert(supplier)
+        val id = repository.insert("FoodSource LLC").getOrThrow()
 
         // WHEN
-        val result = repository.deleteById(id)
+        val result = repository.delete(id).getOrThrow()
 
         // THEN
-        val rows = database.supplierQueries.getAll().awaitAsList()
-        assertThat(rows).hasSize(0)
+        assertThat(result).isEqualTo(id)
+
+        val row = database.supplierQueries.getById(id).awaitAsOneOrNull()
+        assertThat(row).isNull()
     }
 
 }

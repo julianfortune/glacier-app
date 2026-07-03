@@ -2,12 +2,10 @@ package com.julianfortune.glacier.feature.delivery.page.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.data.domain.delivery.DeliveryDetail
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorState
 import com.julianfortune.glacier.feature.delivery.editor.DeliveryEditorStateHolder
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.ui.common.data.Option
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -34,7 +32,7 @@ class EditDeliveryViewModel(
     init {
         viewModelScope.launch {
             supplierRepository.getAll().collect { supplierList ->
-                val suppliers = supplierList.map { Option(it.id, it.data.name) }
+                val suppliers = supplierList.map { Option(it.id, it.name) }
                 stateHolder.updateSuppliers(suppliers)
             }
         }
@@ -46,19 +44,21 @@ class EditDeliveryViewModel(
             "`validated` must be defined to process the delivery update"
         )
 
-        viewModelScope.launch {
-            val delivery = DeliveryDetail(
-                validated.receivedDate,
-                validated.supplierId,
-                validated.taxesCents,
-                validated.feesCents,
-                emptyList()
-            )
-            // Don't update the entries at all
-            deliveryRepository.updateDetailsOnly(Entity(deliveryId, delivery))
+        TODO()
 
-            _channel.send(DeliveryUpdated)
-        }
+//        viewModelScope.launch {
+//            val delivery = Delivery(
+//                validated.receivedDate,
+//                validated.supplierId,
+//                validated.taxesCents,
+//                validated.feesCents,
+//                emptyList()
+//            )
+//            // Don't update the entries at all
+//            deliveryRepository.updateDelivery(Entity(deliveryId, delivery))
+//
+//            _channel.send(DeliveryUpdated)
+//        }
     }
 
 }

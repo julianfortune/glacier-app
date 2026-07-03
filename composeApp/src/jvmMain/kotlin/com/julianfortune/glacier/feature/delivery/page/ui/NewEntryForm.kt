@@ -8,11 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.common.Entity
+import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.data.domain.Item
+import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.domain.Weight
-import com.julianfortune.glacier.data.domain.entry.CostStatus
-import com.julianfortune.glacier.data.domain.entry.Entry
+import com.julianfortune.glacier.feature.delivery.page.EntryBody
 import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.CurrencyInputTextField
@@ -24,10 +25,10 @@ import com.julianfortune.glacier.ui.common.data.Option
 fun NewEntryForm(
     title: String,
     submitButtonText: String,
-    items: List<Entity<Item>>,
-    initialEntry: Entry? = null,
+    items: List<ItemHeadline>,
+    initialEntry: Delivery.Entry? = null,
     onCancel: () -> Unit,
-    onSubmit: (entry: Entry) -> Unit
+    onSubmit: (body: EntryBody) -> Unit
 ) {
     var selectedItem by remember { mutableStateOf<Option<Long>?>(null) }
 
@@ -55,10 +56,8 @@ fun NewEntryForm(
 
     // Update the selected item once the `items` state populates
     LaunchedEffect(initialEntry, items) {
-        selectedItem = initialEntry?.itemId?.let { initialItemId ->
-            items.find { it.id == initialEntry.itemId }?.let { item ->
-                Option(initialItemId, item.data.name)
-            }
+        selectedItem = initialEntry?.item?.let { initialItem ->
+            Option(initialItem.id, initialItem.name)
         }
     }
 
@@ -97,7 +96,7 @@ fun NewEntryForm(
             AutoCompleteDropdownField(
                 selectedOptionId = selectedItem?.id,
                 options = items.map {
-                    Option(it.id, it.data.name)
+                    Option(it.id, it.name)
                 },
                 onSelectedChange = { newItem ->
                     selectedItem = newItem
@@ -241,7 +240,8 @@ fun NewEntryForm(
                         costStatusIsNoCost -> 0L
                         else -> unitCostCents!!
                     }
-                    val entry = Entry(
+
+                    val body = EntryBody(
                         selectedItem!!.id,
                         unitCount!!,
                         unitWeight!!,
@@ -253,7 +253,7 @@ fun NewEntryForm(
                         null,
                     )
 
-                    onSubmit(entry)
+                    onSubmit(body)
                 },
             ) {
                 Text(submitButtonText)

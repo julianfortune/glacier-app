@@ -4,13 +4,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.common.Entity
-import com.julianfortune.glacier.repository.NamedEntityRepository
+import com.julianfortune.glacier.data.common.NamedEntity
+import com.julianfortune.glacier.data.repository.NamedEntityRepository
 import com.julianfortune.glacier.feature.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 
-open class NamedEntityViewModel<T>(private val repository: NamedEntityRepository<T>) : ViewModel() {
+open class NamedEntityViewModel<T : NamedEntity>(private val repository: NamedEntityRepository<*, T>) : ViewModel() {
 
     private val _operation = mutableStateOf<EntityOperation<T>?>(null)
     val operation: State<EntityOperation<T>?> = _operation
@@ -22,27 +22,27 @@ open class NamedEntityViewModel<T>(private val repository: NamedEntityRepository
             initialValue = emptyList()
         )
 
-    suspend fun save(data: T) {
-        repository.insert(data)
+    suspend fun save(name: String) {
+        repository.insert(name = name)
     }
 
-    suspend fun update(entity: Entity<T>) {
-        repository.update(entity)
+    suspend fun update(id: Long, name: String) {
+        repository.update(id = id, name = name)
     }
 
-    suspend fun delete(entityId: Long) {
-        repository.deleteById(entityId)
+    suspend fun delete(id: Long) {
+        repository.delete(id = id)
     }
 
     fun showCreateNew() {
         _operation.value = EntityOperation.CreateNew
     }
 
-    fun showEdit(entity: Entity<T>) {
+    fun showEdit(entity: T) {
         _operation.value = EntityOperation.Edit(entity)
     }
 
-    fun showDelete(entity: Entity<T>) {
+    fun showDelete(entity: T) {
         _operation.value = EntityOperation.Delete(entity.id)
     }
 

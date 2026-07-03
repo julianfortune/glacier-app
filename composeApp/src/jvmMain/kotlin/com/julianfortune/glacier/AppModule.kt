@@ -1,11 +1,11 @@
 package com.julianfortune.glacier
 
-import com.julianfortune.glacier.repository.CategoryRepository
-import com.julianfortune.glacier.repository.DeliveryRepository
-import com.julianfortune.glacier.repository.ItemRepository
-import com.julianfortune.glacier.repository.ProgramRepository
-import com.julianfortune.glacier.repository.PurchasingAccountRepository
-import com.julianfortune.glacier.repository.SupplierRepository
+import com.julianfortune.glacier.data.repository.CategoryRepository
+import com.julianfortune.glacier.data.repository.DeliveryRepository
+import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.data.repository.ProgramRepository
+import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
+import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.feature.delivery.headline.ui.NewDeliveryViewModel

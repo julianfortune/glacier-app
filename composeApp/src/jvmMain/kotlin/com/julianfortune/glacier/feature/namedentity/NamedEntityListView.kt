@@ -29,8 +29,7 @@ import kotlinx.coroutines.launch
 fun <T : NamedEntity> NamedEntityListView(
     viewModel: NamedEntityViewModel<T>,
     title: String,
-    entityName: String,
-    lift: (newName: String) -> T
+    entityName: String
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -48,7 +47,7 @@ fun <T : NamedEntity> NamedEntityListView(
         ) { entity, modifier, elevation ->
             ListItem(
                 headlineContent = {
-                    Text(entity.data.name)
+                    Text(entity.name)
                 },
                 modifier = modifier.clickable(
                     enabled = true,
@@ -86,7 +85,7 @@ fun <T : NamedEntity> NamedEntityListView(
                     is EntityOperation.CreateNew -> {
                         UpdateNamedEntityForm(viewModel, "Create $entityName", "Create") { newName ->
                             coroutineScope.launch {
-                                viewModel.save(lift(newName))
+                                viewModel.save(newName)
                                 viewModel.dismissOperation()
                             }
                         }
@@ -99,10 +98,10 @@ fun <T : NamedEntity> NamedEntityListView(
                             viewModel,
                             "Edit $entityName",
                             "Save",
-                            original.data
+                            original
                         ) { newName ->
                             coroutineScope.launch {
-                                viewModel.update(Entity(original.id, lift(newName)))
+                                viewModel.update(original.id, newName)
                                 viewModel.dismissOperation()
                             }
                         }

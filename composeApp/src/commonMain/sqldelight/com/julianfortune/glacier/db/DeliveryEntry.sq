@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS DeliveryEntry (
     deliveryId INTEGER NOT NULL,
     itemId INTEGER NOT NULL,
 
-    -- Quanity of goods
+    -- Quantity of goods
     unitCount INTEGER NOT NULL,
     itemWeightCentigrams INTEGER, -- Optional value for the weight of a single item
     itemsPerUnit INTEGER, -- Optional value for 'pack' size
@@ -36,7 +36,17 @@ getById:
 SELECT * FROM DeliveryEntry WHERE id = :id LIMIT 1;
 
 getByDeliveryId:
-SELECT * FROM DeliveryEntry WHERE deliveryId = :deliveryId;
+SELECT
+    DeliveryEntry.*,
+    Item.name AS itemName,
+    Program.name AS programName,
+    PurchasingAccount.name AS purchasingAccountName
+FROM DeliveryEntry
+    LEFT JOIN Item ON DeliveryEntry.itemId = Item.id
+    LEFT JOIN Program ON DeliveryEntry.programId = Program.id
+    LEFT JOIN PurchasingAccount ON DeliveryEntry.purchasingAccountId = PurchasingAccount.id
+WHERE DeliveryEntry.deliveryId = :deliveryId
+ORDER BY DeliveryEntry.id DESC;
 
 deleteById:
 DELETE FROM DeliveryEntry WHERE id = :id;
@@ -74,4 +84,20 @@ INSERT INTO DeliveryEntry (
     :purchasingAccountId,
     :createdAtEpochSeconds,
     :updatedAtEpochSeconds
-);
+)
+RETURNING id;
+
+updateById:
+UPDATE DeliveryEntry
+SET
+    itemId = :itemId,
+    unitCount = :unitCount,
+    itemsPerUnit = :itemsPerUnit,
+    itemWeightCentigrams = :itemWeightCentigrams,
+    unitWeightCentigrams = :unitWeightCentigrams,
+    costStatus = :costStatus,
+    unitCostCents = :unitCostCents,
+    programId = :programId,
+    purchasingAccountId = :purchasingAccountId,
+    updatedAtEpochSeconds = :updatedAtEpochSeconds
+WHERE id = :id;

@@ -14,9 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineList
 import com.julianfortune.glacier.feature.delivery.page.DeliveryPage
 import com.julianfortune.glacier.ui.layout.ListDetailScaffold
-import com.julianfortune.glacier.feature.delivery.page.DeliveryPageViewModel
 import com.julianfortune.glacier.ui.common.TopBar
-import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable

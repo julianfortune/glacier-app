@@ -14,16 +14,5 @@ suspend fun createTestDatabase(): Database {
         Database.Schema.create(it).await()
     }
 
-    driver.executeQuery(
-        identifier = null,
-        sql = "PRAGMA foreign_keys;",
-        mapper = { cursor ->
-            val isEnabled = if (cursor.next().value) cursor.getLong(0) == 1L else false
-            println("⚙️ [Database] foreign_keys = $isEnabled")
-            QueryResult.Unit
-        },
-        parameters = 0
-    )
-
     return Database(driver)
 }
