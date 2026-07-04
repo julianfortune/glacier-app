@@ -32,7 +32,7 @@ val appModule = module {
         DeliveryDetailViewModel(get(), get(), get())
     }
     viewModel {
-        DeliveryHeadlineListViewModel(get(), get(), get())
+        DeliveryHeadlineListViewModel(get(), get())
     }
     viewModel {
         ItemViewModel(get())

@@ -22,7 +22,6 @@ class DeliveryHeaderListViewModelTest {
 
         viewModel = DeliveryHeadlineListViewModel(
             deliveryRepository,
-            itemRepository,
             supplierRepository,
         )
     }

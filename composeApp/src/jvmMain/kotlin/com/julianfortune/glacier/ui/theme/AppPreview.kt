@@ -11,11 +11,15 @@ import androidx.compose.ui.Modifier
 @Composable
 fun AppPreview(
     colorScheme: ColorScheme = darkColorScheme(), //  darkColorScheme() or lightColorScheme()
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(colorScheme = colorScheme) {
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = AppTypography(),
+    ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             content()

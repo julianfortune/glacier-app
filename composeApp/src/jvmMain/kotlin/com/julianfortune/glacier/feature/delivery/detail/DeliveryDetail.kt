@@ -15,8 +15,8 @@ import com.julianfortune.glacier.feature.delivery.common.ui.EntryForm
 import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryAction
 import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryDetailState
 import com.julianfortune.glacier.feature.delivery.detail.data.EntryAction
+import com.julianfortune.glacier.feature.delivery.detail.ui.DeliveryDetailTopBar
 import com.julianfortune.glacier.feature.delivery.detail.ui.DeliveryPageContent
-import com.julianfortune.glacier.feature.delivery.detail.ui.DeliveryTopBar
 import com.julianfortune.glacier.feature.delivery.detail.ui.EntrySideSheet
 import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.Dialog
@@ -46,7 +46,7 @@ fun DeliveryDetail(
             DeliveryDetailState.Failure -> Text("Undefined")
             DeliveryDetailState.Loading -> Text("Loading...")
             is DeliveryDetailState.Success -> {
-                DeliveryTopBar(
+                DeliveryDetailTopBar(
                     (state as DeliveryDetailState.Success).title,
                     onClickDelete = {
                         viewModel.showDeleteDelivery(selectedId)

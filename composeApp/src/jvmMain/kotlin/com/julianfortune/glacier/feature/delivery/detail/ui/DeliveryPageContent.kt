@@ -35,7 +35,7 @@ fun DeliveryPageContent(
     val horizontalContentPadding = 24.dp
     val horizontalTextPadding = 16.dp
 
-    // TODO(!!): Create a reusable scroll column
+    // TODO(P1): Create a reusable scroll column
     Box(modifier = Modifier.fillMaxSize()) {
         val scrollState = rememberScrollState()
 
@@ -50,6 +50,7 @@ fun DeliveryPageContent(
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Delivery 'header' data section
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = horizontalContentPadding),
@@ -80,18 +81,14 @@ fun DeliveryPageContent(
                         }
                     }
 
-                    // TODO: Probably should be handled by ViewModel ..?
-                    val detailItems = listOf(
-                        KeyValueItem(Icons.Outlined.CalendarMonth, "Received", state.receivedDate),
-                        KeyValueItem(Icons.Outlined.Storefront, "Supplier", state.supplierName),
-                        KeyValueItem(Icons.Outlined.Gavel, "Taxes", state.taxes, FontFamily.Monospace),
-                        KeyValueItem(Icons.Outlined.CreditCard, "Fees", state.fees, FontFamily.Monospace),
-                    )
-
                     KeyValueList(
-                        detailItems,
-                        modifier = Modifier.padding(horizontal = horizontalTextPadding).widthIn(max = 320.dp)
-                    )
+                        modifier = Modifier.widthIn(max = 360.dp).padding(horizontal = horizontalTextPadding)
+                    ) {
+                        KeyValueItem(Icons.Outlined.CalendarMonth, "Received", state.receivedDate)
+                        KeyValueItem(Icons.Outlined.Storefront, "Supplier", state.supplierName)
+                        KeyValueItem(Icons.Outlined.Gavel, "Taxes", state.taxes, FontFamily.Monospace)
+                        KeyValueItem(Icons.Outlined.CreditCard, "Fees", state.fees, FontFamily.Monospace)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -108,13 +105,10 @@ fun DeliveryPageContent(
 
                 val spaceBetweenCells = 16.dp
 
-                // Converted from stickyHeader to a regular Column
                 Column(
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background)
                         .padding(horizontal = horizontalContentPadding)
                 ) {
-                    Spacer(Modifier.height(4.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -136,15 +130,12 @@ fun DeliveryPageContent(
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(
-                                start = horizontalTextPadding,
-                                end = horizontalTextPadding,
-                                bottom = 16.dp,
-                                top = 4.dp
-                            ),
+                            .padding(horizontal = horizontalTextPadding),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
                     ) {
@@ -193,6 +184,9 @@ fun DeliveryPageContent(
                                 .background(Color.Red)
                         ) { }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.outlineVariant,
                         thickness = 0.5.dp
@@ -321,45 +315,24 @@ fun DeliveryPageContent(
                         )
                         Spacer(Modifier.height(12.dp))
 
-                        Column(
+                        KeyValueList(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = horizontalTextPadding),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                                .widthIn(max = 360.dp)
+                                .padding(horizontal = horizontalTextPadding)
                         ) {
-                            // TODO: Probably should be handled by ViewModel ..?
-                            val summaryItems = listOf(
-                                KeyValueItem(
-                                    Icons.Outlined.Summarize,
-                                    "Subtotal",
-                                    state.subtotal,
-                                    FontFamily.Monospace
-                                ),
-                                KeyValueItem(
-                                    Icons.Outlined.Gavel,
-                                    "Taxes",
-                                    state.taxes,
-                                    FontFamily.Monospace
-                                ),
-                                KeyValueItem(
-                                    Icons.Outlined.CreditCard,
-                                    "Fees",
-                                    state.fees,
-                                    FontFamily.Monospace
-                                ),
-                                KeyValueItem(
-                                    Icons.Outlined.Money,
-                                    "Total",
-                                    state.totalCost,
-                                    FontFamily.Monospace
-                                ),
+                            KeyValueItem(
+                                Icons.Outlined.Summarize, "Subtotal", state.subtotal, FontFamily.Monospace
+                            )
+                            KeyValueItem(
+                                Icons.Outlined.Gavel, "Taxes", state.taxes, FontFamily.Monospace
+                            )
+                            KeyValueItem(
+                                Icons.Outlined.CreditCard, "Fees", state.fees, FontFamily.Monospace
+                            )
+                            KeyValueItem(
+                                Icons.Outlined.Money, "Total", state.totalCost, FontFamily.Monospace
                             )
 
-                            KeyValueList(
-                                summaryItems,
-                                modifier = Modifier.widthIn(max = 240.dp)
-                            )
                         }
                     }
                 }

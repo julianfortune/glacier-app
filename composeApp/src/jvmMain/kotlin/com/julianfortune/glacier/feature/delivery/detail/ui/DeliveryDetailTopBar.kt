@@ -15,7 +15,7 @@ import com.julianfortune.glacier.ui.theme.AppPreview
 
 
 @Composable
-fun DeliveryTopBar(
+fun DeliveryDetailTopBar(
     title: String,
     onClickDelete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -40,6 +40,7 @@ fun DeliveryTopBar(
 @Composable
 fun DeliveryPageTopBarPreview() {
     AppPreview {
-        DeliveryTopBar(title = "Title", onClickDelete = {})
+        DeliveryDetailTopBar(title = "Title", onClickDelete = {})
     }
+
 }

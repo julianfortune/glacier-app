@@ -1,6 +1,12 @@
 package com.julianfortune.glacier.feature.delivery.detail.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.CreditCard
+import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.Store
+import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -9,40 +15,69 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.ui.theme.AppPreview
 
-data class KeyValueItem(
-    val icon: ImageVector,
-    val key: String,
-    val value: String,
-    val valueFontStyle: FontFamily = FontFamily.Default,
-)
 
 @Composable
 fun KeyValueList(
-    items: List<KeyValueItem>,
+    modifier: Modifier = Modifier,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(12.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        modifier = modifier,
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun KeyValueItem(
+    icon: ImageVector,
+    key: String,
+    value: String,
+    valueFontStyle: FontFamily = FontFamily.Default,
     modifier: Modifier = Modifier,
 ) {
-    items.forEach { i ->
-        val (icon, key, value, valueFontStyle) = i
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier,
+    ) {
+        Icon(
+            icon,
+            key,
+            modifier = Modifier.height(14.dp),
+            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+        )
+
+        Spacer(Modifier.width(6.dp))
+
+        Text(
+            key,
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+        )
+
+        Text(value, fontFamily = valueFontStyle)
+    }
+}
+
+@Preview
+@Composable
+fun KeyValueListPreview() {
+    AppPreview {
+        KeyValueList(
+            modifier = Modifier.padding(32.dp)
         ) {
-            Icon(
-                icon,
-                key,
-                modifier = Modifier.height(14.dp),
-                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-            )
-            Spacer(Modifier.width(6.dp))
-            Text(
-                key,
-                modifier = Modifier.weight(1f),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-            )
-            Text(value, fontFamily = valueFontStyle)
+            KeyValueItem(Icons.Outlined.Storefront, "Supplier", "ABC Foods")
+            KeyValueItem(Icons.Outlined.Gavel, "Taxes", "$10.00", FontFamily.Monospace)
+            KeyValueItem(Icons.Outlined.CreditCard, "Fees", "$15.00", FontFamily.Monospace)
         }
     }
 }
