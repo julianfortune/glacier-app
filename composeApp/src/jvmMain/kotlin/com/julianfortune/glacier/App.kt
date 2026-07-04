@@ -17,10 +17,10 @@ import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Program
 import com.julianfortune.glacier.data.domain.PurchasingAccount
 import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.feature.delivery.DeliveriesScreen
+import com.julianfortune.glacier.feature.delivery.DeliveriesListDetail
 import com.julianfortune.glacier.feature.item.ItemListView
 import com.julianfortune.glacier.feature.namedentity.NamedEntityListView
-import com.julianfortune.glacier.theme.AppTypography
+import com.julianfortune.glacier.ui.theme.AppTypography
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
 
@@ -72,7 +72,7 @@ fun App() {
                         "Category"
                     )
 
-                    NavigationPage.DELIVERIES -> DeliveriesScreen()
+                    NavigationPage.DELIVERIES -> DeliveriesListDetail()
                     NavigationPage.ITEMS -> ItemListView()
                     NavigationPage.PROGRAMS -> NamedEntityListView<Program>(
                         koinViewModel(named("programViewModel")),

@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.headline
+package com.julianfortune.glacier.feature.delivery.list
 
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository

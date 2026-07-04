@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.page.ui
+package com.julianfortune.glacier.feature.delivery.detail.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -10,10 +10,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.CostStatus
 import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.domain.Weight
-import com.julianfortune.glacier.feature.delivery.page.EntryBody
+import com.julianfortune.glacier.feature.delivery.detail.EntryBody
 import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
 import com.julianfortune.glacier.ui.common.CurrencyInput
 import com.julianfortune.glacier.ui.common.CurrencyInputTextField
@@ -177,7 +176,7 @@ fun NewEntryForm(
 
                 CurrencyInputTextField(
                     label = { Text("Price") },
-                    value = unitCostInput,
+                    value = unitCostInput?.value ?: "",
                     onValueChange = { unitCostInput = it },
                     onFocusLost = {
                         // Simplify the cost if possible

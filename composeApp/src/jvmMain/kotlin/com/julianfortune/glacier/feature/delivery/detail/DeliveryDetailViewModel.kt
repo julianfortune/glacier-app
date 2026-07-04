@@ -1,27 +1,20 @@
-package com.julianfortune.glacier.feature.delivery.page
+package com.julianfortune.glacier.feature.delivery.detail
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.CostStatus
-import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.data.domain.Weight
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
+import com.julianfortune.glacier.data.domain.*
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
+import com.julianfortune.glacier.feature.delivery.common.data.DeliveryBody
+import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryAction
+import com.julianfortune.glacier.feature.delivery.detail.data.EntryAction
+import com.julianfortune.glacier.ui.common.data.Option
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-
-data class DeliveryBody(
-    val received: LocalDate,
-    // ...
-)
 
 data class EntryBody(
     val itemId: Long,
@@ -36,15 +29,19 @@ data class EntryBody(
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DeliveryPageViewModel(
+class DeliveryDetailViewModel(
     private val deliveryRepository: DeliveryRepository,
     itemRepository: ItemRepository,
     supplierRepository: SupplierRepository,
 ) : ViewModel() {
+
     private val selectedDeliveryId = MutableStateFlow<Long?>(null)
 
-    private val _deliveryEntryAction = mutableStateOf<DeliveryEntryAction?>(null)
-    val deliveryEntryAction: State<DeliveryEntryAction?> = _deliveryEntryAction
+    private val _deliveryAction = mutableStateOf<DeliveryAction?>(null)
+    val deliveryAction: State<DeliveryAction?> = _deliveryAction
+
+    private val _entryAction = mutableStateOf<EntryAction?>(null)
+    val entryAction: State<EntryAction?> = _entryAction
 
     // Derived flow for selected item details
     val delivery: StateFlow<Delivery?> = selectedDeliveryId
@@ -57,13 +54,15 @@ class DeliveryPageViewModel(
             initialValue = null
         )
 
-    val allSuppliers: StateFlow<List<Supplier>> =
-        supplierRepository.getAll()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyList()
-            )
+    val supplierOptions = supplierRepository.getAll()
+        .map { suppliers ->
+            suppliers.map { Option(it.id, it.name) }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
 
     val allItems: StateFlow<List<ItemHeadline>> =
         itemRepository.getAll()
@@ -75,6 +74,18 @@ class DeliveryPageViewModel(
 
     fun setCurrentId(id: Long?) {
         selectedDeliveryId.value = id
+    }
+
+    fun updateDelivery(id: Long, delivery: DeliveryBody) {
+        viewModelScope.launch {
+            deliveryRepository.updateDelivery(
+                id,
+                delivery.received,
+                delivery.supplierId,
+                delivery.taxesCents,
+                delivery.feesCents,
+            )
+        }
     }
 
     fun deleteDelivery(deliveryId: Long) {
@@ -131,15 +142,15 @@ class DeliveryPageViewModel(
     }
 
     fun showNewEntry() {
-        _deliveryEntryAction.value = DeliveryEntryAction.CreateNew
+        _entryAction.value = EntryAction.CreateNew
     }
 
     fun showEditEntry(entry: Delivery.Entry) {
-        _deliveryEntryAction.value = DeliveryEntryAction.Edit(entry)
+        _entryAction.value = EntryAction.Edit(entry)
     }
 
     fun cancelEntryOperation() {
-        _deliveryEntryAction.value = null
+        _entryAction.value = null
     }
 
 }

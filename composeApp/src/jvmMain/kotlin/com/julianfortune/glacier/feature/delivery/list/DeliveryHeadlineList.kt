@@ -1,23 +1,20 @@
-package com.julianfortune.glacier.feature.delivery.headline
+package com.julianfortune.glacier.feature.delivery.list
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.julianfortune.glacier.feature.delivery.headline.ui.NewDelivery
-import com.julianfortune.glacier.ui.common.formatLocalDate
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.feature.delivery.common.ui.DeliveryForm
 import com.julianfortune.glacier.ui.common.CollectionView
 import com.julianfortune.glacier.ui.common.Dialog
+import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.formatLocalDate
+import kotlinx.coroutines.flow.map
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.collections.get
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,6 +26,7 @@ fun DeliveryHeadlineList(
     viewModel: DeliveryHeadlineListViewModel = koinViewModel(),
 ) {
     val deliveryHeadlines by viewModel.allDeliveries.collectAsState(emptyList())
+    val supplierOptions by viewModel.supplierOptions.collectAsState(emptyList())
 
     var creationDialogIsOpen by remember { mutableStateOf(false) }
 
@@ -71,15 +69,20 @@ fun DeliveryHeadlineList(
         Dialog(
             onDismissRequest = { creationDialogIsOpen = false },
         ) {
-            NewDelivery(
+            DeliveryForm(
+                title = "New Delivery",
+                supplierOptions = supplierOptions,
+                initialDelivery = null,
                 onCancel = {
                     creationDialogIsOpen = false
                 },
-                onSuccess = { newDeliveryId ->
+                onSubmit = { newDelivery ->
+                    viewModel.saveNewDelivery(newDelivery)
+
+                    // TODO: Automatically update selected ID to the newly created delivery
                     creationDialogIsOpen = false
-                    // Automatically update selected ID to the newly created delivery
-                    onSelect(newDeliveryId)
-                }
+                },
+                modifier = Modifier.padding(16.dp)
             )
         }
     }

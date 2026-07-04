@@ -58,7 +58,7 @@ value class CurrencyInput private constructor(val value: String) {
 
 @Composable
 fun CurrencyInputTextField(
-    value: CurrencyInput?,
+    value: String,
     onValueChange: (CurrencyInput) -> Unit,
     label: @Composable (() -> Unit)? = { Text("Cost") },
     enabled: Boolean = true,
@@ -67,7 +67,7 @@ fun CurrencyInputTextField(
     modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
-        value = value?.value ?: "",
+        value = value,
         placeholder = { Text("0.00") },
         onValueChange = { newValue -> CurrencyInput.fromString(newValue)?.let { onValueChange(it) } },
         label = label,

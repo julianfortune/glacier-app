@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.feature.delivery.page.ui
+package com.julianfortune.glacier.feature.delivery.detail.ui
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.feature.delivery.page.data.*
+import com.julianfortune.glacier.feature.delivery.detail.data.*
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
@@ -31,7 +31,7 @@ import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 @Composable
 fun DeliveryPageContent(
-    state: DeliveryPageState,
+    state: DeliveryContentState,
     onClickEditDetails: () -> Unit,
     onClickEditEntry: (entry: Delivery.Entry) -> Unit,
     onClickDeleteEntry: (index: Int) -> Unit,
@@ -89,10 +89,10 @@ fun DeliveryPageContent(
 
                         // TODO: Probably should be handled by ViewModel ..?
                         val detailItems = listOf(
-                            KeyValueItem(Icons.Outlined.CalendarMonth, "Received", state.details.receivedDate),
-                            KeyValueItem(Icons.Outlined.Storefront, "Supplier", state.details.supplierName),
-                            KeyValueItem(Icons.Outlined.Gavel, "Taxes", state.details.taxes, FontFamily.Monospace),
-                            KeyValueItem(Icons.Outlined.CreditCard, "Fees", state.details.fees, FontFamily.Monospace),
+                            KeyValueItem(Icons.Outlined.CalendarMonth, "Received", state.receivedDate),
+                            KeyValueItem(Icons.Outlined.Storefront, "Supplier", state.supplierName),
+                            KeyValueItem(Icons.Outlined.Gavel, "Taxes", state.taxes, FontFamily.Monospace),
+                            KeyValueItem(Icons.Outlined.CreditCard, "Fees", state.fees, FontFamily.Monospace),
                         )
 
                         KeyValueList(
@@ -208,7 +208,7 @@ fun DeliveryPageContent(
                     }
                 }
 
-                items(state.entry.entryRows) { entryRow ->
+                items(state.entryRows) { entryRow ->
                     Column(modifier = Modifier.padding(horizontal = horizontalContentPadding)) {
                         Row(
                             modifier = Modifier
@@ -307,19 +307,19 @@ fun DeliveryPageContent(
                                 modifier = Modifier.weight(rowWeights("account")),
                             )
                             Text(
-                                text = state.entry.totalCount,
+                                text = state.totalCount,
                                 textAlign = TextAlign.End,
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.weight(rowWeights("count")),
                             )
                             Text(
-                                text = state.entry.totalWeight,
+                                text = state.totalWeight,
                                 textAlign = TextAlign.End,
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.weight(rowWeights("weight")),
                             )
                             Text(
-                                text = state.entry.totalCost,
+                                text = state.totalCost,
                                 textAlign = TextAlign.End,
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.weight(rowWeights("cost")),
@@ -329,7 +329,7 @@ fun DeliveryPageContent(
                     }
                 }
 
-                if (state.entry.entryRows.size > 0) {
+                if (state.entryRows.size > 0) {
                     item {
                         Column(modifier = Modifier.fillMaxSize().padding(horizontal = horizontalContentPadding)) {
                             Text(
@@ -351,25 +351,25 @@ fun DeliveryPageContent(
                                     KeyValueItem(
                                         Icons.Outlined.Summarize,
                                         "Subtotal",
-                                        state.summary.subtotal,
+                                        state.subtotal,
                                         FontFamily.Monospace
                                     ),
                                     KeyValueItem(
                                         Icons.Outlined.Gavel,
                                         "Taxes",
-                                        state.summary.taxes,
+                                        state.taxes,
                                         FontFamily.Monospace
                                     ),
                                     KeyValueItem(
                                         Icons.Outlined.CreditCard,
                                         "Fees",
-                                        state.summary.fees,
+                                        state.fees,
                                         FontFamily.Monospace
                                     ),
                                     KeyValueItem(
                                         Icons.Outlined.Money,
                                         "Total",
-                                        state.summary.total,
+                                        state.totalCost,
                                         FontFamily.Monospace
                                     ),
                                 )
@@ -403,34 +403,34 @@ fun DeliveryPageContent(
 @Composable
 fun DeliveryPageContentPreview() {
     AppPreview {
-        DeliveryPageContent(
-            DeliveryPageState(
-                details = DeliveryPageDetailsState(
-                    "09/10/2998",
-                    "ABC Foods",
-                    "$0.00",
-                    "$0.00",
-                ),
-                entry = DeliveryPageEntryState(
-                    listOf(
-                        EntryRowState("Green Beans", null, null, "4", "40.0", "$28"),
-                        EntryRowState("Lettuce", null, null, "7", "70.0", "$43")
-                    ),
-                    totalCount = "2",
-                    totalWeight = "320.0",
-                    totalCost = "$800.00",
-                ),
-                summary = DeliveryPageSummaryState(
-                    "$800.00",
-                    "$0.00",
-                    "$0.00",
-                    "$800.00",
-                ),
-            ),
-            {},
-            onClickEditEntry = {},
-            onClickDeleteEntry = {},
-            onClickAddEntry = {},
-        )
+//        DeliveryPageContent(
+//            DeliveryContentState(
+//                details = DeliveryPageDetailsState(
+//                    "09/10/2998",
+//                    "ABC Foods",
+//                    "$0.00",
+//                    "$0.00",
+//                ),
+//                entry = DeliveryPageEntryState(
+//                    listOf(
+//                        EntryRowState("Green Beans", null, null, "4", "40.0", "$28"),
+//                        EntryRowState("Lettuce", null, null, "7", "70.0", "$43")
+//                    ),
+//                    totalCount = "2",
+//                    totalWeight = "320.0",
+//                    totalCost = "$800.00",
+//                ),
+//                summary = DeliveryPageSummaryState(
+//                    "$800.00",
+//                    "$0.00",
+//                    "$0.00",
+//                    "$800.00",
+//                ),
+//            ),
+//            {},
+//            onClickEditEntry = {},
+//            onClickDeleteEntry = {},
+//            onClickAddEntry = {},
+//        )
     }
 }

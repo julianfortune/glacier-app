@@ -50,7 +50,7 @@ fun parseDateSafe(input: String): LocalDate? {
 
 @Composable
 fun LocalDateInputTextField(
-    value: LocalDateInput?,
+    value: String?,
     onValueChange: (LocalDateInput?) -> Unit,
     label: @Composable (() -> Unit)? = { Text("Date") },
     enabled: Boolean = true,
@@ -59,7 +59,7 @@ fun LocalDateInputTextField(
     modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
-        value = value?.value ?: "",
+        value = value ?: "",
         onValueChange = { newValue ->
             if (newValue == "") onValueChange(null)
             onValueChange(LocalDateInput.fromInput(newValue))

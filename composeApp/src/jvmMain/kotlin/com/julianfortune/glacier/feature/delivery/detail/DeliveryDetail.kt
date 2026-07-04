@@ -1,6 +1,7 @@
-package com.julianfortune.glacier.feature.delivery.page
+package com.julianfortune.glacier.feature.delivery.detail
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -9,17 +10,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.core.util.formatCents
-import com.julianfortune.glacier.data.domain.*
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryEntryAction
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageDetailsState
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageEntryState
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageState
-import com.julianfortune.glacier.feature.delivery.page.data.DeliveryPageSummaryState
-import com.julianfortune.glacier.feature.delivery.page.data.EntryRowState
-import com.julianfortune.glacier.feature.delivery.page.ui.DeliveryPageContent
-import com.julianfortune.glacier.feature.delivery.page.ui.DeliveryTopBar
-import com.julianfortune.glacier.feature.delivery.page.ui.EditDelivery
-import com.julianfortune.glacier.feature.delivery.page.ui.NewEntryForm
+import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.feature.delivery.common.data.DeliveryBody
+import com.julianfortune.glacier.feature.delivery.common.ui.DeliveryForm
+import com.julianfortune.glacier.feature.delivery.detail.data.*
+import com.julianfortune.glacier.feature.delivery.detail.ui.DeliveryPageContent
+import com.julianfortune.glacier.feature.delivery.detail.ui.DeliveryTopBar
+import com.julianfortune.glacier.feature.delivery.detail.ui.NewEntryForm
 import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.Dialog
 import com.julianfortune.glacier.ui.common.SideSheet
@@ -59,9 +58,9 @@ fun calculateDeliveryTotalWeightPounds(delivery: Delivery): Double {
 }
 
 @Composable
-fun DeliveryPage(
+fun DeliveryDetail(
     selectedId: Long,
-    viewModel: DeliveryPageViewModel = koinViewModel(),
+    viewModel: DeliveryDetailViewModel = koinViewModel(),
 ) {
     LaunchedEffect(selectedId) {
         viewModel.setCurrentId(selectedId)
@@ -69,10 +68,12 @@ fun DeliveryPage(
 
     // TODO: Use an ADT to represent the data better e.g., DeliveryUiState := Loading, Error(...), Delivery(data)
     val delivery by viewModel.delivery.collectAsState()
-    val deliveryEntryAction by viewModel.deliveryEntryAction
+    val deliveryEntryAction by viewModel.entryAction
 
     var editDetailsDialogIsOpen by remember { mutableStateOf(false) }
     var deleteDialogIsOpen by remember { mutableStateOf(false) }
+
+    val supplierOptions by viewModel.supplierOptions.collectAsState(emptyList())
 
     Column(modifier = Modifier.fillMaxSize()) {
         delivery?.let { delivery ->
@@ -96,37 +97,28 @@ fun DeliveryPage(
             val fees = "$" + formatCents(delivery.feesCents ?: 0)
             val taxes = "$" + formatCents(delivery.taxesCents ?: 0)
             val total = "$" + formatCents(calculateDeliveryTotalCostCents(delivery))
-            val pageState = DeliveryPageState(
-                DeliveryPageDetailsState(
-                    formatLocalDate(delivery.received, FormatStyle.MEDIUM),
-                    supplierName ?: "",
-                    fees,
-                    taxes,
-                ),
-                DeliveryPageEntryState(
-                    delivery.entries.map { e ->
-                        // TODO: Need to fetch all the data from the DB atomically
-                        val totalWeight = calculateEntryTotalWeight(e)
-                        val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
-                        EntryRowState(
-                            e.item.name,
-                            null,
-                            null,
-                            e.unitCount.toString(),
-                            totalWeight.toPounds().toString(),
-                            totalCostCents,
-                        )
-                    },
-                    totalCount,
-                    totalWeight,
-                    total,
-                ),
-                DeliveryPageSummaryState(
-                    subtotal,
-                    fees,
-                    taxes,
-                    total,
-                )
+            val pageState = DeliveryContentState(
+                formatLocalDate(delivery.received, FormatStyle.MEDIUM),
+                supplierName ?: "",
+                delivery.entries.map { e ->
+                    // TODO: Need to fetch all the data from the DB atomically
+                    val totalWeight = calculateEntryTotalWeight(e)
+                    val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
+                    EntryRowState(
+                        e.item.name,
+                        null,
+                        null,
+                        e.unitCount.toString(),
+                        totalWeight.toPounds().toString(),
+                        totalCostCents,
+                    )
+                },
+                totalCount,
+                totalWeight,
+                subtotal,
+                fees,
+                taxes,
+                total,
             )
 
             DeliveryPageContent(
@@ -151,14 +143,29 @@ fun DeliveryPage(
         Dialog(
             onDismissRequest = { editDetailsDialogIsOpen = false },
         ) {
-            EditDelivery(
-                delivery = delivery ?: throw NoSuchElementException("`deliveryDetail` must be defined"),
+            DeliveryForm(
+                title = "Edit Delivery",
+                supplierOptions = supplierOptions,
+                // TODO: Type-safe state management
+                initialDelivery = delivery?.let {
+                    DeliveryBody(
+                        it.received,
+                        it.supplier.id,
+                        it.taxesCents,
+                        it.feesCents
+                    )
+                },
                 onCancel = {
                     editDetailsDialogIsOpen = false
                 },
-                onSuccess = {
+                onSubmit = { newDelivery ->
+                    // TODO: Type-safe state management
+                    viewModel.updateDelivery(delivery!!.id, newDelivery)
+
+                    // TODO: Automatically update selected ID to the newly created delivery
                     editDetailsDialogIsOpen = false
-                }
+                },
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
@@ -196,7 +203,7 @@ fun DeliveryPage(
                     .padding(16.dp),
             ) {
                 when (deliveryEntryAction) {
-                    is DeliveryEntryAction.CreateNew -> {
+                    is EntryAction.CreateNew -> {
                         NewEntryForm(
                             "New Entry",
                             "Create",
@@ -211,17 +218,17 @@ fun DeliveryPage(
                         )
                     }
 
-                    is DeliveryEntryAction.Edit -> {
+                    is EntryAction.Edit -> {
                         NewEntryForm(
                             "Edit Entry",
                             "Update",
                             viewModel.allItems.collectAsState(initial = emptyList()).value,
-                            initialEntry = (deliveryEntryAction as DeliveryEntryAction.Edit).entry,
+                            initialEntry = (deliveryEntryAction as EntryAction.Edit).entry,
                             onCancel = {
                                 dismissSheet()
                             },
                             onSubmit = { newEntry ->
-                                val id = (deliveryEntryAction as DeliveryEntryAction.Edit).entry.id
+                                val id = (deliveryEntryAction as EntryAction.Edit).entry.id
 
                                 viewModel.updateEntry(id, newEntry)
                                 dismissSheet()

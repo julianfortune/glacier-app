@@ -11,14 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.feature.delivery.headline.DeliveryHeadlineList
-import com.julianfortune.glacier.feature.delivery.page.DeliveryPage
-import com.julianfortune.glacier.ui.layout.ListDetailScaffold
+import com.julianfortune.glacier.feature.delivery.detail.DeliveryDetail
+import com.julianfortune.glacier.feature.delivery.list.DeliveryHeadlineList
 import com.julianfortune.glacier.ui.common.TopBar
+import com.julianfortune.glacier.ui.layout.ListDetailScaffold
 
 
 @Composable
-fun DeliveriesScreen() {
+fun DeliveriesListDetail() {
     ListDetailScaffold(
         listWidth = 320.dp,
         listView = { selectedId, onSelect, clearSelection ->
@@ -45,6 +45,6 @@ fun DeliveriesScreen() {
             }
         }
     ) { selectedId ->
-        DeliveryPage(selectedId)
+        DeliveryDetail(selectedId)
     }
 }
