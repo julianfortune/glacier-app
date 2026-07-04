@@ -11,9 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.feature.delivery.common.ui.DeliveryForm
 import com.julianfortune.glacier.ui.common.CollectionView
 import com.julianfortune.glacier.ui.common.Dialog
-import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.formatLocalDate
-import kotlinx.coroutines.flow.map
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -79,7 +77,7 @@ fun DeliveryHeadlineList(
                 onSubmit = { newDelivery ->
                     viewModel.saveNewDelivery(newDelivery)
 
-                    // TODO: Automatically update selected ID to the newly created delivery
+                    // TODO(!!): Automatically update selected ID to the newly created delivery (using channels)
                     creationDialogIsOpen = false
                 },
                 modifier = Modifier.padding(16.dp)

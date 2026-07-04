@@ -1,13 +1,7 @@
 package com.julianfortune.glacier.feature.delivery.detail.ui
 
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.*
@@ -22,8 +16,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.feature.delivery.detail.data.*
+import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryContentState
+import com.julianfortune.glacier.feature.delivery.detail.data.EntryRowState
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
@@ -33,76 +27,74 @@ import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 fun DeliveryPageContent(
     state: DeliveryContentState,
     onClickEditDetails: () -> Unit,
-    onClickEditEntry: (entry: Delivery.Entry) -> Unit,
-    onClickDeleteEntry: (index: Int) -> Unit,
     onClickAddEntry: () -> Unit,
+    onClickEditEntry: (entryId: Long) -> Unit,
+    onClickDeleteEntry: (entryId: Long) -> Unit,
 ) {
     val contentMaxWidth = 960.dp
     val horizontalContentPadding = 24.dp
     val horizontalTextPadding = 16.dp
 
+    // TODO(!!): Create a reusable scroll column
     Box(modifier = Modifier.fillMaxSize()) {
-        val listScrollState = rememberLazyListState()
+        val scrollState = rememberScrollState()
 
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Center
         ) {
-            LazyColumn(
-                modifier = Modifier.widthIn(max = contentMaxWidth),
-                state = listScrollState,
+            Column(
+                modifier = Modifier
+                    .widthIn(max = contentMaxWidth)
+                    .verticalScroll(scrollState),
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
+                Spacer(modifier = Modifier.height(24.dp))
 
-                item {
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = horizontalContentPadding),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalAlignment = Alignment.Start
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = horizontalContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Details",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.padding(vertical = 8.dp, horizontal = horizontalTextPadding)
-                            )
+                        Text(
+                            text = "Details",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = horizontalTextPadding)
+                        )
 
-                            Row {
-                                IconButton(
-                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                    onClick = onClickEditDetails
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Edit,
-                                        contentDescription = "Edit details"
-                                    )
-                                }
+                        Row {
+                            IconButton(
+                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                onClick = onClickEditDetails
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = "Edit details"
+                                )
                             }
                         }
-
-                        // TODO: Probably should be handled by ViewModel ..?
-                        val detailItems = listOf(
-                            KeyValueItem(Icons.Outlined.CalendarMonth, "Received", state.receivedDate),
-                            KeyValueItem(Icons.Outlined.Storefront, "Supplier", state.supplierName),
-                            KeyValueItem(Icons.Outlined.Gavel, "Taxes", state.taxes, FontFamily.Monospace),
-                            KeyValueItem(Icons.Outlined.CreditCard, "Fees", state.fees, FontFamily.Monospace),
-                        )
-
-                        KeyValueList(
-                            detailItems,
-                            modifier = Modifier.padding(horizontal = horizontalTextPadding).widthIn(max = 320.dp)
-                        )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    // TODO: Probably should be handled by ViewModel ..?
+                    val detailItems = listOf(
+                        KeyValueItem(Icons.Outlined.CalendarMonth, "Received", state.receivedDate),
+                        KeyValueItem(Icons.Outlined.Storefront, "Supplier", state.supplierName),
+                        KeyValueItem(Icons.Outlined.Gavel, "Taxes", state.taxes, FontFamily.Monospace),
+                        KeyValueItem(Icons.Outlined.CreditCard, "Fees", state.fees, FontFamily.Monospace),
+                    )
+
+                    KeyValueList(
+                        detailItems,
+                        modifier = Modifier.padding(horizontal = horizontalTextPadding).widthIn(max = 320.dp)
+                    )
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 val rowWeights = { column: String ->
                     when (column) {
@@ -116,99 +108,98 @@ fun DeliveryPageContent(
 
                 val spaceBetweenCells = 16.dp
 
-                stickyHeader {
-                    Column(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(horizontal = horizontalContentPadding)
+                // Converted from stickyHeader to a regular Column
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(horizontal = horizontalContentPadding)
+                ) {
+                    Spacer(Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Spacer(Modifier.height(4.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Text(
+                            text = "Entries",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(horizontal = horizontalTextPadding)
+                        )
+                        IconButton(
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            onClick = onClickAddEntry
                         ) {
-                            Text(
-                                text = "Entries",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.padding(horizontal = horizontalTextPadding)
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Entry",
                             )
-                            IconButton(
-                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                onClick = onClickAddEntry
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add Entry",
-                                )
-                            }
                         }
+                    }
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = horizontalTextPadding,
+                                end = horizontalTextPadding,
+                                bottom = 16.dp,
+                                top = 4.dp
+                            ),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                    ) {
+                        Text(
+                            text = "Item",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(rowWeights("item")),
+                        )
+                        Text(
+                            text = "Program",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(rowWeights("program")),
+                        )
+                        Text(
+                            text = "Account",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(rowWeights("account")),
+                        )
+                        Text(
+                            text = "Count",
+                            textAlign = TextAlign.End,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(rowWeights("count")),
+                        )
+                        Text(
+                            text = "Weight",
+                            textAlign = TextAlign.End,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(rowWeights("weight")),
+                        )
+                        Text(
+                            text = "Cost",
+                            textAlign = TextAlign.End,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            modifier = Modifier.weight(rowWeights("cost")),
+                        )
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = horizontalTextPadding,
-                                    end = horizontalTextPadding,
-                                    bottom = 16.dp,
-                                    top = 4.dp
-                                ),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
-                        ) {
-                            Text(
-                                text = "Item",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(rowWeights("item")),
-                            )
-                            Text(
-                                text = "Program",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(rowWeights("program")),
-                            )
-                            Text(
-                                text = "Account",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(rowWeights("account")),
-                            )
-                            Text(
-                                text = "Count",
-                                textAlign = TextAlign.End,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(rowWeights("count")),
-                            )
-                            Text(
-                                text = "Weight",
-                                textAlign = TextAlign.End,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(rowWeights("weight")),
-                            )
-                            Text(
-                                text = "Cost",
-                                textAlign = TextAlign.End,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.weight(rowWeights("cost")),
-                            )
-                            Row(
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .background(Color.Red)
-                            ) { }
-                        }
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            thickness = 0.5.dp
-                        )
+                                .width(24.dp)
+                                .background(Color.Red)
+                        ) { }
                     }
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        thickness = 0.5.dp
+                    )
                 }
 
-                items(state.entryRows) { entryRow ->
+                state.entryRows.forEach { entryRow ->
                     Column(modifier = Modifier.padding(horizontal = horizontalContentPadding)) {
                         Row(
                             modifier = Modifier
@@ -246,12 +237,8 @@ fun DeliveryPageContent(
                             )
                             Row(modifier = Modifier.width(24.dp)) {
                                 EntityOptionsDropdownMenu(
-                                    edit = {
-                                        TODO()
-                                    },
-                                    delete = {
-                                        TODO()
-                                    }
+                                    edit = { onClickEditEntry(entryRow.entryId) },
+                                    delete = { onClickDeleteEntry(entryRow.entryId) }
                                 )
                             }
                         }
@@ -262,129 +249,121 @@ fun DeliveryPageContent(
                     }
                 }
 
-                item {
-                    Column(
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = horizontalContentPadding)
+                        .pointerHoverIcon(PointerIcon.Hand)
+                        .clickable { onClickAddEntry() },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "New",
+                        Modifier.padding(vertical = 16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        thickness = 0.5.dp
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.padding(horizontal = horizontalContentPadding),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Row(
                         modifier = Modifier
-                            .padding(horizontal = horizontalContentPadding)
-                            .pointerHoverIcon(PointerIcon.Hand)
-                            .clickable { onClickAddEntry() },
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = horizontalTextPadding),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
                     ) {
                         Text(
-                            "New",
-                            Modifier.padding(vertical = 16.dp),
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            text = "",
+                            modifier = Modifier.weight(rowWeights("item")),
                         )
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            thickness = 0.5.dp
+                        Text(
+                            text = "",
+                            modifier = Modifier.weight(rowWeights("program")),
                         )
+                        Text(
+                            text = "",
+                            modifier = Modifier.weight(rowWeights("account")),
+                        )
+                        Text(
+                            text = state.totalCount,
+                            textAlign = TextAlign.End,
+                            fontFamily = FontFamily.Monospace,
+                            modifier = Modifier.weight(rowWeights("count")),
+                        )
+                        Text(
+                            text = state.totalWeight,
+                            textAlign = TextAlign.End,
+                            fontFamily = FontFamily.Monospace,
+                            modifier = Modifier.weight(rowWeights("weight")),
+                        )
+                        Text(
+                            text = state.totalCost,
+                            textAlign = TextAlign.End,
+                            fontFamily = FontFamily.Monospace,
+                            modifier = Modifier.weight(rowWeights("cost")),
+                        )
+                        Row(modifier = Modifier.width(24.dp)) { }
                     }
                 }
 
-                item {
-                    Column(
-                        modifier = Modifier.padding(horizontal = horizontalContentPadding),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Row(
+                if (state.entryRows.isNotEmpty()) {
+                    Column(modifier = Modifier.fillMaxSize().padding(horizontal = horizontalContentPadding)) {
+                        Text(
+                            text = "Summary",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(16.dp, top = 24.dp, 16.dp, bottom = 8.dp)
+                        )
+                        Spacer(Modifier.height(12.dp))
+
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp, horizontal = horizontalTextPadding),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                                .fillMaxSize()
+                                .padding(horizontal = horizontalTextPadding),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            Text(
-                                text = "",
-                                modifier = Modifier.weight(rowWeights("item")),
+                            // TODO: Probably should be handled by ViewModel ..?
+                            val summaryItems = listOf(
+                                KeyValueItem(
+                                    Icons.Outlined.Summarize,
+                                    "Subtotal",
+                                    state.subtotal,
+                                    FontFamily.Monospace
+                                ),
+                                KeyValueItem(
+                                    Icons.Outlined.Gavel,
+                                    "Taxes",
+                                    state.taxes,
+                                    FontFamily.Monospace
+                                ),
+                                KeyValueItem(
+                                    Icons.Outlined.CreditCard,
+                                    "Fees",
+                                    state.fees,
+                                    FontFamily.Monospace
+                                ),
+                                KeyValueItem(
+                                    Icons.Outlined.Money,
+                                    "Total",
+                                    state.totalCost,
+                                    FontFamily.Monospace
+                                ),
                             )
-                            Text(
-                                text = "",
-                                modifier = Modifier.weight(rowWeights("program")),
+
+                            KeyValueList(
+                                summaryItems,
+                                modifier = Modifier.widthIn(max = 240.dp)
                             )
-                            Text(
-                                text = "",
-                                modifier = Modifier.weight(rowWeights("account")),
-                            )
-                            Text(
-                                text = state.totalCount,
-                                textAlign = TextAlign.End,
-                                fontFamily = FontFamily.Monospace,
-                                modifier = Modifier.weight(rowWeights("count")),
-                            )
-                            Text(
-                                text = state.totalWeight,
-                                textAlign = TextAlign.End,
-                                fontFamily = FontFamily.Monospace,
-                                modifier = Modifier.weight(rowWeights("weight")),
-                            )
-                            Text(
-                                text = state.totalCost,
-                                textAlign = TextAlign.End,
-                                fontFamily = FontFamily.Monospace,
-                                modifier = Modifier.weight(rowWeights("cost")),
-                            )
-                            Row(modifier = Modifier.width(24.dp)) { }
                         }
                     }
                 }
-
-                if (state.entryRows.size > 0) {
-                    item {
-                        Column(modifier = Modifier.fillMaxSize().padding(horizontal = horizontalContentPadding)) {
-                            Text(
-                                text = "Summary",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.padding(16.dp, top = 24.dp, 16.dp, bottom = 8.dp)
-                            )
-                            Spacer(Modifier.height(12.dp))
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = horizontalTextPadding),
-                                horizontalAlignment = Alignment.Start,
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                            ) {
-                                // TODO: Probably should be handled by ViewModel ..?
-                                val summaryItems = listOf(
-                                    KeyValueItem(
-                                        Icons.Outlined.Summarize,
-                                        "Subtotal",
-                                        state.subtotal,
-                                        FontFamily.Monospace
-                                    ),
-                                    KeyValueItem(
-                                        Icons.Outlined.Gavel,
-                                        "Taxes",
-                                        state.taxes,
-                                        FontFamily.Monospace
-                                    ),
-                                    KeyValueItem(
-                                        Icons.Outlined.CreditCard,
-                                        "Fees",
-                                        state.fees,
-                                        FontFamily.Monospace
-                                    ),
-                                    KeyValueItem(
-                                        Icons.Outlined.Money,
-                                        "Total",
-                                        state.totalCost,
-                                        FontFamily.Monospace
-                                    ),
-                                )
-
-                                KeyValueList(
-                                    summaryItems,
-                                    modifier = Modifier.widthIn(max = 240.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
 
@@ -393,7 +372,7 @@ fun DeliveryPageContent(
                 .align(Alignment.CenterEnd)
                 .fillMaxHeight()
                 .padding(2.dp),
-            adapter = rememberScrollbarAdapter(listScrollState),
+            adapter = rememberScrollbarAdapter(scrollState),
             style = dynamicScrollbarStyle(MaterialTheme.colorScheme.onBackground)
         )
     }
@@ -403,34 +382,25 @@ fun DeliveryPageContent(
 @Composable
 fun DeliveryPageContentPreview() {
     AppPreview {
-//        DeliveryPageContent(
-//            DeliveryContentState(
-//                details = DeliveryPageDetailsState(
-//                    "09/10/2998",
-//                    "ABC Foods",
-//                    "$0.00",
-//                    "$0.00",
-//                ),
-//                entry = DeliveryPageEntryState(
-//                    listOf(
-//                        EntryRowState("Green Beans", null, null, "4", "40.0", "$28"),
-//                        EntryRowState("Lettuce", null, null, "7", "70.0", "$43")
-//                    ),
-//                    totalCount = "2",
-//                    totalWeight = "320.0",
-//                    totalCost = "$800.00",
-//                ),
-//                summary = DeliveryPageSummaryState(
-//                    "$800.00",
-//                    "$0.00",
-//                    "$0.00",
-//                    "$800.00",
-//                ),
-//            ),
-//            {},
-//            onClickEditEntry = {},
-//            onClickDeleteEntry = {},
-//            onClickAddEntry = {},
-//        )
+        DeliveryPageContent(
+            DeliveryContentState(
+                "09/10/2998",
+                "ABC Foods",
+                listOf(
+                    EntryRowState(1, "Green Beans", null, null, "4", "40.0", "$28"),
+                    EntryRowState(2, "Lettuce", null, null, "7", "70.0", "$43"),
+                ),
+                "2",
+                "320.0",
+                "$800.00",
+                "$0.00",
+                "$0.00",
+                "$800.00",
+            ),
+            {},
+            onClickEditEntry = {},
+            onClickDeleteEntry = {},
+            onClickAddEntry = {},
+        )
     }
 }

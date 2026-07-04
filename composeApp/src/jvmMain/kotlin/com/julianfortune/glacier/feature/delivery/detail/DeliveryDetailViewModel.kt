@@ -4,29 +4,23 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.core.util.formatCents
+import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.common.data.DeliveryBody
-import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryAction
-import com.julianfortune.glacier.feature.delivery.detail.data.EntryAction
+import com.julianfortune.glacier.feature.delivery.common.data.EntryBody
+import com.julianfortune.glacier.feature.delivery.detail.data.*
 import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.formatLocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.format.FormatStyle
 
-data class EntryBody(
-    val itemId: Long,
-    val unitCount: Long,
-    val unitWeight: Weight,
-    val costStatus: CostStatus,
-    val unitCostCents: Long,
-    val itemWeight: Weight?,
-    val itemsPerUnit: Long?,
-    val programId: Long?,
-    val purchasingAccountId: Long?,
-)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryDetailViewModel(
@@ -44,7 +38,7 @@ class DeliveryDetailViewModel(
     val entryAction: State<EntryAction?> = _entryAction
 
     // Derived flow for selected item details
-    val delivery: StateFlow<Delivery?> = selectedDeliveryId
+    private val delivery: StateFlow<Delivery?> = selectedDeliveryId
         .flatMapLatest { id ->
             id?.let { deliveryRepository.getDeliveryById(it) } ?: flowOf(null)
         }
@@ -53,6 +47,54 @@ class DeliveryDetailViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
+
+    val uiState: StateFlow<DeliveryDetailState> = delivery
+        .map { delivery ->
+            delivery?.let {
+                // TODO(P2): Clean up this mess
+                val title = "Delivery " + formatLocalDate(
+                    delivery.received,
+                    FormatStyle.MEDIUM
+                ) + " • ${delivery.supplier.name}"
+                val totalCount = (delivery.entries.sumOf { it.unitCount }).toString()
+                val totalWeight = calculateDeliveryTotalWeightPounds(delivery).toString()
+                val subtotal = "$" + formatCents(calculateDeliverySubTotalCostCents(delivery))
+                val fees = "$" + formatCents(delivery.feesCents ?: 0)
+                val taxes = "$" + formatCents(delivery.taxesCents ?: 0)
+                val total = "$" + formatCents(calculateDeliveryTotalCostCents(delivery))
+
+                val content = DeliveryContentState(
+                    formatLocalDate(delivery.received, FormatStyle.MEDIUM),
+                    delivery.supplier.name,
+                    delivery.entries.map { e ->
+                        val totalWeight = calculateEntryTotalWeight(e)
+                        val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
+                        EntryRowState(
+                            e.id,
+                            e.item.name,
+                            null,
+                            null,
+                            e.unitCount.toString(),
+                            totalWeight.toPounds().toString(),
+                            totalCostCents,
+                        )
+                    },
+                    totalCount,
+                    totalWeight,
+                    subtotal,
+                    fees,
+                    taxes,
+                    total,
+                )
+
+                DeliveryDetailState.Success(title, content)
+            } ?: DeliveryDetailState.Failure
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = DeliveryDetailState.Loading
+        )
+
 
     val supplierOptions = supplierRepository.getAll()
         .map { suppliers ->
@@ -64,13 +106,15 @@ class DeliveryDetailViewModel(
             initialValue = emptyList()
         )
 
-    val allItems: StateFlow<List<ItemHeadline>> =
-        itemRepository.getAll()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyList()
-            )
+    val itemOptions = itemRepository.getAll()
+        .map { items ->
+            items.map { Option(it.id, it.name) }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
 
     fun setCurrentId(id: Long?) {
         selectedDeliveryId.value = id
@@ -145,12 +189,83 @@ class DeliveryDetailViewModel(
         _entryAction.value = EntryAction.CreateNew
     }
 
-    fun showEditEntry(entry: Delivery.Entry) {
-        _entryAction.value = EntryAction.Edit(entry)
+    fun showEditDelivery(deliveryId: Long) {
+        // TODO(P2): Get rid of `!!`
+        val body = delivery.value?.let {
+            DeliveryBody(
+                it.received,
+                it.supplier.id,
+                it.taxesCents,
+                it.feesCents,
+            )
+        }!!
+
+        _deliveryAction.value = DeliveryAction.Edit(deliveryId, body)
+    }
+
+    fun showDeleteDelivery(deliveryId: Long) {
+        _deliveryAction.value = DeliveryAction.Delete(deliveryId)
+    }
+
+    fun cancelDeliveryOperation() {
+        _deliveryAction.value = null
+    }
+
+    fun showEditEntry(entryId: Long) {
+        // TODO(P1): Better error handling !
+        val entry = delivery.value?.entries?.find { it.id == entryId }!!
+        val body = EntryBody(
+            entry.item.id,
+            entry.unitCount,
+            entry.unitWeight,
+            entry.costStatus,
+            entry.unitCostCents,
+            entry.itemWeight,
+            entry.itemsPerUnit,
+            entry.program?.id,
+            entry.purchasingAccount?.id,
+        )
+
+        _entryAction.value = EntryAction.Edit(entry.id, body)
+    }
+
+    fun showDeleteEntry(entryId: Long) {
+        _entryAction.value = EntryAction.Delete(entryId)
     }
 
     fun cancelEntryOperation() {
         _entryAction.value = null
     }
 
+}
+
+
+fun calculateEntryTotalCostCents(entry: Delivery.Entry): Long {
+    if (entry.costStatus == CostStatus.NO_COST) {
+        return 0L
+    }
+
+    return entry.unitCount * entry.unitCostCents
+}
+
+fun calculateDeliverySubTotalCostCents(delivery: Delivery): Long {
+    val totalUnitsCost = delivery.entries.map { calculateEntryTotalCostCents(it) }.reduceOrNull { a, b -> a + b } ?: 0
+
+    return totalUnitsCost
+}
+
+fun calculateDeliveryTotalCostCents(delivery: Delivery): Long {
+    val totalUnitsCost = delivery.entries.map { calculateEntryTotalCostCents(it) }.reduceOrNull { a, b -> a + b } ?: 0
+
+    return totalUnitsCost + (delivery.feesCents ?: 0) + (delivery.taxesCents ?: 0)
+}
+
+fun calculateEntryTotalWeight(entry: Delivery.Entry): Weight {
+    return entry.unitWeight.times(entry.unitCount)
+}
+
+fun calculateDeliveryTotalWeightPounds(delivery: Delivery): Double {
+    return (delivery.entries).fold(0.0) { sum, entry ->
+        sum + calculateEntryTotalWeight(entry).toPounds()
+    }
 }

@@ -51,7 +51,6 @@ fun DeliveryForm(
         },
         modifier = modifier
     )
-
 }
 
 @Composable
@@ -149,7 +148,7 @@ fun DeliveryFormUi(
 
 @Preview
 @Composable
-fun DefaultPreview() {
+fun DeliveryFormPreview() {
     AppPreview {
         Column(modifier = Modifier.padding(16.dp)) {
             DeliveryFormUi(
@@ -166,7 +165,7 @@ fun DefaultPreview() {
 
 @Preview
 @Composable
-fun ValidPreview() {
+fun DeliveryFormValidPreview() {
     AppPreview {
         Column(modifier = Modifier.padding(16.dp)) {
             DeliveryFormUi(
