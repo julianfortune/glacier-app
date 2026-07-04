@@ -21,6 +21,7 @@ import com.julianfortune.glacier.feature.delivery.detail.data.EntryRowState
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
+import java.beans.ConstructorProperties
 
 
 @Composable
@@ -93,18 +94,6 @@ fun DeliveryPageContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                val rowWeights = { column: String ->
-                    when (column) {
-                        "item" -> 2f
-                        "program" -> 1.5f
-                        "account" -> 1.5f
-                        "cost" -> 1f
-                        else -> 0.8f
-                    }
-                }
-
-                val spaceBetweenCells = 16.dp
-
                 Column(
                     modifier = Modifier
                         .padding(horizontal = horizontalContentPadding)
@@ -132,60 +121,19 @@ fun DeliveryPageContent(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = horizontalTextPadding),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                    EntryRow(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Item",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(rowWeights("item")),
-                        )
-                        Text(
-                            text = "Program",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(rowWeights("program")),
-                        )
-                        Text(
-                            text = "Account",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(rowWeights("account")),
-                        )
-                        Text(
-                            text = "Count",
-                            textAlign = TextAlign.End,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(rowWeights("count")),
-                        )
-                        Text(
-                            text = "Weight",
-                            textAlign = TextAlign.End,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(rowWeights("weight")),
-                        )
-                        Text(
-                            text = "Cost",
-                            textAlign = TextAlign.End,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                            modifier = Modifier.weight(rowWeights("cost")),
-                        )
-                        Row(
-                            modifier = Modifier
-                                .width(24.dp)
-                                .background(Color.Red)
-                        ) { }
+                        ItemNameCell { EntryRowHeaderText("Item") }
+                        ProgramCell { EntryRowHeaderText("Program") }
+                        PurchasingAccountCell { EntryRowHeaderText("Account") }
+                        UnitCountCell { EntryRowHeaderText("Count") }
+                        EntryWeightCell { EntryRowHeaderText("Weight") }
+                        EntryCostCell { EntryRowHeaderText("Cost") }
+                        ActionCell { }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.outlineVariant,
@@ -193,43 +141,37 @@ fun DeliveryPageContent(
                     )
                 }
 
-                state.entryRows.forEach { entryRow ->
-                    Column(modifier = Modifier.padding(horizontal = horizontalContentPadding)) {
-                        Row(
+                Column(modifier = Modifier.padding(horizontal = horizontalContentPadding)) {
+                    state.entryRows.forEach { entryRow ->
+                        EntryRow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 12.dp, horizontal = horizontalTextPadding),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                                .padding(
+                                    vertical = 12.dp,
+                                ),
                         ) {
-                            Text(
-                                text = entryRow.itemName,
-                                modifier = Modifier.weight(rowWeights("item")),
-                            )
-                            Text(
-                                text = entryRow.programName ?: "",
-                                modifier = Modifier.weight(rowWeights("program")),
-                            )
-                            Text(
-                                text = entryRow.accountName ?: "",
-                                modifier = Modifier.weight(rowWeights("account")),
-                            )
-                            Text(
-                                text = entryRow.unitCount,
-                                textAlign = TextAlign.End,
-                                modifier = Modifier.weight(rowWeights("count")),
-                            )
-                            Text(
-                                text = entryRow.totalWeight,
-                                textAlign = TextAlign.End,
-                                modifier = Modifier.weight(rowWeights("weight")),
-                            )
-                            Text(
-                                text = entryRow.totalCost,
-                                textAlign = TextAlign.End,
-                                modifier = Modifier.weight(rowWeights("cost")),
-                            )
-                            Row(modifier = Modifier.width(24.dp)) {
+                            ItemNameCell { Text(entryRow.itemName) }
+                            ProgramCell { Text(entryRow.programName ?: "") }
+                            PurchasingAccountCell { Text(entryRow.accountName ?: "") }
+                            UnitCountCell {
+                                Text(
+                                    text = entryRow.unitCount,
+                                    fontFamily = FontFamily.Monospace,
+                                )
+                            }
+                            EntryWeightCell {
+                                Text(
+                                    text = entryRow.totalWeight,
+                                    fontFamily = FontFamily.Monospace,
+                                )
+                            }
+                            EntryCostCell {
+                                Text(
+                                    text = entryRow.totalCost,
+                                    textAlign = TextAlign.End,
+                                )
+                            }
+                            ActionCell {
                                 EntityOptionsDropdownMenu(
                                     edit = { onClickEditEntry(entryRow.entryId) },
                                     delete = { onClickDeleteEntry(entryRow.entryId) }
@@ -265,44 +207,35 @@ fun DeliveryPageContent(
                     modifier = Modifier.padding(horizontal = horizontalContentPadding),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Row(
+                    EntryRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp, horizontal = horizontalTextPadding),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+                            .padding(
+                                vertical = 12.dp,
+                            ),
                     ) {
-                        Text(
-                            text = "",
-                            modifier = Modifier.weight(rowWeights("item")),
-                        )
-                        Text(
-                            text = "",
-                            modifier = Modifier.weight(rowWeights("program")),
-                        )
-                        Text(
-                            text = "",
-                            modifier = Modifier.weight(rowWeights("account")),
-                        )
-                        Text(
-                            text = state.totalCount,
-                            textAlign = TextAlign.End,
-                            fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.weight(rowWeights("count")),
-                        )
-                        Text(
-                            text = state.totalWeight,
-                            textAlign = TextAlign.End,
-                            fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.weight(rowWeights("weight")),
-                        )
-                        Text(
-                            text = state.totalCost,
-                            textAlign = TextAlign.End,
-                            fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.weight(rowWeights("cost")),
-                        )
-                        Row(modifier = Modifier.width(24.dp)) { }
+                        ItemNameCell {  }
+                        ProgramCell {  }
+                        PurchasingAccountCell { }
+                        UnitCountCell {
+                            Text(
+                                text = state.totalCount,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
+                        EntryWeightCell {
+                            Text(
+                                text = state.totalWeight,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
+                        EntryCostCell {
+                            Text(
+                                text = state.totalCost,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
+                        ActionCell { }
                     }
                 }
 
@@ -349,6 +282,15 @@ fun DeliveryPageContent(
             style = dynamicScrollbarStyle(MaterialTheme.colorScheme.onBackground)
         )
     }
+}
+
+@Composable
+fun EntryRowHeaderText(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+    )
 }
 
 @Preview
