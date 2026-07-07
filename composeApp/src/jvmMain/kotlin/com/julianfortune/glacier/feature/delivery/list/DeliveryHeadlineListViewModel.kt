@@ -8,8 +8,11 @@ import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.feature.delivery.common.data.DeliveryBody
 import com.julianfortune.glacier.ui.common.data.Option
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -18,6 +21,19 @@ class DeliveryHeadlineListViewModel(
     private val deliveryRepository: DeliveryRepository,
     supplierRepository: SupplierRepository
 ) : ViewModel() {
+
+    sealed interface UiEvent {
+        data class DeliveryCreated(val id: Long) : UiEvent
+    }
+
+    private val _uiEventChannel = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: StateFlow<UiEvent?> = _uiEventChannel.receiveAsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = null
+        )
+
     // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
     // TODO(P5): Filtering, e.g., by time period
     val allDeliveries = deliveryRepository.getAllAsHeadlines()
@@ -39,12 +55,17 @@ class DeliveryHeadlineListViewModel(
 
     fun saveNewDelivery(delivery: DeliveryBody) {
         viewModelScope.launch {
-            deliveryRepository.insertDelivery(
+            val result = deliveryRepository.insertDelivery(
                 delivery.received,
                 delivery.supplierId,
                 delivery.taxesCents,
                 delivery.feesCents,
             )
+
+            result.map { newId ->
+                _uiEventChannel.send(UiEvent.DeliveryCreated(newId))
+            }
+            // TODO(P3): Error handling
         }
     }
 }

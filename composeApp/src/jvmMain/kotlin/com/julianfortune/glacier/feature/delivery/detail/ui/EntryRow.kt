@@ -1,9 +1,6 @@
 package com.julianfortune.glacier.feature.delivery.detail.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
@@ -14,20 +11,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.theme.AppPreview
-
-private val spaceBetweenCells = 16.dp
 
 @Composable
 fun EntryRow(
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     modifier: Modifier = Modifier,
     content: @Composable EntryRowScope.() -> Unit
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(spaceBetweenCells)
+        verticalAlignment = verticalAlignment,
     ) {
         val scope = EntryRowScopeImpl(this)
         scope.content()
@@ -55,7 +49,7 @@ fun EntryRowPreview() {
 fun EntryRowSelectablePreview() {
     AppPreview {
         EntryRow {
-            SelectionCell { Checkbox(checked = false, onCheckedChange = {}) }
+            SelectionCell(true) { Checkbox(checked = false, onCheckedChange = {}) }
             ItemNameCell { Text("Item Name") }
             ProgramCell { Text("Program Name") }
             PurchasingAccountCell { Text("Account") }

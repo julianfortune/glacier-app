@@ -1,18 +1,21 @@
 package com.julianfortune.glacier.feature.delivery.detail.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 
+private val spaceBetweenCells = 16.dp
+private val iconButtonPadding = 8.dp
+
 sealed interface EntryRowScope {
     @Composable
-    fun SelectionCell(content: @Composable () -> Unit)
+    fun SelectionCell(isVisible: Boolean, content: @Composable () -> Unit)
 
     @Composable
     fun ItemNameCell(content: @Composable () -> Unit)
@@ -44,17 +47,28 @@ internal class EntryRowScopeImpl(private val rowScope: RowScope) : EntryRowScope
             "item" -> 2f
             "program" -> 1.5f
             "account" -> 1.5f
-            "cost" -> 1f
-            else -> 0.8f
+            else -> throw NotImplementedError("Column '$column' does not have a weight")
+        }
+    }
+
+    private fun getColumnWidth(column: String): Dp {
+        return when (column) {
+            "count" -> 64.dp
+            "weight" -> 96.dp
+            "total" -> 112.dp
+            else -> throw NotImplementedError("Column '$column' does not have a weight")
         }
     }
 
     @Composable
-    override fun SelectionCell(content: @Composable () -> Unit) {
-        Row(
-            modifier = Modifier.width(36.dp).padding(start = 8.dp),
-        ) {
-            content()
+    override fun SelectionCell(isVisible: Boolean, content: @Composable () -> Unit) {
+        AnimatedVisibility(isVisible, enter = expandHorizontally(), exit = shrinkHorizontally()) {
+            Row(
+                modifier = Modifier.width(36.dp)
+                    .padding(start = iconButtonPadding),
+            ) {
+                content()
+            }
         }
     }
 
@@ -64,7 +78,7 @@ internal class EntryRowScopeImpl(private val rowScope: RowScope) : EntryRowScope
             Row(
                 modifier = Modifier
                     .weight(getColumnWeight("item"))
-                    .padding(start = 16.dp),
+                    .padding(start = spaceBetweenCells),
             ) {
                 content()
             }
@@ -75,7 +89,9 @@ internal class EntryRowScopeImpl(private val rowScope: RowScope) : EntryRowScope
     override fun ProgramCell(content: @Composable (() -> Unit)) {
         with(rowScope) {
             Row(
-                modifier = Modifier.weight(getColumnWeight("program"))
+                modifier = Modifier
+                    .weight(getColumnWeight("program"))
+                    .padding(start = spaceBetweenCells)
             ) {
                 content()
             }
@@ -86,7 +102,9 @@ internal class EntryRowScopeImpl(private val rowScope: RowScope) : EntryRowScope
     override fun PurchasingAccountCell(content: @Composable (() -> Unit)) {
         with(rowScope) {
             Row(
-                modifier = Modifier.weight(getColumnWeight("account"))
+                modifier = Modifier
+                    .weight(getColumnWeight("account"))
+                    .padding(start = spaceBetweenCells)
             ) {
                 content()
             }
@@ -95,44 +113,42 @@ internal class EntryRowScopeImpl(private val rowScope: RowScope) : EntryRowScope
 
     @Composable
     override fun UnitCountCell(content: @Composable (() -> Unit)) {
-        with(rowScope) {
-            Row(
-                modifier = Modifier.weight(getColumnWeight("count")),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                content()
-            }
+        Row(
+            modifier = Modifier
+                .width(getColumnWidth("count")),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            content()
         }
     }
 
     @Composable
     override fun EntryWeightCell(content: @Composable (() -> Unit)) {
-        with(rowScope) {
-            Row(
-                modifier = Modifier.weight(getColumnWeight("weight")),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                content()
-            }
+        Row(
+            modifier = Modifier
+                .width(getColumnWidth("weight")),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            content()
         }
     }
 
     @Composable
     override fun EntryCostCell(content: @Composable (() -> Unit)) {
-        with(rowScope) {
-            Row(
-                modifier = Modifier.weight(getColumnWeight("cost")),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                content()
-            }
+        Row(
+            modifier = Modifier
+                .width(getColumnWidth("total"))
+                .padding(end = iconButtonPadding),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            content()
         }
     }
 
     @Composable
     override fun ActionCell(content: @Composable () -> Unit) {
         Row(
-            modifier = Modifier.width(36.dp).padding(end = 8.dp),
+            modifier = Modifier.width(36.dp).padding(end = iconButtonPadding),
             horizontalArrangement = Arrangement.End,
         ) {
             content()

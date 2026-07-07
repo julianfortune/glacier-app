@@ -23,6 +23,7 @@ data class ListDetailUiState(
     val selectedId: Long?
 )
 
+// TODO(P4): This should probably be a ViewModel
 class ListDetailStateHolder(initialState: ListDetailUiState = ListDetailUiState(null)) {
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<ListDetailUiState> = _state.asStateFlow()

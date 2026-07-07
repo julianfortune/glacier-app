@@ -35,6 +35,19 @@ fun DeliveryHeadlineList(
         }
     }
 
+    LaunchedEffect(viewModel.uiEvent) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is DeliveryHeadlineListViewModel.UiEvent.DeliveryCreated -> {
+                    onSelect(event.id) // Automatically select the new delivery
+                    creationDialogIsOpen = false // Close the dialog safely
+                }
+
+                else -> {}
+            }
+        }
+    }
+
     CollectionView(
         "Deliveries",
         deliveryHeadlines,
@@ -76,9 +89,6 @@ fun DeliveryHeadlineList(
                 },
                 onSubmit = { newDelivery ->
                     viewModel.saveNewDelivery(newDelivery)
-
-                    // TODO(!!): Automatically update selected ID to the newly created delivery (using channels)
-                    creationDialogIsOpen = false
                 },
                 modifier = Modifier.padding(16.dp)
             )

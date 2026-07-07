@@ -1,6 +1,7 @@
 package com.julianfortune.glacier.feature.delivery.detail.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CreditCard
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.theme.AppPreview
@@ -60,11 +62,16 @@ fun KeyValueItem(
 
         Text(
             key,
-            modifier = Modifier.weight(1f),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
         )
 
-        Text(value, fontFamily = valueFontStyle)
+        SelectionContainer(modifier = Modifier.weight(1f)) {
+            Text(
+                value,
+                textAlign = TextAlign.End,
+                fontFamily = valueFontStyle,
+            )
+        }
     }
 }
 
