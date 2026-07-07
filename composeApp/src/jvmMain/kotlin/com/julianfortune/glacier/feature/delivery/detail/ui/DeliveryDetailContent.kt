@@ -1,27 +1,35 @@
 package com.julianfortune.glacier.feature.delivery.detail.ui
 
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryContentState
 import com.julianfortune.glacier.feature.delivery.detail.data.EntryRowState
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
-import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
@@ -36,6 +44,9 @@ fun DeliveryPageContent(
     onClickAddEntry: () -> Unit,
     onClickEditEntry: (entryId: Long) -> Unit,
     onClickDeleteEntry: (entryId: Long) -> Unit,
+    onClickToggleAllEntries: () -> Unit,
+    onClickToggleEntry: (isSelected: Boolean, entryId: Long) -> Unit,
+    onClickClearEntrySelection: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         val scrollState = rememberScrollState()
@@ -60,6 +71,8 @@ fun DeliveryPageContent(
                 )
 
                 EntriesTable(
+                    state.entrySelectionCount,
+                    state.entrySelectionState,
                     state.entryRows,
                     state.totalCount,
                     state.totalWeight,
@@ -67,6 +80,9 @@ fun DeliveryPageContent(
                     onClickAddEntry,
                     onClickEditEntry,
                     onClickDeleteEntry,
+                    onClickToggleAllEntries,
+                    onClickToggleEntry,
+                    onClickClearEntrySelection,
                 )
 
                 if (state.entryRows.isNotEmpty()) {
@@ -143,6 +159,8 @@ fun DeliveryHeader(
 
 @Composable
 fun EntriesTable(
+    entrySelectionCount: Int,
+    entrySelectionState: ToggleableState,
     entryRows: List<EntryRowState>,
     totalCount: String,
     totalWeight: String,
@@ -150,6 +168,9 @@ fun EntriesTable(
     onClickAddEntry: () -> Unit,
     onClickEditEntry: (entryId: Long) -> Unit,
     onClickDeleteEntry: (entryId: Long) -> Unit,
+    onClickToggleAllEntries: () -> Unit,
+    onClickToggleEntry: (isSelected: Boolean, entryId: Long) -> Unit,
+    onClickClearEntrySelection: () -> Unit,
 ) {
     var selectionModeEnabled by remember { mutableStateOf(false) }
 
@@ -169,25 +190,78 @@ fun EntriesTable(
                     .weight(1f)
                     .padding(horizontal = horizontalTextPadding)
             )
-            IconButton(
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = {
-                    selectionModeEnabled = !selectionModeEnabled
+
+            val actionRowHeight = 48.dp
+
+            Box(contentAlignment = Alignment.TopEnd) {
+                Column(
+                    modifier = Modifier.height(actionRowHeight),
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Row {
+                        IconButton(
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            onClick = {
+                                selectionModeEnabled = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Checklist,
+                                contentDescription = "Select multiple entries",
+                            )
+                        }
+                        IconButton(
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            onClick = onClickAddEntry
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Entry",
+                            )
+                        }
+                    }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Checklist,
-                    contentDescription = "Select multiple entries",
-                )
-            }
-            IconButton(
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = onClickAddEntry
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Entry",
-                )
+
+                Column(
+                    modifier = Modifier.height(actionRowHeight),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    AnimatedVisibility(
+                        selectionModeEnabled,
+                        enter = fadeIn(), // + slideInVertically(initialOffsetY = { -it / 4 }),
+                        exit = fadeOut(), //+ slideOutVertically(targetOffsetY = { -it / 4 }),
+                    ) {
+                        Card(
+                            colors = CardDefaults.cardColors().copy(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                            ),
+                        ) {
+                            Row(
+                                modifier = Modifier.height(actionRowHeight),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Spacer(Modifier.width(16.dp))
+                                Text(
+                                    "$entrySelectionCount selected",
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                )
+                                IconButton(
+                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                    onClick = {
+                                        onClickClearEntrySelection()
+                                        selectionModeEnabled = false
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Cancel selection",
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -202,8 +276,10 @@ fun EntriesTable(
                     modifier = Modifier
                         .size(28.dp)
                         .pointerHoverIcon(PointerIcon.Hand),
-                    state = ToggleableState.Indeterminate,
-                    onClick = {},
+                    state = entrySelectionState,
+                    onClick = {
+                        onClickToggleAllEntries()
+                    },
                 )
             }
             ItemNameCell { EntryRowHeaderText("Item") }
@@ -233,8 +309,10 @@ fun EntriesTable(
                         modifier = Modifier
                             .size(28.dp)
                             .pointerHoverIcon(PointerIcon.Hand),
-                        checked = false,
-                        onCheckedChange = {},
+                        checked = entryRow.isSelected,
+                        onCheckedChange = {
+                            onClickToggleEntry(it, entryRow.entryId)
+                        },
                     )
                 }
                 ItemNameCell { Text(entryRow.itemName) }
@@ -399,56 +477,60 @@ fun EntryRowHeaderText(text: String) {
     )
 }
 
-@Preview
-@Composable
-fun DeliveryPageContentPreview() {
-    AppPreview {
-        DeliveryPageContent(
-            DeliveryContentState(
-                "09/10/2998",
-                "ABC Foods",
-                listOf(
-                    EntryRowState(1, "Green Beans", null, null, "4", "40.0", "$28.00"),
-                    EntryRowState(2, "Lettuce", null, null, "7", "70.0", "$43.00"),
-                ),
-                "11",
-                "110.0",
-                "$800.00",
-                "$0.00",
-                "$0.00",
-                "$800.00",
-            ),
-            {},
-            onClickEditEntry = {},
-            onClickDeleteEntry = {},
-            onClickAddEntry = {},
-        )
-    }
-}
-
-@Preview
-@Composable
-fun DeliveryPageContentMaximalistPreview() {
-    AppPreview {
-        DeliveryPageContent(
-            DeliveryContentState(
-                "12/31/2000",
-                "Abracadabra Foods Incorporated",
-                listOf(
-                    EntryRowState(1, "Organic Himalayan Salt", null, null, "100", "4000.0", "$2800.00"),
-                    EntryRowState(2, "Organic Fresh Dinosaur Kale", null, null, "7", "70.0", "$43.00"),
-                ),
-                "3000",
-                "10320.0",
-                "$11000.00",
-                "$999.00",
-                "$999.00",
-                "$99999.99",
-            ),
-            {},
-            onClickEditEntry = {},
-            onClickDeleteEntry = {},
-            onClickAddEntry = {},
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun DeliveryPageContentPreview() {
+//    AppPreview {
+//        DeliveryPageContent(
+//            DeliveryContentState(
+//                "09/10/2998",
+//                "ABC Foods",
+//                listOf(
+//                    EntryRowState(1, false, "Green Beans", null, null, "4", "40.0", "$28.00"),
+//                    EntryRowState(2, false, "Lettuce", null, null, "7", "70.0", "$43.00"),
+//                ),
+//                "11",
+//                "110.0",
+//                "$800.00",
+//                "$0.00",
+//                "$0.00",
+//                "$800.00",
+//            ),
+//            {},
+//            onClickEditEntry = {},
+//            onClickDeleteEntry = {},
+//            onClickAddEntry = {},
+//            onClickToggleAllEntries = {},
+//            onClickToggleEntry = { _, _ -> },
+//        )
+//    }
+//}
+//
+//@Preview
+//@Composable
+//fun DeliveryPageContentMaximalistPreview() {
+//    AppPreview {
+//        DeliveryPageContent(
+//            DeliveryContentState(
+//                "12/31/2000",
+//                "Abracadabra Foods Incorporated",
+//                listOf(
+//                    EntryRowState(1, false, "Organic Himalayan Salt", null, null, "100", "4000.0", "$2800.00"),
+//                    EntryRowState(2, false, "Organic Fresh Dinosaur Kale", null, null, "7", "70.0", "$43.00"),
+//                ),
+//                "3000",
+//                "10320.0",
+//                "$11000.00",
+//                "$999.00",
+//                "$999.00",
+//                "$99999.99",
+//            ),
+//            {},
+//            onClickEditEntry = {},
+//            onClickDeleteEntry = {},
+//            onClickAddEntry = {},
+//            onClickToggleAllEntries = {},
+//            onClickToggleEntry = { _, _ -> },
+//        )
+//    }
+//}

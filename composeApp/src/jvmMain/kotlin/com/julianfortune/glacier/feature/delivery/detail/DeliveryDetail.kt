@@ -65,6 +65,15 @@ fun DeliveryDetail(
                     onClickDeleteEntry = { entryId ->
                         viewModel.showDeleteEntry(entryId)
                     },
+                    onClickToggleAllEntries = {
+                        viewModel.onToggleALlEntriesSelection()
+                    },
+                    onClickToggleEntry = { isSelected, entryId ->
+                        viewModel.onToggleEntrySelection(isSelected, entryId)
+                    },
+                    onClickClearEntrySelection = {
+                        viewModel.clearEntrySelection()
+                    }
                 )
             }
         }

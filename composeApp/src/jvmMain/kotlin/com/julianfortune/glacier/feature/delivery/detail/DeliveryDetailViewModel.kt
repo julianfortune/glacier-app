@@ -2,6 +2,7 @@ package com.julianfortune.glacier.feature.delivery.detail
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.util.formatCents
@@ -37,6 +38,8 @@ class DeliveryDetailViewModel(
     private val _entryAction = mutableStateOf<EntryAction?>(null)
     val entryAction: State<EntryAction?> = _entryAction
 
+    val selectedEntryRows = MutableStateFlow<Set<Long>>(emptySet())
+
     // Derived flow for selected item details
     private val delivery: StateFlow<Delivery?> = selectedDeliveryId
         .flatMapLatest { id ->
@@ -48,53 +51,65 @@ class DeliveryDetailViewModel(
             initialValue = null
         )
 
-    val uiState: StateFlow<DeliveryDetailState> = delivery
-        .map { delivery ->
-            delivery?.let {
-                // TODO(P2): Clean up this mess
-                val title = "Delivery " + formatLocalDate(
-                    delivery.received,
-                    FormatStyle.MEDIUM
-                ) + " • ${delivery.supplier.name}"
-                val totalCount = (delivery.entries.sumOf { it.unitCount }).toString()
-                val totalWeight = calculateDeliveryTotalWeightPounds(delivery).toString()
-                val subtotal = "$" + formatCents(calculateDeliverySubTotalCostCents(delivery))
-                val fees = "$" + formatCents(delivery.feesCents ?: 0)
-                val taxes = "$" + formatCents(delivery.taxesCents ?: 0)
-                val total = "$" + formatCents(calculateDeliveryTotalCostCents(delivery))
+    val uiState: StateFlow<DeliveryDetailState> = combine(delivery, selectedEntryRows) { delivery, selections ->
+        delivery?.let {
+            // TODO(P2): Clean up this mess
+            val title = "Delivery " + formatLocalDate(
+                delivery.received,
+                FormatStyle.MEDIUM
+            ) + " • ${delivery.supplier.name}"
+            val totalCount = (delivery.entries.sumOf { it.unitCount }).toString()
+            val totalWeight = calculateDeliveryTotalWeightPounds(delivery).toString()
+            val subtotal = "$" + formatCents(calculateDeliverySubTotalCostCents(delivery))
+            val fees = "$" + formatCents(delivery.feesCents ?: 0)
+            val taxes = "$" + formatCents(delivery.taxesCents ?: 0)
+            val total = "$" + formatCents(calculateDeliveryTotalCostCents(delivery))
 
-                val content = DeliveryContentState(
-                    formatLocalDate(delivery.received, FormatStyle.MEDIUM),
-                    delivery.supplier.name,
-                    delivery.entries.map { e ->
-                        val totalWeight = calculateEntryTotalWeight(e)
-                        val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
-                        EntryRowState(
-                            e.id,
-                            e.item.name,
-                            null,
-                            null,
-                            e.unitCount.toString(),
-                            totalWeight.toPounds().toString(),
-                            totalCostCents,
-                        )
-                    },
-                    totalCount,
-                    totalWeight,
-                    subtotal,
-                    fees,
-                    taxes,
-                    total,
-                )
+            val entrySelectionState = when (selections.size) {
+                0 -> ToggleableState.Off
+                else -> {
+                    val unselectedEntries = delivery.entries.map { it.id }.toSet().minus(selections)
+                    when (unselectedEntries.size) {
+                        0 -> ToggleableState.On
+                        else -> ToggleableState.Indeterminate
+                    }
+                }
+            }
 
-                DeliveryDetailState.Success(title, content)
-            } ?: DeliveryDetailState.Failure
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = DeliveryDetailState.Loading
-        )
+            val content = DeliveryContentState(
+                formatLocalDate(delivery.received, FormatStyle.MEDIUM),
+                delivery.supplier.name,
+                selections.size,
+                entrySelectionState,
+                delivery.entries.map { e ->
+                    val totalWeight = calculateEntryTotalWeight(e)
+                    val totalCostCents = "$" + formatCents(calculateEntryTotalCostCents(e))
+                    EntryRowState(
+                        e.id,
+                        e.id in selections,
+                        e.item.name,
+                        null,
+                        null,
+                        e.unitCount.toString(),
+                        totalWeight.toPounds().toString(),
+                        totalCostCents,
+                    )
+                },
+                totalCount,
+                totalWeight,
+                subtotal,
+                fees,
+                taxes,
+                total,
+            )
 
+            DeliveryDetailState.Success(title, content)
+        } ?: DeliveryDetailState.Failure
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = DeliveryDetailState.Loading
+    )
 
     val supplierOptions = supplierRepository.getAll()
         .map { suppliers ->
@@ -237,6 +252,23 @@ class DeliveryDetailViewModel(
         _entryAction.value = null
     }
 
+    fun onToggleALlEntriesSelection() {
+        when (selectedEntryRows.value.size) {
+            0 -> selectedEntryRows.value = delivery.value?.entries?.map { it.id }?.toSet() ?: emptySet()
+            else -> selectedEntryRows.value = emptySet()
+        }
+    }
+
+    fun onToggleEntrySelection(isSelected: Boolean, entryId: Long) {
+        when {
+            isSelected -> selectedEntryRows.value = selectedEntryRows.value.plus(entryId)
+            else -> selectedEntryRows.value = selectedEntryRows.value.minus(entryId)
+        }
+    }
+
+    fun clearEntrySelection() {
+        selectedEntryRows.value = emptySet()
+    }
 }
 
 
