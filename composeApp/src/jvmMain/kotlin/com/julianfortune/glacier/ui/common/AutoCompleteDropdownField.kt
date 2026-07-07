@@ -110,7 +110,9 @@ fun <ID> AutoCompleteDropdownField(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shadowElevation = 5.dp,
         ) {
             when {
                 filteredOptions.isEmpty() -> NoOptionsMenuItem()
@@ -120,7 +122,7 @@ fun <ID> AutoCompleteDropdownField(
                     // Use colors to highlight selected item
                     val backgroundColor = if (isSelected) {
                         MaterialTheme.colorScheme.primaryContainer
-                    } else MenuDefaults.containerColor
+                    } else MaterialTheme.colorScheme.surfaceContainerHigh
                     val textColor = if (isSelected) {
                         MaterialTheme.colorScheme.onPrimaryContainer
                     } else MaterialTheme.colorScheme.onSurface

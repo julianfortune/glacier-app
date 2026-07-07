@@ -16,7 +16,7 @@ fun EntrySideSheet(
 ) {
     SideSheet(
         onClose = onClose,
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
         tonalElevation = 1.dp,
     ) { dismissSheet ->
         Column(

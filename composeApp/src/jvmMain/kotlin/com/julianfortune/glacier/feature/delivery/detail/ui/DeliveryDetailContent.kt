@@ -2,34 +2,41 @@ package com.julianfortune.glacier.feature.delivery.detail.ui
 
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.julianfortune.glacier.feature.delivery.detail.data.DeliveryContentState
 import com.julianfortune.glacier.feature.delivery.detail.data.EntryRowState
+import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
 import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.theme.AppPreview
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
@@ -157,6 +164,7 @@ fun DeliveryHeader(
     }
 }
 
+// TODO(!!): I'm thinking this should probably be its own top-level feature with its own ViewModel ..
 @Composable
 fun EntriesTable(
     entrySelectionCount: Int,
@@ -198,26 +206,23 @@ fun EntriesTable(
                     modifier = Modifier.height(actionRowHeight),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    Row {
-                        IconButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
-                                selectionModeEnabled = true
+                    AnimatedVisibility(
+                        !selectionModeEnabled,
+                        enter = fadeIn(), // + slideInVertically(initialOffsetY = { -it / 4 }),
+                        exit = fadeOut(), //+ slideOutVertically(targetOffsetY = { -it / 4 }),
+                    ) {
+                        Row {
+                            IconButton(
+                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                onClick = {
+                                    selectionModeEnabled = true
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Checklist,
+                                    contentDescription = "Select multiple entries",
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Checklist,
-                                contentDescription = "Select multiple entries",
-                            )
-                        }
-                        IconButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            onClick = onClickAddEntry
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add Entry",
-                            )
                         }
                     }
                 }
@@ -228,38 +233,102 @@ fun EntriesTable(
                 ) {
                     AnimatedVisibility(
                         selectionModeEnabled,
-                        enter = fadeIn(), // + slideInVertically(initialOffsetY = { -it / 4 }),
-                        exit = fadeOut(), //+ slideOutVertically(targetOffsetY = { -it / 4 }),
+                        enter = fadeIn() + slideInHorizontally(initialOffsetX = { -32 }),
+                        exit = fadeOut() + slideOutHorizontally(targetOffsetX = { -32 }),
                     ) {
-                        Card(
-                            colors = CardDefaults.cardColors().copy(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                            ),
+                        var programPopoverOpen by remember { mutableStateOf(false) }
+
+                        Row(
+                            modifier = Modifier.height(actionRowHeight),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Row(
-                                modifier = Modifier.height(actionRowHeight),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Spacer(Modifier.width(16.dp))
-                                Text(
-                                    "$entrySelectionCount selected",
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                                )
+                            Spacer(Modifier.width(16.dp))
+                            Text(
+                                "$entrySelectionCount selected",
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                            Spacer(Modifier.width(16.dp))
+
+                            Column {
+                                // TODO: Tooltip
                                 IconButton(
-                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                                    onClick = {
-                                        onClickClearEntrySelection()
-                                        selectionModeEnabled = false
-                                    }
+                                    onClick = { programPopoverOpen = !programPopoverOpen },
+                                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = "Cancel selection",
+                                        imageVector = Icons.Default.Storefront,
+                                        contentDescription = "Editing Supplier",
                                     )
                                 }
 
+                                Box {
+                                    if (programPopoverOpen) {
+                                        Popup(
+                                            alignment = Alignment.TopCenter,
+                                            // Dismisses the popup when clicking outside
+                                            onDismissRequest = { programPopoverOpen = false },
+                                            properties = PopupProperties(focusable = true)
+                                        ) {
+                                            Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                                OutlinedCard(
+                                                    colors = CardDefaults.cardColors().copy(
+                                                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                                                    ),
+
+                                                ) {
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .width(280.dp)
+                                                            .padding(16.dp)
+                                                    ) {
+                                                        Text("Edit Program")
+
+                                                        AutoCompleteDropdownField(
+                                                            null,
+                                                            emptyList(),
+                                                            onSelectedChange = {},
+                                                            label = { Text("Program") },
+                                                        )
+
+                                                        Button(
+                                                            onClick = { },
+                                                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
+                                                        ) {
+                                                            Text("Update")
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            IconButton(
+                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                onClick = {
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = "Delete entries",
+                                )
+                            }
+
+                            IconButton(
+                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                onClick = {
+                                    onClickClearEntrySelection()
+                                    selectionModeEnabled = false
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Cancel selection",
+                                )
                             }
                         }
+
                     }
                 }
             }
@@ -386,7 +455,6 @@ fun EntriesTable(
                         text = "UNITS",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-//                        fontFamily = FontFamily.Monospace,
                     )
                     SelectionContainer {
                         Text(
@@ -477,60 +545,66 @@ fun EntryRowHeaderText(text: String) {
     )
 }
 
-//@Preview
-//@Composable
-//fun DeliveryPageContentPreview() {
-//    AppPreview {
-//        DeliveryPageContent(
-//            DeliveryContentState(
-//                "09/10/2998",
-//                "ABC Foods",
-//                listOf(
-//                    EntryRowState(1, false, "Green Beans", null, null, "4", "40.0", "$28.00"),
-//                    EntryRowState(2, false, "Lettuce", null, null, "7", "70.0", "$43.00"),
-//                ),
-//                "11",
-//                "110.0",
-//                "$800.00",
-//                "$0.00",
-//                "$0.00",
-//                "$800.00",
-//            ),
-//            {},
-//            onClickEditEntry = {},
-//            onClickDeleteEntry = {},
-//            onClickAddEntry = {},
-//            onClickToggleAllEntries = {},
-//            onClickToggleEntry = { _, _ -> },
-//        )
-//    }
-//}
-//
-//@Preview
-//@Composable
-//fun DeliveryPageContentMaximalistPreview() {
-//    AppPreview {
-//        DeliveryPageContent(
-//            DeliveryContentState(
-//                "12/31/2000",
-//                "Abracadabra Foods Incorporated",
-//                listOf(
-//                    EntryRowState(1, false, "Organic Himalayan Salt", null, null, "100", "4000.0", "$2800.00"),
-//                    EntryRowState(2, false, "Organic Fresh Dinosaur Kale", null, null, "7", "70.0", "$43.00"),
-//                ),
-//                "3000",
-//                "10320.0",
-//                "$11000.00",
-//                "$999.00",
-//                "$999.00",
-//                "$99999.99",
-//            ),
-//            {},
-//            onClickEditEntry = {},
-//            onClickDeleteEntry = {},
-//            onClickAddEntry = {},
-//            onClickToggleAllEntries = {},
-//            onClickToggleEntry = { _, _ -> },
-//        )
-//    }
-//}
+@Preview
+@Composable
+fun DeliveryPageContentPreview() {
+    AppPreview {
+        DeliveryPageContent(
+            DeliveryContentState(
+                "09/10/2998",
+                "ABC Foods",
+                0,
+                ToggleableState.Off,
+                listOf(
+                    EntryRowState(1, false, "Green Beans", null, null, "4", "40.0", "$28.00"),
+                    EntryRowState(2, false, "Lettuce", null, null, "7", "70.0", "$43.00"),
+                ),
+                "11",
+                "110.0",
+                "$800.00",
+                "$0.00",
+                "$0.00",
+                "$800.00",
+            ),
+            {},
+            onClickEditEntry = {},
+            onClickDeleteEntry = {},
+            onClickAddEntry = {},
+            onClickToggleAllEntries = {},
+            onClickToggleEntry = { _, _ -> },
+            onClickClearEntrySelection = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun DeliveryPageContentMaximalistPreview() {
+    AppPreview {
+        DeliveryPageContent(
+            DeliveryContentState(
+                "12/31/2000",
+                "Abracadabra Foods Incorporated",
+                0,
+                ToggleableState.Off,
+                listOf(
+                    EntryRowState(1, false, "Organic Himalayan Salt", null, null, "100", "4000.0", "$2800.00"),
+                    EntryRowState(2, false, "Organic Fresh Dinosaur Kale", null, null, "7", "70.0", "$43.00"),
+                ),
+                "3000",
+                "10320.0",
+                "$11000.00",
+                "$999.00",
+                "$999.00",
+                "$99999.99",
+            ),
+            {},
+            onClickEditEntry = {},
+            onClickDeleteEntry = {},
+            onClickAddEntry = {},
+            onClickToggleAllEntries = {},
+            onClickToggleEntry = { _, _ -> },
+            onClickClearEntrySelection = {},
+        )
+    }
+}
