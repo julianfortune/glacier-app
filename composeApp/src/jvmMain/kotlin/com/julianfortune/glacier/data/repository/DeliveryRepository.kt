@@ -4,6 +4,7 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.data.common.EntityMetadata
@@ -41,16 +42,20 @@ class DeliveryRepository(private val database: Database) {
             }
     }
 
-    fun getDeliveryById(deliveryId: Long): Flow<Delivery> {
+    fun getDeliveryById(deliveryId: Long): Flow<Delivery?> {
         val deliveryFlow = database.deliveryQueries.getById(deliveryId)
             .asFlow()
-            .mapToOne(Dispatchers.IO)
+            .mapToOneOrNull(Dispatchers.IO)
 
         val entriesFlow = database.deliveryEntryQueries.getByDeliveryId(deliveryId)
             .asFlow()
             .mapToList(Dispatchers.IO)
 
         return combine(deliveryFlow, entriesFlow) { deliveryRow, entryRows ->
+            if (deliveryRow == null) {
+                return@combine null
+            }
+
             val supplier = supplierFromJoinedRow(deliveryRow.supplierId, deliveryRow.supplierName)
             val entries = entryRows.map(this::entryFromRow)
             val metadata = EntityMetadata.ofEpochSeconds(
@@ -121,7 +126,7 @@ class DeliveryRepository(private val database: Database) {
         val now = Instant.now()
 
         return Result.runCatching {
-            database.deliveryQueries.insert(
+            val id = database.deliveryQueries.insert(
                 LocalDateCodec.serialize(received),
                 supplierId,
                 taxesCents,
@@ -129,6 +134,9 @@ class DeliveryRepository(private val database: Database) {
                 now.epochSecond,
                 now.epochSecond,
             ).awaitAsOne()
+
+            println("Created delivery with id: $id")
+            id
         }
     }
 

@@ -1,5 +1,7 @@
 package com.julianfortune.glacier
 
+import com.julianfortune.glacier.core.viewer.DefaultDeliveryViewer
+import com.julianfortune.glacier.core.viewer.DeliveryViewer
 import com.julianfortune.glacier.data.repository.CategoryRepository
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
@@ -7,10 +9,13 @@ import com.julianfortune.glacier.data.repository.ProgramRepository
 import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
-import com.julianfortune.glacier.feature.delivery.list.DeliveryHeadlineListViewModel
-import com.julianfortune.glacier.feature.delivery.detail.DeliveryDetailViewModel
-import com.julianfortune.glacier.feature.item.ItemViewModel
-import com.julianfortune.glacier.feature.namedentity.NamedEntityViewModel
+import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
+import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
+import com.julianfortune.glacier.ui.feature.entry.table.EntryTableViewModel
+import com.julianfortune.glacier.ui.page.item.ItemsPageViewModel
+import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPageViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -18,33 +23,47 @@ import org.koin.dsl.module
 val appModule = module {
     single { Database(get()) }
 
-    single { CategoryRepository(get()) }
     single { DeliveryRepository(get()) }
+    single { CategoryRepository(get()) }
     single { ItemRepository(get()) }
     single { SupplierRepository(get()) }
     single { ProgramRepository(get()) }
     single { PurchasingAccountRepository(get()) }
 
+    // TODO: Figure out coroutine scope
+    single<DeliveryViewer> { DefaultDeliveryViewer(get(), CoroutineScope(Dispatchers.Default)) }
+
     viewModel(named("categoryViewModel")) {
-        NamedEntityViewModel(get<CategoryRepository>())
+        NamedEntityPageViewModel(get<CategoryRepository>())
     }
     viewModel {
-        DeliveryDetailViewModel(get(), get(), get())
+        EntryTableViewModel(get(), get(), get())
     }
     viewModel {
-        DeliveryHeadlineListViewModel(get(), get())
+        DeliveryDetailViewModel(
+            get(),
+            get(),
+            get(),
+        )
     }
     viewModel {
-        ItemViewModel(get())
+        DeliveryHeadlineListViewModel(
+            get(),
+            get(),
+            get(),
+        )
+    }
+    viewModel {
+        ItemsPageViewModel(get())
     }
     viewModel(named("programViewModel")) {
-        NamedEntityViewModel(get<ProgramRepository>())
+        NamedEntityPageViewModel(get<ProgramRepository>())
     }
     viewModel(named("purchasingAccountViewModel")) {
-        NamedEntityViewModel(get<PurchasingAccountRepository>())
+        NamedEntityPageViewModel(get<PurchasingAccountRepository>())
     }
     viewModel(named("supplierViewModel")) {
-        NamedEntityViewModel(get<SupplierRepository>())
+        NamedEntityPageViewModel(get<SupplierRepository>())
     }
 
 }

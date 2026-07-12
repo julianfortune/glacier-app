@@ -6,8 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,6 +26,8 @@ import androidx.compose.ui.window.PopupProperties
 
 @Composable
 fun SideSheet(
+    // TODO(P0): Update to have `isVisible: Boolean` and be fully controlled
+    //  (and use `onDismissRequest: () -> Unit = {},` instead of `isDismissable`)
     onClose: () -> Unit,
     isDismissable: Boolean = true,
     scrimAlpha: Float = 0.6f,

@@ -41,7 +41,8 @@ class ItemRepository(private val database: Database) {
         return database.itemQueries.getAllItemsWithCategoriesByQueryingName(
             query = "%$searchString%",
             startsWith = "$searchString%",
-            exactMatch = searchString
+            exactMatch = searchString,
+            limit = 50,
         )
             .asFlow()
             .mapToList(Dispatchers.IO)

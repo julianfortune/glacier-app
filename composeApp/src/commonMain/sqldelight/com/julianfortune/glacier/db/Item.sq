@@ -35,15 +35,19 @@ FROM Item
 WHERE Item.name LIKE :query
 ORDER BY
     -- Make a best effort to sort result by 'closeness' of match
-    CASE WHEN Item.name = :exactMatch THEN 0 ELSE 1 END ASC,
-    CASE WHEN Item.name LIKE :startsWith THEN 0 ELSE 1 END ASC,
-    Item.name ASC;
+    CASE
+        WHEN Item.name = :exactMatch THEN 0
+        ELSE 1
+    END ASC,
+    CASE
+        WHEN Item.name LIKE :startsWith THEN 0
+        ELSE 1
+    END ASC,
+    Item.name ASC
+LIMIT :limit;
 
 deleteById:
 DELETE FROM Item WHERE id = :id;
-
-deleteAll:
-DELETE FROM Item;
 
 insert:
 INSERT INTO Item (

@@ -17,9 +17,9 @@ import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Program
 import com.julianfortune.glacier.data.domain.PurchasingAccount
 import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.feature.delivery.DeliveriesListDetail
-import com.julianfortune.glacier.feature.item.ItemListView
-import com.julianfortune.glacier.feature.namedentity.NamedEntityListView
+import com.julianfortune.glacier.ui.page.delivery.DeliveriesPage
+import com.julianfortune.glacier.ui.page.item.ItemsPage
+import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPage
 import com.julianfortune.glacier.ui.theme.AppTypography
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
@@ -66,33 +66,35 @@ fun App() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 when (selectedNavigationItem) {
-                    NavigationPage.CATEGORIES -> NamedEntityListView<Category>(
+                    NavigationPage.CATEGORIES -> NamedEntityPage<Category>(
                         koinViewModel(named("categoryViewModel")),
                         "Categories",
                         "Category"
                     )
 
-                    NavigationPage.DELIVERIES -> DeliveriesListDetail()
-                    NavigationPage.ITEMS -> ItemListView()
-                    NavigationPage.PROGRAMS -> NamedEntityListView<Program>(
+                    NavigationPage.DELIVERIES -> DeliveriesPage()
+
+                    NavigationPage.ITEMS -> ItemsPage()
+
+                    NavigationPage.PROGRAMS -> NamedEntityPage<Program>(
                         koinViewModel(named("programViewModel")),
                         "Programs",
                         "Program"
                     )
 
-                    NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityListView<PurchasingAccount>(
+                    NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityPage<PurchasingAccount>(
                         koinViewModel(named("purchasingAccountViewModel")),
                         "Accounts",
                         "Account"
                     )
 
-                    NavigationPage.SUPPLIERS -> NamedEntityListView<Supplier>(
+                    NavigationPage.SUPPLIERS -> NamedEntityPage<Supplier>(
                         koinViewModel(named("supplierViewModel")),
                         "Suppliers",
                         "Supplier"
                     )
 
-                    else -> Column(
+                    NavigationPage.REPORTS -> Column(
                         Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally

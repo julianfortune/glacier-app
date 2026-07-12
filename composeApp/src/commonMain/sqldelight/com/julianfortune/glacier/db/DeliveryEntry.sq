@@ -22,18 +22,19 @@ CREATE TABLE IF NOT EXISTS DeliveryEntry (
     createdAtEpochSeconds INTEGER NOT NULL,
     updatedAtEpochSeconds INTEGER NOT NULL,
 
-    FOREIGN KEY(deliveryId) REFERENCES Delivery(id),
+    FOREIGN KEY(deliveryId) REFERENCES Delivery(id) ON DELETE CASCADE,
     FOREIGN KEY(itemId) REFERENCES Item(id),
     FOREIGN KEY(programId) REFERENCES Program(id),
     FOREIGN KEY(purchasingAccountId) REFERENCES PurchasingAccount(id)
 );
 
 -- QUERIES
-getAll:
-SELECT * FROM DeliveryEntry;
-
 getById:
-SELECT * FROM DeliveryEntry WHERE id = :id LIMIT 1;
+SELECT *
+FROM DeliveryEntry
+WHERE id = :id
+ORDER BY createdAtEpochSeconds ASC
+LIMIT 1;
 
 getByDeliveryId:
 SELECT
@@ -46,16 +47,10 @@ FROM DeliveryEntry
     LEFT JOIN Program ON DeliveryEntry.programId = Program.id
     LEFT JOIN PurchasingAccount ON DeliveryEntry.purchasingAccountId = PurchasingAccount.id
 WHERE DeliveryEntry.deliveryId = :deliveryId
-ORDER BY DeliveryEntry.id DESC;
+ORDER BY createdAtEpochSeconds ASC;
 
 deleteById:
 DELETE FROM DeliveryEntry WHERE id = :id;
-
-deleteByDeliveryId:
-DELETE FROM DeliveryEntry WHERE deliveryId = :deliveryId;
-
-deleteAll:
-DELETE FROM DeliveryEntry;
 
 insert:
 INSERT INTO DeliveryEntry (
