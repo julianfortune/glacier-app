@@ -9,6 +9,8 @@ import com.julianfortune.glacier.data.repository.ProgramRepository
 import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.ui.common.provider.CategoryOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.DefaultCategoryOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.DefaultItemOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.DefaultProgramOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.DefaultPurchasingAccountOptionsProvider
@@ -48,6 +50,12 @@ val appModule = module {
     }
 
     // ViewModel capability providers
+    single<CategoryOptionsProvider> {
+        DefaultCategoryOptionsProvider(
+            categoryRepository = get(),
+            scope = CoroutineScope(Dispatchers.Default)
+        )
+    }
     single<ItemOptionsProvider> {
         DefaultItemOptionsProvider(
             itemRepository = get(),
@@ -101,7 +109,7 @@ val appModule = module {
         )
     }
     viewModel {
-        ItemsPageViewModel(get())
+        ItemsPageViewModel(get(), get())
     }
     viewModel(named("programViewModel")) {
         NamedEntityPageViewModel(get<ProgramRepository>())

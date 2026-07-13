@@ -9,21 +9,26 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.ui.page.item.ItemsPageViewModel
+import com.julianfortune.glacier.data.domain.Item
+import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
+import com.julianfortune.glacier.ui.page.item.data.ItemBody
+import com.julianfortune.glacier.ui.theme.AppPreview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemForm(
-    // TODO(P1): No ViewModel
-    viewModel: ItemsPageViewModel,
+    categoryOptions: List<Option<Long>>,
     title: String,
     submitButtonText: String,
-    initialItem: ItemHeadline? = null,
-    onSubmit: (name: String) -> Unit
+    initialValue: ItemBody? = null,
+    onCancel: () -> Unit,
+    onSubmit: (body: ItemBody) -> Unit,
 ) {
-    var name by remember { mutableStateOf(initialItem?.name ?: "") }
+    var name by remember { mutableStateOf(initialValue?.name ?: "") }
+    var categoryId by remember { mutableStateOf(initialValue?.categoryId) }
 
     val isValid = remember(name) {
         name != ""
@@ -57,7 +62,15 @@ fun ItemForm(
             colors = OutlinedTextFieldDefaults.colors(),
         )
 
-        // TODO(#27): Category drop down
+        AutocompleteSelect(
+            categoryId,
+            categoryOptions,
+            {
+                categoryId = it?.id
+            },
+            label = { Text("Category") },
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -66,9 +79,7 @@ fun ItemForm(
         ) {
             TextButton(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = {
-                    viewModel.cancelItemOperation()
-                }
+                onClick = onCancel
             ) {
                 Text("Cancel")
             }
@@ -79,7 +90,7 @@ fun ItemForm(
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
                 enabled = isValid,
                 onClick = {
-                    onSubmit(name)
+                    onSubmit(ItemBody(name, categoryId))
                 },
             ) {
                 Text(submitButtonText)
@@ -87,4 +98,17 @@ fun ItemForm(
         }
     }
 
+}
+
+@Preview
+@Composable
+fun ItemFormPreview() = AppPreview {
+    ItemForm(
+        categoryOptions = emptyList(),
+        title = "Title",
+        submitButtonText = "Save",
+        initialValue = null,
+        onCancel = {},
+        onSubmit = {},
+    )
 }

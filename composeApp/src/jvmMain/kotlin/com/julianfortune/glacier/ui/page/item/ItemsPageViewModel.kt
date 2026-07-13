@@ -4,16 +4,26 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.repository.ItemRepository
+import com.julianfortune.glacier.ui.common.provider.CategoryOptionsProvider
+import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
+import com.julianfortune.glacier.ui.page.item.data.ItemBody
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class ItemsPageViewModel(private val itemRepository: ItemRepository) : ViewModel() {
+class ItemsPageViewModel(
+    private val itemRepository: ItemRepository,
+    categoryOptionsProvider: CategoryOptionsProvider,
+) : ViewModel(),
+    CategoryOptionsProvider by categoryOptionsProvider {
 
-    private val _itemOperation = mutableStateOf<EntityOperation<ItemHeadline>?>(null)
-    val itemOperation: State<EntityOperation<ItemHeadline>?> = _itemOperation
+    private val _itemOperation = mutableStateOf<EntityOperation<Item>?>(null)
+    val itemOperation: State<EntityOperation<Item>?> = _itemOperation
 
     // TODO: Understand what this is doing
     val items = itemRepository.getAll()
@@ -23,13 +33,12 @@ class ItemsPageViewModel(private val itemRepository: ItemRepository) : ViewModel
             initialValue = emptyList()
         )
 
-    suspend fun saveItem(name: String) {
-        // TODO: Category IDs
-        itemRepository.insert(name, emptySet())
+    suspend fun saveItem(body: ItemBody) {
+        itemRepository.insert(body.name, setOfNotNull(body.categoryId))
     }
 
-    suspend fun updateItem(id: Long, name: String) {
-        itemRepository.update(id, name, emptySet())
+    suspend fun updateItem(id: Long, body: ItemBody) {
+        itemRepository.update(id, body.name, setOfNotNull(body.categoryId))
     }
 
     suspend fun deleteItem(id: Long) {
@@ -41,7 +50,10 @@ class ItemsPageViewModel(private val itemRepository: ItemRepository) : ViewModel
     }
 
     fun showEditItem(item: ItemHeadline) {
-        _itemOperation.value = EntityOperation.Edit(item)
+        viewModelScope.launch {
+            val fullItem = itemRepository.getById(item.id).firstOrNull()
+            fullItem?.let { _itemOperation.value = EntityOperation.Edit(it) }
+        }
     }
 
     fun showDeleteItem(item: ItemHeadline) {

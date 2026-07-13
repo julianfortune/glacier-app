@@ -30,7 +30,9 @@ class ItemRepository(private val database: Database) {
             .mapToList(Dispatchers.IO)
             .map { rows ->
                 val first = rows.firstOrNull() ?: throw RuntimeException("Unable to find an Item with id=$id")
-                val categories = rows.map { Category(it.categoryId!!, it.categoryName!!) }
+                val categories = rows
+                    .filter { it.categoryId != null } // Since it's a LEFT JOIN there may be no category
+                    .map { Category(it.categoryId!!, it.categoryName!!) }
 
                 Item(first.id, first.name, categories, emptyList())
             }
