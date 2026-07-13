@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS DeliveryEntry (
 );
 
 -- QUERIES
-getById:
+getById: -- Only used for testing
 SELECT *
 FROM DeliveryEntry
 WHERE id = :id

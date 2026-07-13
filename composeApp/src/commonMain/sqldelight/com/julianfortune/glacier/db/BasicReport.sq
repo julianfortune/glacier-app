@@ -16,7 +16,13 @@ CREATE TABLE IF NOT EXISTS BasicReport (
 
     -- Metadata
     createdAtEpochSeconds INTEGER NOT NULL,
-    updatedAtEpochSeconds INTEGER NOT NULL
+    updatedAtEpochSeconds INTEGER NOT NULL,
+
+    FOREIGN KEY(itemId) REFERENCES Item(id),
+    FOREIGN KEY(itemCategoryId) REFERENCES Category(id),
+    FOREIGN KEY(programId) REFERENCES Program(id),
+    FOREIGN KEY(purchasingAccountId) REFERENCES PurchasingAccount(id),
+    FOREIGN KEY(supplierId) REFERENCES Supplier(id)
 );
 
 -- QUERIES
@@ -25,6 +31,24 @@ SELECT * FROM BasicReport ORDER BY createdAtEpochSeconds DESC;
 
 getById:
 SELECT * FROM BasicReport WHERE id = :id LIMIT 1;
+
+getByIdWithHydration:
+SELECT
+    BasicReport.*,
+    Item.name AS itemName,
+    Category.name AS categoryName,
+    Program.name AS programName,
+    PurchasingAccount.name AS purchasingAccountName,
+    Supplier.name AS supplierName
+FROM BasicReport
+    LEFT JOIN Item ON BasicReport.itemId = Item.id
+    LEFT JOIN Category ON BasicReport.itemCategoryId = Category.id
+    LEFT JOIN Program ON BasicReport.programId = Program.id
+    LEFT JOIN PurchasingAccount ON BasicReport.purchasingAccountId = PurchasingAccount.id
+    LEFT JOIN Supplier ON BasicReport.supplierId = Supplier.id
+WHERE BasicReport.id = :id
+LIMIT 1;
+
 
 deleteById:
 DELETE FROM BasicReport WHERE id = :id;

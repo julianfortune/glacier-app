@@ -1,0 +1,102 @@
+package com.julianfortune.glacier.data.repository
+
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.julianfortune.glacier.data.codec.CostStatusCodec
+import com.julianfortune.glacier.data.codec.LocalDateCodec
+import com.julianfortune.glacier.data.common.EntityMetadata
+import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.db.Database
+import dev.forkhandles.result4k.orThrow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+
+class BasicReportRepository(private val database: Database) {
+
+    fun getAllAsHeadlines(): Flow<List<BasicReportHeadline>> {
+        return database.basicReportQueries.getAll()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { reports ->
+                reports.map {
+                    // TODO(P3): Error handling
+                    val start = LocalDateCodec.deserialize(it.startDate).orThrow()
+                    val end = LocalDateCodec.deserialize(it.endDate).orThrow()
+
+                    BasicReportHeadline(it.id, it.name, start, end)
+                }
+            }
+    }
+
+    fun getById(id: Long): Flow<BasicReport?> = database.basicReportQueries.getByIdWithHydration(id)
+        .asFlow()
+        .mapToOneOrNull(Dispatchers.IO)
+        .map { row ->
+            when (row) {
+                null -> null
+                else -> {
+                    val start = LocalDateCodec.deserialize(row.startDate).orThrow()
+                    val end = LocalDateCodec.deserialize(row.endDate).orThrow()
+
+                    val item = row.itemId?.let { itemId ->
+                        ItemHeadline(
+                            itemId,
+                            row.itemName ?: throw Exception("`itemName` must be defined by foreign key constraints")
+                        )
+                    }
+                    val category = row.itemCategoryId?.let { categoryId ->
+                        Category(
+                            categoryId,
+                            row.categoryName
+                                ?: throw Exception("`categoryName` must be defined by foreign key constraints")
+                        )
+                    }
+                    val costStatus = row.costStatus?.let { CostStatusCodec.deserialize(it).orThrow() }
+                    val program = row.programId?.let { id ->
+                        Program(
+                            id,
+                            row.programName
+                                ?: throw Exception("`programName` must be defined by foreign key constraints")
+                        )
+                    }
+                    val account = row.purchasingAccountId?.let { id ->
+                        PurchasingAccount(
+                            id,
+                            row.purchasingAccountName
+                                ?: throw Exception("`purchasingAccountName` must be defined by foreign key constraints")
+                        )
+                    }
+                    val supplier = row.supplierId?.let { id ->
+                        Supplier(
+                            id,
+                            row.supplierName
+                                ?: throw Exception("`supplierName` must be defined by foreign key constraints")
+                        )
+                    }
+
+                    val metadata = EntityMetadata.ofEpochSeconds(row.createdAtEpochSeconds, row.updatedAtEpochSeconds)
+
+                    BasicReport(
+                        row.id,
+                        row.name,
+                        start,
+                        end,
+                        BasicReport.Filter(
+                            item,
+                            category,
+                            costStatus,
+                            program,
+                            account,
+                            supplier,
+                        ),
+                        metadata
+                    )
+                }
+            }
+        }
+
+
+}

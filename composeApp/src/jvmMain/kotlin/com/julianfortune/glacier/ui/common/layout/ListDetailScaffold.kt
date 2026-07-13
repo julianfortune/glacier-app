@@ -26,8 +26,7 @@ fun ListDetailScaffold(
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier) {
         // Left-hand 'list' of items
         Column(modifier = Modifier.width(listWidth)) {
-            listView(
-            )
+            listView()
         }
 
         // Separator between columns

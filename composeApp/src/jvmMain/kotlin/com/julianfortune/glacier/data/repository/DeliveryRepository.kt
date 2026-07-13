@@ -3,7 +3,6 @@ package com.julianfortune.glacier.data.repository
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
@@ -174,8 +173,6 @@ class DeliveryRepository(private val database: Database) {
             else -> Result.failure(IllegalStateException("Delivery was not deleted"))
         }
     }
-
-    // TODO: Method for deleting an entry
 
     suspend fun appendDeliveryEntry(
         deliveryId: Long,

@@ -2,6 +2,7 @@ package com.julianfortune.glacier
 
 import com.julianfortune.glacier.core.viewer.DefaultDeliveryViewer
 import com.julianfortune.glacier.core.viewer.DeliveryViewer
+import com.julianfortune.glacier.data.repository.BasicReportRepository
 import com.julianfortune.glacier.data.repository.CategoryRepository
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
@@ -22,6 +23,7 @@ import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
 import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTableViewModel
+import com.julianfortune.glacier.ui.feature.report.list.ReportHeadlineListViewModel
 import com.julianfortune.glacier.ui.page.item.ItemsPageViewModel
 import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPageViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +36,7 @@ val appModule = module {
     single { Database(get()) }
 
     // Repositories
+    single { BasicReportRepository(get()) }
     single { DeliveryRepository(get()) }
     single { CategoryRepository(get()) }
     single { ItemRepository(get()) }
@@ -116,6 +119,9 @@ val appModule = module {
     }
     viewModel(named("purchasingAccountViewModel")) {
         NamedEntityPageViewModel(get<PurchasingAccountRepository>())
+    }
+    viewModel {
+        ReportHeadlineListViewModel(get())
     }
     viewModel(named("supplierViewModel")) {
         NamedEntityPageViewModel(get<SupplierRepository>())

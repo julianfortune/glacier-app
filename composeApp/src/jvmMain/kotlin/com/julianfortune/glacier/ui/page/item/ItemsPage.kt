@@ -68,7 +68,9 @@ fun ItemsPage(viewModel: ItemsPageViewModel = koinViewModel()) {
 
     // Create/edit item modal
     if (itemOperation != null) {
-        Dialog {
+        Dialog(
+            onDismissRequest = { viewModel.cancelItemOperation() }
+        ) {
             when (itemOperation) {
                 is EntityOperation.CreateNew -> {
                     ItemForm(
