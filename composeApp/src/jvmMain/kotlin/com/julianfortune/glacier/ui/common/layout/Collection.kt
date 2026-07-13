@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.ui.common
+package com.julianfortune.glacier.ui.common.layout
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
@@ -16,12 +16,13 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.common.Entity
+import com.julianfortune.glacier.ui.common.component.TopBar
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun <T : Entity> CollectionView(
+fun <T : Entity> Collection(
     title: String,
     entities: List<T>,
     selectedId: Long? = null,

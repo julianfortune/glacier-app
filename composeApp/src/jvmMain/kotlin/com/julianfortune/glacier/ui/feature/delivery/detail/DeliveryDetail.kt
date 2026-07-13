@@ -19,9 +19,9 @@ import com.julianfortune.glacier.ui.feature.delivery.detail.ui.DeliveryDetailTop
 import com.julianfortune.glacier.ui.feature.delivery.detail.ui.DeliveryHeader
 import com.julianfortune.glacier.ui.feature.delivery.detail.ui.DeliverySummary
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTable
-import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
-import com.julianfortune.glacier.ui.common.Dialog
-import com.julianfortune.glacier.ui.common.TopBar
+import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.ui.common.foundation.Dialog
+import com.julianfortune.glacier.ui.common.component.TopBar
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 import org.koin.compose.viewmodel.koinViewModel
 

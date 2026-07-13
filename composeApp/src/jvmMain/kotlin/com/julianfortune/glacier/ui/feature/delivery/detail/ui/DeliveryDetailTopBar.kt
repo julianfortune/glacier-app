@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.tooling.preview.Preview
-import com.julianfortune.glacier.ui.common.TopBar
+import com.julianfortune.glacier.ui.common.component.TopBar
 import com.julianfortune.glacier.ui.theme.AppPreview
 
 

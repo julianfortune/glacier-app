@@ -4,11 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Cases
 import androidx.compose.material.icons.outlined.Delete
@@ -25,10 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
-import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
-import com.julianfortune.glacier.ui.common.Dialog
-import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
+import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.ui.common.foundation.Dialog
+import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.feature.entry.form.EntryForm
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryAction
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryTableState
@@ -415,7 +412,7 @@ fun SelectionProgramModifierMenu() {
             Text("Edit Program")
 
             // TODO(#28)
-            AutoCompleteDropdownField(
+            AutocompleteSelect(
                 null,
                 emptyList(),
                 onSelectedChange = {},
@@ -451,7 +448,7 @@ fun SelectionAccountModifierMenu() {
             Text("Edit Account")
 
             // TODO(#28)
-            AutoCompleteDropdownField(
+            AutocompleteSelect(
                 null,
                 emptyList(),
                 onSelectedChange = {},

@@ -4,14 +4,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.julianfortune.glacier.ui.common.CurrencyInput
-import com.julianfortune.glacier.ui.common.LocalDateInput
+import com.julianfortune.glacier.ui.common.input.CurrencyInput
+import com.julianfortune.glacier.ui.common.input.LocalDateInput
 import com.julianfortune.glacier.ui.common.data.FormFieldState
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryFormState
 
 
-// NOTE: In order to test this in a sane way this should probably be converted into a ViewModel
 class DeliveryFormStateHolder(initialValues: DeliveryBody? = null) {
 
     private var receivedDateInput by mutableStateOf<LocalDateInput?>(

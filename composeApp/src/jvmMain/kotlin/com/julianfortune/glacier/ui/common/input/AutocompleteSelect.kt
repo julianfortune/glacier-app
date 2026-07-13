@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.ui.common
+package com.julianfortune.glacier.ui.common.input
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +25,7 @@ import com.julianfortune.glacier.ui.common.data.Option
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <ID> AutoCompleteDropdownField(
+fun <ID> AutocompleteSelect(
     selectedOptionId: ID?,
     options: List<Option<ID>>,
     onSelectedChange: (Option<ID>?) -> Unit,

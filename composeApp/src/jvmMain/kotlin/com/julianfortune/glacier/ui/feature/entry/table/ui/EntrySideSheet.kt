@@ -7,7 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.ui.common.SideSheet
+import com.julianfortune.glacier.ui.common.foundation.SideSheet
 
 @Composable
 fun EntrySideSheet(

@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.feature.delivery.form.data
 
-import com.julianfortune.glacier.ui.common.LocalDateInput
+import com.julianfortune.glacier.ui.common.input.LocalDateInput
 import com.julianfortune.glacier.ui.common.data.FormFieldState
 
 data class DeliveryFormState(

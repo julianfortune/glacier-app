@@ -12,9 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.ui.common.CollectionView
-import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
-import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.common.layout.Collection
+import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.page.item.ui.ItemForm
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ fun ItemsPage(viewModel: ItemsPageViewModel = koinViewModel()) {
     val itemOperation by viewModel.itemOperation
 
     Column {
-        CollectionView(
+        Collection(
             "Items",
             items,
             null,

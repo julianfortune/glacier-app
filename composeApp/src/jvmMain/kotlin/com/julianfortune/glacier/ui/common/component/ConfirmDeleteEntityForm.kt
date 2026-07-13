@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.ui.common
+package com.julianfortune.glacier.ui.common.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

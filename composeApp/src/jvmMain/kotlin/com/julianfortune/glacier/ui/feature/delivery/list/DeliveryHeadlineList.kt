@@ -8,8 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.ui.common.CollectionView
-import com.julianfortune.glacier.ui.common.Dialog
+import com.julianfortune.glacier.ui.common.layout.Collection
+import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.formatLocalDate
 import com.julianfortune.glacier.ui.feature.delivery.form.DeliveryForm
 import org.koin.compose.viewmodel.koinViewModel
@@ -42,7 +42,7 @@ fun DeliveryHeadlineList(
         }
     }
 
-    CollectionView(
+    Collection(
         "Deliveries",
         deliveryHeadlines,
         selectedId,

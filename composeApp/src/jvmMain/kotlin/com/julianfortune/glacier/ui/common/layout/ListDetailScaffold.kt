@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.ui.layout
+package com.julianfortune.glacier.ui.common.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

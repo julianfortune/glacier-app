@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.ui.common
+package com.julianfortune.glacier.ui.common.input
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons

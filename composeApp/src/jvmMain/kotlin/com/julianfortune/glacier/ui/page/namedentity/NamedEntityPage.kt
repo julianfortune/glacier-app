@@ -13,9 +13,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.common.NamedEntity
-import com.julianfortune.glacier.ui.common.CollectionView
-import com.julianfortune.glacier.ui.common.ConfirmDeleteEntityForm
-import com.julianfortune.glacier.ui.common.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.common.layout.Collection
+import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import com.julianfortune.glacier.ui.page.namedentity.ui.UpdateNamedEntityForm
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ fun <T : NamedEntity> NamedEntityPage(
     val currentOperation by viewModel.operation
 
     Column {
-        CollectionView(
+        Collection(
             title,
             entities,
             null,

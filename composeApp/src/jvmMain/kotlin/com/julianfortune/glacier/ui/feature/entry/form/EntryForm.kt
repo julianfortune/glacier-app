@@ -12,10 +12,10 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.ui.common.AutoCompleteDropdownField
-import com.julianfortune.glacier.ui.common.CurrencyInput
-import com.julianfortune.glacier.ui.common.CurrencyInputTextField
-import com.julianfortune.glacier.ui.common.Selection
+import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
+import com.julianfortune.glacier.ui.common.input.CurrencyInput
+import com.julianfortune.glacier.ui.common.input.CurrencyInputTextField
+import com.julianfortune.glacier.ui.common.input.DropdownSelect
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormState
@@ -86,7 +86,7 @@ fun NewEntryFormUi(
         )
 
         Column {
-            AutoCompleteDropdownField(
+            AutocompleteSelect(
                 selectedOptionId = state.selectedItemId.value,
                 options = itemOptions,
                 onSelectedChange = { onSelectedItemIdChange(it?.id) },
@@ -154,7 +154,7 @@ fun NewEntryFormUi(
                 val noCostOption = Option(id = true, title = "No Cost")
                 val paidOption = Option(id = false, title = "Paid")
 
-                Selection(
+                DropdownSelect(
                     options = listOf(paidOption, noCostOption),
                     selectedId = state.costStatusIsNoCost.value,
                     onSelectedChange = { selection ->

@@ -1,6 +1,7 @@
-package com.julianfortune.glacier.ui.common
+package com.julianfortune.glacier.ui.common.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -12,13 +13,14 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EntityOptionsDropdownMenu(
-    edit: () -> Unit,
-    delete: () -> Unit,
+fun OverflowMenu(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.(onDismiss: () -> Unit) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val dismiss = { expanded = false }
 
-    Box {
+    Box(modifier = modifier) {
         IconButton(
             onClick = { expanded = !expanded },
             modifier = Modifier
@@ -26,31 +28,16 @@ fun EntityOptionsDropdownMenu(
                 .pointerHoverIcon(PointerIcon.Hand)
         ) {
             Icon(
-                Icons.Default.MoreVert, contentDescription = "Options"
+                Icons.Default.MoreVert,
+                contentDescription = "More options"
             )
         }
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = dismiss
         ) {
-            DropdownMenuItem(
-                text = { Text("Edit") },
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = {
-                    edit()
-                    expanded = false
-                }
-            )
-
-            DropdownMenuItem(
-                text = { Text("Delete") },
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = {
-                    delete()
-                    expanded = false
-                }
-            )
+            content(dismiss)
         }
     }
 }
