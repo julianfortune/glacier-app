@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.ui.feature.delivery.detail.ui
+package com.julianfortune.glacier.ui.common.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer

@@ -15,6 +15,8 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.ui.common.component.KeyValueItem
+import com.julianfortune.glacier.ui.common.component.KeyValueList
 
 private val horizontalContentPadding = 24.dp
 private val horizontalTextPadding = 16.dp

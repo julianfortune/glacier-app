@@ -20,6 +20,7 @@ import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.ui.page.delivery.DeliveriesPage
 import com.julianfortune.glacier.ui.page.item.ItemsPage
 import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPage
+import com.julianfortune.glacier.ui.page.report.ReportsPage
 import com.julianfortune.glacier.ui.theme.AppTypography
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
@@ -94,14 +95,7 @@ fun App() {
                         "Supplier"
                     )
 
-                    NavigationPage.REPORTS -> Column(
-                        Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("Not implemented yet!")
-                        Text("(Selected: ${selectedNavigationItem.title})")
-                    }
+                    NavigationPage.REPORTS -> ReportsPage()
                 }
             }
         }
