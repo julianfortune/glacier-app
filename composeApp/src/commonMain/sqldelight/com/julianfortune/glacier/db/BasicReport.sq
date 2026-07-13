@@ -49,7 +49,6 @@ FROM BasicReport
 WHERE BasicReport.id = :id
 LIMIT 1;
 
-
 deleteById:
 DELETE FROM BasicReport WHERE id = :id;
 

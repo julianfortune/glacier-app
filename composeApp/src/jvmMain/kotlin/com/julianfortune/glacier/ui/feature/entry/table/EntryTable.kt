@@ -245,6 +245,23 @@ fun EntryTableUi(
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            FilledTonalButton(
+                onClick = {
+                    onClickAddEntry()
+                },
+                shape = MaterialTheme.shapes.extraSmall,
+                modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                colors = ButtonDefaults.filledTonalButtonColors().copy(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+            ) {
+                Text("New")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

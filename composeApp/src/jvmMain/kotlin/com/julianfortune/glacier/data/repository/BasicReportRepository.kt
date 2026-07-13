@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -12,6 +13,8 @@ import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.time.LocalDate
 
 
 class BasicReportRepository(private val database: Database) {
@@ -98,5 +101,78 @@ class BasicReportRepository(private val database: Database) {
             }
         }
 
+    suspend fun insert(
+        name: String,
+        start: LocalDate,
+        end: LocalDate,
+        itemId: Long?,
+        itemCategoryId: Long?,
+        costStatus: CostStatus?,
+        programId: Long?,
+        purchasingAccountId: Long?,
+        supplierId: Long?,
+    ): Result<Long> {
+        val now = Instant.now()
 
+        return Result.runCatching {
+            database.basicReportQueries.insert(
+                name,
+                LocalDateCodec.serialize(start),
+                LocalDateCodec.serialize(end),
+                itemId,
+                itemCategoryId,
+                costStatus?.let { CostStatusCodec.serialize(it) },
+                programId,
+                purchasingAccountId,
+                supplierId,
+                now.epochSecond,
+                now.epochSecond,
+            ).awaitAsOne()
+        }
+    }
+
+    suspend fun update(
+        id: Long,
+        name: String,
+        start: LocalDate,
+        end: LocalDate,
+        itemId: Long?,
+        itemCategoryId: Long?,
+        costStatus: CostStatus?,
+        programId: Long?,
+        purchasingAccountId: Long?,
+        supplierId: Long?,
+    ): Result<Long> {
+        val now = Instant.now()
+
+        return Result.runCatching {
+            val rowsUpdated = database.basicReportQueries.updateById(
+                name,
+                LocalDateCodec.serialize(start),
+                LocalDateCodec.serialize(end),
+                itemId,
+                itemCategoryId,
+                costStatus?.let { CostStatusCodec.serialize(it) },
+                programId,
+                purchasingAccountId,
+                supplierId,
+                now.epochSecond,
+                id,
+            )
+
+            return when {
+                rowsUpdated > 0 -> Result.success(id)
+                else -> Result.failure(IllegalStateException("BasicReport with id=$id could not be updated"))
+            }
+        }
+    }
+
+    suspend fun delete(id: Long): Result<Long> {
+        val rowsDeleted = database.basicReportQueries.deleteById(id)
+
+        return when {
+            rowsDeleted > 0 -> Result.success(id)
+            else -> Result.failure(IllegalStateException("BasicReport with id=$id could not be deleted"))
+        }
+    }
 }
