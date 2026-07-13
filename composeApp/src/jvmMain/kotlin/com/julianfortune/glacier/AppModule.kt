@@ -10,8 +10,12 @@ import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.ui.common.provider.DefaultItemOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.DefaultProgramOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.DefaultPurchasingAccountOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.DefaultSupplierOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.ItemOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.ProgramOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.PurchasingAccountOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
 import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
@@ -43,16 +47,28 @@ val appModule = module {
         )
     }
 
-    // Providers
-    single<SupplierOptionsProvider> {
-        DefaultSupplierOptionsProvider(
-            supplierRepository = get(),
-            scope = CoroutineScope(Dispatchers.Default)
-        )
-    }
+    // ViewModel capability providers
     single<ItemOptionsProvider> {
         DefaultItemOptionsProvider(
             itemRepository = get(),
+            scope = CoroutineScope(Dispatchers.Default)
+        )
+    }
+    single<ProgramOptionsProvider> {
+        DefaultProgramOptionsProvider(
+            programRepository = get(),
+            scope = CoroutineScope(Dispatchers.Default)
+        )
+    }
+    single<PurchasingAccountOptionsProvider> {
+        DefaultPurchasingAccountOptionsProvider(
+            purchasingAccountRepository = get(),
+            scope = CoroutineScope(Dispatchers.Default)
+        )
+    }
+    single<SupplierOptionsProvider> {
+        DefaultSupplierOptionsProvider(
+            supplierRepository = get(),
             scope = CoroutineScope(Dispatchers.Default)
         )
     }
@@ -62,7 +78,13 @@ val appModule = module {
         NamedEntityPageViewModel(get<CategoryRepository>())
     }
     viewModel {
-        EntryTableViewModel(get(), get(), get())
+        EntryTableViewModel(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
     }
     viewModel {
         DeliveryDetailViewModel(

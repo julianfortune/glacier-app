@@ -7,9 +7,10 @@ import com.julianfortune.glacier.core.util.formatCents
 import com.julianfortune.glacier.core.viewer.DeliveryViewer
 import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
 import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.data.repository.ItemRepository
-import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.provider.DefaultPurchasingAccountOptionsProvider
 import com.julianfortune.glacier.ui.common.provider.ItemOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.ProgramOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.PurchasingAccountOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliverySubTotalCostCents
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliveryTotalWeightPounds
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateEntryTotalCostCents
@@ -25,8 +26,13 @@ import kotlinx.coroutines.launch
 class EntryTableViewModel(
     private val deliveryViewer: DeliveryViewer,
     private val deliveryRepository: DeliveryRepository,
-    itemOptionsProvider: ItemOptionsProvider
-) : ViewModel(), ItemOptionsProvider by itemOptionsProvider {
+    itemOptionsProvider: ItemOptionsProvider,
+    programOptionsProvider: ProgramOptionsProvider,
+    purchasingAccountOptionsProvider: PurchasingAccountOptionsProvider,
+) : ViewModel(),
+    ItemOptionsProvider by itemOptionsProvider,
+    ProgramOptionsProvider by programOptionsProvider,
+    PurchasingAccountOptionsProvider by purchasingAccountOptionsProvider {
 
     private val entryAction = MutableStateFlow<EntryAction?>(null)
     private val selectionEnabled = MutableStateFlow(false)
@@ -68,8 +74,8 @@ class EntryTableViewModel(
                         e.id,
                         e.id in selections,
                         e.item.name,
-                        null,
-                        null,
+                        e.program?.name,
+                        e.purchasingAccount?.name,
                         e.unitCount.toString(),
                         totalWeight.toPounds().toString(),
                         totalCostCents,
@@ -134,6 +140,7 @@ class EntryTableViewModel(
         entryAction.value = null
     }
 
+    // TODO: These can probably all be moved into a state-holder for the data table
     fun enableEntrySelection() {
         selectionEnabled.value = true
     }
@@ -167,6 +174,37 @@ class EntryTableViewModel(
         selectedEntryRows.value = emptySet()
     }
 
+    fun onBulkUpdateProgram(newProgramId: Long?) {
+        val selection = selectedEntryRows.value
+
+        if (selection.isEmpty()) {
+            return
+        }
+
+        // TODO: Error handling
+        viewModelScope.launch {
+            for (entryId in selection) {
+                deliveryRepository.updateDeliveryEntryProgram(entryId, newProgramId)
+            }
+        }
+    }
+
+    fun onBulkUpdateAccount(newAccountId: Long?) {
+        val selection = selectedEntryRows.value
+
+        if (selection.isEmpty()) {
+            return
+        }
+
+        // TODO: Error handling
+        viewModelScope.launch {
+            for (entryId in selection) {
+                deliveryRepository.updateDeliveryEntryPurchasingAccount(entryId, newAccountId)
+            }
+        }
+    }
+
+    // TODO: These can be moved into a `EntryMutationProvider`...?
     fun saveEntry(body: EntryBody) {
         val current = deliveryViewer.state.value
 

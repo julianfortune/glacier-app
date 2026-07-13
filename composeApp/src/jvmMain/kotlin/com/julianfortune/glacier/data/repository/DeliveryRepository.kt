@@ -247,6 +247,40 @@ class DeliveryRepository(private val database: Database) {
         }
     }
 
+    suspend fun updateDeliveryEntryProgram(entryId: Long, programId: Long?): Result<Long> {
+        val now = Instant.now()
+
+        return Result.runCatching {
+            database.deliveryEntryQueries.updateProgramById(
+                programId,
+                now.epochSecond,
+                entryId,
+            )
+        }.map { rowsUpdated ->
+            return when {
+                rowsUpdated > 0 -> Result.success(entryId)
+                else -> Result.failure(IllegalStateException("DeliveryEntry was not updated"))
+            }
+        }
+    }
+
+    suspend fun updateDeliveryEntryPurchasingAccount(entryId: Long, purchasingAccountId: Long?): Result<Long> {
+        val now = Instant.now()
+
+        return Result.runCatching {
+            database.deliveryEntryQueries.updatePurchasingAccountById(
+                purchasingAccountId,
+                now.epochSecond,
+                entryId,
+            )
+        }.map { rowsUpdated ->
+            return when {
+                rowsUpdated > 0 -> Result.success(entryId)
+                else -> Result.failure(IllegalStateException("DeliveryEntry was not updated"))
+            }
+        }
+    }
+
     suspend fun deleteDeliveryEntryById(id: Long): Result<Long> {
         val rowsDeleted = database.deliveryEntryQueries.deleteById(id)
 

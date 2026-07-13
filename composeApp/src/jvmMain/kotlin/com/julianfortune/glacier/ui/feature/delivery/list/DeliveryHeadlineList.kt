@@ -23,6 +23,8 @@ fun DeliveryHeadlineList(
     val selectedId by viewModel.selectedId.collectAsState(null)
 
     val deliveryHeadlines by viewModel.allDeliveries.collectAsState(emptyList())
+
+    // TODO: This can be pushed down into the form component
     val supplierOptions by viewModel.supplierOptions.collectAsState(emptyList())
 
     var creationDialogIsOpen by remember { mutableStateOf(false) }

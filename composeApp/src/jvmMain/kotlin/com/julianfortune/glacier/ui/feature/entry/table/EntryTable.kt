@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Cases
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +25,7 @@ import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.feature.entry.form.EntryForm
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryAction
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryTableState
@@ -44,12 +44,17 @@ fun EntryTable(
     viewModel: EntryTableViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
     val itemOptions by viewModel.itemOptions.collectAsState(emptyList())
+    val programOptions by viewModel.programOptions.collectAsState(emptyList())
+    val accountOptions by viewModel.accountOptions.collectAsState(emptyList())
 
     Box {
         uiState?.let { state ->
             EntryTableUi(
                 state,
+                programOptions,
+                accountOptions,
                 viewModel::showAddEntry,
                 viewModel::showEditEntry,
                 viewModel::showDeleteEntry,
@@ -57,6 +62,8 @@ fun EntryTable(
                 viewModel::disableEntrySelection,
                 viewModel::onToggleAllEntriesSelection,
                 viewModel::onToggleEntrySelection,
+                viewModel::onBulkUpdateProgram,
+                viewModel::onBulkUpdateAccount,
                 viewModel::clearEntrySelection,
             )
 
@@ -128,6 +135,8 @@ fun EntryTable(
 @Composable
 fun EntryTableUi(
     state: EntryTableState,
+    programOptions: List<Option<Long>>,
+    accountOptions: List<Option<Long>>,
     onClickAddEntry: () -> Unit = {},
     onClickEditEntry: (entryId: Long) -> Unit = {},
     onClickDeleteEntry: (entryId: Long) -> Unit = {},
@@ -135,6 +144,8 @@ fun EntryTableUi(
     onClickDisableSelection: () -> Unit = {},
     onClickToggleAllEntries: () -> Unit = {},
     onClickToggleEntry: (isSelected: Boolean, entryId: Long) -> Unit = { _, _ -> },
+    onClickBulkUpdateProgram: (programId: Long?) -> Unit = {},
+    onClickBulkUpdateAccount: (accountId: Long?) -> Unit = {},
     onClickClearEntrySelection: () -> Unit = {},
 ) {
     Column(
@@ -185,20 +196,39 @@ fun EntryTableUi(
                         )
                         Spacer(Modifier.width(16.dp))
 
-                        SelectionProgramModifierMenu()
-
-                        SelectionAccountModifierMenu()
-
-                        IconButton(
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            onClick = {
+                        BulkEditProgramDropdownButton(enabled = selectionState.count > 0) { dismiss ->
+                            BulkEditLinkedProperty(
+                                "Bulk edit program",
+                                "Program*",
+                                programOptions,
+                            ) { newProgramId ->
+                                onClickBulkUpdateProgram(newProgramId)
+                                dismiss()
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Delete,
-                                contentDescription = "Delete entries",
-                            )
                         }
+
+                        BulkEditAccountDropdownButton(enabled = selectionState.count > 0) { dismiss ->
+                            BulkEditLinkedProperty(
+                                "Bulk edit account",
+                                "Account*",
+                                accountOptions,
+                            ) { newAccountId ->
+                                onClickBulkUpdateAccount(newAccountId)
+                                dismiss()
+                            }
+                        }
+
+//                        IconButton(
+//                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+//                            onClick = {
+//
+//                            }
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Outlined.Delete,
+//                                contentDescription = "Delete entries",
+//                            )
+//                        }
 
                         IconButton(
                             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
@@ -394,7 +424,10 @@ fun EntryRowHeaderText(text: String) {
 }
 
 @Composable
-fun SelectionProgramModifierMenu() {
+fun BulkEditProgramDropdownButton(
+    enabled: Boolean = true,
+    content: @Composable (dismiss: () -> Unit) -> Unit,
+) {
     SelectionModifierMenu(
         icon = {
             Icon(
@@ -403,34 +436,18 @@ fun SelectionProgramModifierMenu() {
             )
         },
         tooltipText = "Edit Program",
-    ) {
-        Column(
-            modifier = Modifier
-                .width(280.dp)
-                .padding(16.dp)
-        ) {
-            Text("Edit Program")
-
-            // TODO(#28)
-            AutocompleteSelect(
-                null,
-                emptyList(),
-                onSelectedChange = {},
-                label = { Text("Program") },
-            )
-
-            Button(
-                onClick = { },
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
-            ) {
-                Text("Save")
-            }
-        }
+        enabled = enabled,
+    ) { dismiss ->
+        content(dismiss)
     }
 }
 
+
 @Composable
-fun SelectionAccountModifierMenu() {
+fun BulkEditAccountDropdownButton(
+    enabled: Boolean = true,
+    content: @Composable (dismiss: () -> Unit) -> Unit,
+) {
     SelectionModifierMenu(
         icon = {
             Icon(
@@ -439,24 +456,47 @@ fun SelectionAccountModifierMenu() {
             )
         },
         tooltipText = "Edit Purchasing Account",
+        enabled = enabled,
+    ) { dismiss ->
+        content(dismiss)
+    }
+}
+
+@Composable
+fun BulkEditLinkedProperty(
+    title: String,
+    label: String,
+    options: List<Option<Long>>,
+    onSubmit: (newProgramId: Long?) -> Unit
+) {
+    var selectedId by remember { mutableStateOf<Long?>(null) }
+
+    Column(
+        modifier = Modifier
+            .width(320.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .width(280.dp)
-                .padding(16.dp)
+        Text(title)
+
+        AutocompleteSelect(
+            selectedId,
+            options,
+            onSelectedChange = {
+                selectedId = it?.id
+            },
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Row(
+            modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
         ) {
-            Text("Edit Account")
-
-            // TODO(#28)
-            AutocompleteSelect(
-                null,
-                emptyList(),
-                onSelectedChange = {},
-                label = { Text("Account") },
-            )
-
             Button(
-                onClick = { },
+                onClick = {
+                    onSubmit(selectedId)
+                },
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
             ) {
                 Text("Save")
@@ -465,12 +505,26 @@ fun SelectionAccountModifierMenu() {
     }
 }
 
+@Preview
+@Composable
+fun BulkEditLinkedPropertyPreview() = AppPreview {
+    BulkEditLinkedProperty(
+        "Edit Program",
+        "Program",
+        listOf(Option(1L, "Placeholder")),
+        {}
+    )
+}
+
+
+// TODO: This should live in common.foundation / common.component (and maybe be multiple)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectionModifierMenu(
     icon: @Composable () -> Unit,
     tooltipText: String,
-    content: @Composable () -> Unit
+    enabled: Boolean = true,
+    content: @Composable (dismiss: () -> Unit) -> Unit
 ) {
     var programPopoverOpen by remember { mutableStateOf(false) }
 
@@ -484,12 +538,14 @@ fun SelectionModifierMenu(
         ) {
             IconButton(
                 onClick = { programPopoverOpen = !programPopoverOpen },
+                enabled = enabled,
                 modifier = Modifier.pointerHoverIcon(PointerIcon.Hand)
             ) {
                 icon()
             }
         }
 
+        // TODO(P3): Try to fix alignment
         Box {
             if (programPopoverOpen) {
                 Popup(
@@ -504,7 +560,7 @@ fun SelectionModifierMenu(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerLow
                             )
                         ) {
-                            content()
+                            content { programPopoverOpen = false }
                         }
                     }
                 }
@@ -517,6 +573,8 @@ fun SelectionModifierMenu(
 @Composable
 fun EntryTablePreviewEmpty() = AppPreview {
     EntryTableUi(
-        EntryTableState.empty()
+        EntryTableState.empty(),
+        emptyList(),
+        emptyList(),
     )
 }

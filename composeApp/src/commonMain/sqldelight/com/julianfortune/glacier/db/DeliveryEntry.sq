@@ -96,3 +96,17 @@ SET
     purchasingAccountId = :purchasingAccountId,
     updatedAtEpochSeconds = :updatedAtEpochSeconds
 WHERE id = :id;
+
+updateProgramById:
+UPDATE DeliveryEntry
+SET
+    programId = :programId,
+    updatedAtEpochSeconds = :updatedAtEpochSeconds
+WHERE id = :id;
+
+updatePurchasingAccountById:
+UPDATE DeliveryEntry
+SET
+    purchasingAccountId = :purchasingAccountId,
+    updatedAtEpochSeconds = :updatedAtEpochSeconds
+WHERE id = :id;
