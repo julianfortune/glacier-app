@@ -20,6 +20,7 @@ import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryContent
 import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryDetailState
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.formatLocalDate
+import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,8 +34,8 @@ import java.time.format.FormatStyle
 class DeliveryDetailViewModel(
     private val deliveryRepository: DeliveryRepository,
     private val deliveryViewer: DeliveryViewer,
-    supplierRepository: SupplierRepository,
-) : ViewModel() {
+    supplierOptionsProvider: SupplierOptionsProvider
+) : ViewModel(), SupplierOptionsProvider by supplierOptionsProvider {
 
     private val _deliveryAction = mutableStateOf<DeliveryAction?>(null)
     val deliveryAction: State<DeliveryAction?> = _deliveryAction
@@ -55,17 +56,6 @@ class DeliveryDetailViewModel(
                 val fees = "$" + formatCents(delivery.feesCents ?: 0)
                 val taxes = "$" + formatCents(delivery.taxesCents ?: 0)
                 val total = "$" + formatCents(calculateDeliveryTotalCostCents(delivery))
-//
-//                val entrySelectionState = when (selections.size) {
-//                    0 -> ToggleableState.Off
-//                    else -> {
-//                        val unselectedEntries = delivery.entries.map { it.id }.toSet().minus(selections)
-//                        when (unselectedEntries.size) {
-//                            0 -> ToggleableState.On
-//                            else -> ToggleableState.Indeterminate
-//                        }
-//                    }
-//                }
 
                 val content = DeliveryContentState(
                     delivery.id,
@@ -90,16 +80,6 @@ class DeliveryDetailViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = DeliveryDetailState.Loading
     )
-
-    val supplierOptions = supplierRepository.getAll()
-        .map { suppliers ->
-            suppliers.map { Option(it.id, it.name) }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
 
     fun updateDelivery(id: Long, delivery: DeliveryBody) {
         viewModelScope.launch {
@@ -132,6 +112,7 @@ class DeliveryDetailViewModel(
                 )
                 _deliveryAction.value = DeliveryAction.Edit(delivery.id, body)
             }
+
             else -> {
                 // TODO(P2): Error handling ...
             }
@@ -143,6 +124,7 @@ class DeliveryDetailViewModel(
             is DeliveryViewerState.Viewing -> {
                 _deliveryAction.value = DeliveryAction.Delete(current.currentDelivery.id)
             }
+
             else -> {
                 // TODO(P2): Error handling ...
             }

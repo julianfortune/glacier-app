@@ -9,6 +9,10 @@ import com.julianfortune.glacier.data.repository.ProgramRepository
 import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.ui.common.provider.DefaultItemOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.DefaultSupplierOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.ItemOptionsProvider
+import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
 import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTableViewModel
@@ -23,6 +27,7 @@ import org.koin.dsl.module
 val appModule = module {
     single { Database(get()) }
 
+    // Repositories
     single { DeliveryRepository(get()) }
     single { CategoryRepository(get()) }
     single { ItemRepository(get()) }
@@ -30,9 +35,29 @@ val appModule = module {
     single { ProgramRepository(get()) }
     single { PurchasingAccountRepository(get()) }
 
-    // TODO: Figure out coroutine scope
-    single<DeliveryViewer> { DefaultDeliveryViewer(get(), CoroutineScope(Dispatchers.Default)) }
+    // View coordinators
+    single<DeliveryViewer> {
+        DefaultDeliveryViewer(
+            get(),
+            CoroutineScope(Dispatchers.Default),
+        )
+    }
 
+    // Providers
+    single<SupplierOptionsProvider> {
+        DefaultSupplierOptionsProvider(
+            supplierRepository = get(),
+            scope = CoroutineScope(Dispatchers.Default)
+        )
+    }
+    single<ItemOptionsProvider> {
+        DefaultItemOptionsProvider(
+            itemRepository = get(),
+            scope = CoroutineScope(Dispatchers.Default)
+        )
+    }
+
+    // ViewModels
     viewModel(named("categoryViewModel")) {
         NamedEntityPageViewModel(get<CategoryRepository>())
     }

@@ -9,6 +9,7 @@ import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.provider.ItemOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliverySubTotalCostCents
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliveryTotalWeightPounds
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateEntryTotalCostCents
@@ -24,8 +25,8 @@ import kotlinx.coroutines.launch
 class EntryTableViewModel(
     private val deliveryViewer: DeliveryViewer,
     private val deliveryRepository: DeliveryRepository,
-    private val itemRepository: ItemRepository,
-) : ViewModel() {
+    itemOptionsProvider: ItemOptionsProvider
+) : ViewModel(), ItemOptionsProvider by itemOptionsProvider {
 
     private val entryAction = MutableStateFlow<EntryAction?>(null)
     private val selectionEnabled = MutableStateFlow(false)
@@ -94,16 +95,6 @@ class EntryTableViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
     )
-
-    val itemOptions = itemRepository.getAll()
-        .map { items ->
-            items.map { Option(it.id, it.name) }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
 
     fun showAddEntry() {
         entryAction.value = EntryAction.Add

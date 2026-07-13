@@ -44,7 +44,7 @@ fun EntryTable(
     viewModel: EntryTableViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val itemOptions by viewModel.itemOptions.collectAsState()
+    val itemOptions by viewModel.itemOptions.collectAsState(emptyList())
 
     Box {
         uiState?.let { state ->

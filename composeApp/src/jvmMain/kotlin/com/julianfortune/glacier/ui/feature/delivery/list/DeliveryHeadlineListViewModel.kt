@@ -5,20 +5,20 @@ import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.viewer.DeliveryViewer
 import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
 import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.data.repository.SupplierRepository
-import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryHeadlineListViewModel(
     private val deliveryViewer: DeliveryViewer,
     private val deliveryRepository: DeliveryRepository,
-    supplierRepository: SupplierRepository
-) : ViewModel() {
+    supplierOptionsProvider: SupplierOptionsProvider
+) : ViewModel(), SupplierOptionsProvider by supplierOptionsProvider {
 
     sealed interface UiEvent {
         data class DeliveryCreated(val id: Long) : UiEvent
@@ -43,16 +43,6 @@ class DeliveryHeadlineListViewModel(
     // TODO(P3): Sorting, default: By receivedDate and then createdDatetime
     // TODO(P5): Filtering, e.g., by time period
     val allDeliveries = deliveryRepository.getAllAsHeadlines()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
-
-    val supplierOptions = supplierRepository.getAll()
-        .map { suppliers ->
-            suppliers.map { Option(it.id, it.name) }
-        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

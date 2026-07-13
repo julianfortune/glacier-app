@@ -271,8 +271,7 @@ class DeliveryRepositoryTest {
                 }
 
                 // THEN
-                println(result)
-                val firstEntry = result.entries.first()
+                val firstEntry = result!!.entries.first()
 
                 assertThat(firstEntry.item).isEqualTo(ItemHeadline(initialItemId, initialItemName))
                 assertThat(firstEntry.program).isEqualTo(Program(initialProgramId, initialProgramName))
