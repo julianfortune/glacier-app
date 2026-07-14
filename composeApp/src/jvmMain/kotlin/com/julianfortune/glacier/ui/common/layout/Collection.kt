@@ -38,18 +38,11 @@ fun <T : Entity> Collection(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (onClickCreateNew != null) {
-                        FilledTonalButton(
-                            onClick = {
-                                onClickCreateNew.invoke()
-                            },
-                            shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier.height(32.dp).pointerHoverIcon(PointerIcon.Hand),
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors().copy(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            ),
+                    onClickCreateNew?.let { onClick ->
+                        // TODO: `.height(32.dp)` would be better, but causes the text to become un-centered
+                        Button(
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            onClick = onClick,
                         ) {
                             Text("New")
                         }

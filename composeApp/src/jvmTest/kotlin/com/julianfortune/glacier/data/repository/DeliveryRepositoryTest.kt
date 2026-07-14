@@ -19,22 +19,18 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDate
 import kotlin.properties.Delegates
-import kotlin.random.Random
 
 class DeliveryRepositoryTest {
-
-    val random = Random(300)
 
     val database: Database = runBlocking { createTestDatabase() }
     val repository: DeliveryRepository = DeliveryRepository(database)
 
     @BeforeEach
     fun setUp(): Unit = runBlocking {
-        // Add some initial data to help prevent the id being 1 ( the number of rows mutated during most operations)
         val supplierId = database.supplierQueries.insert("Supplier 1").awaitAsOne()
 
-        // TODO: Doesn't seem to be advancing through the random series correctly
-        (1..random.nextInt(1, 5)).forEach {
+        // Add some initial data to help prevent the id being 1 ( the number of rows mutated during most operations)
+        (1..5).forEach {
             repository.insertDelivery(
                 LocalDate.of(2025, 1, it),
                 supplierId,
