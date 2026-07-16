@@ -5,22 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.util.formatCents
-import com.julianfortune.glacier.core.viewer.DeliveryViewer
-import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
+import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator
+import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.data.domain.CostStatus
 import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.data.repository.ItemRepository
-import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
-import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
 import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryAction
 import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryContentState
 import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryDetailState
-import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.formatLocalDate
-import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
+import com.julianfortune.glacier.ui.delegate.SupplierOptionsProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,18 +29,18 @@ import java.time.format.FormatStyle
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryDetailViewModel(
     private val deliveryRepository: DeliveryRepository,
-    private val deliveryViewer: DeliveryViewer,
+    private val deliveryViewCoordinator: DeliveryViewCoordinator,
     supplierOptionsProvider: SupplierOptionsProvider
 ) : ViewModel(), SupplierOptionsProvider by supplierOptionsProvider {
 
     private val _deliveryAction = mutableStateOf<DeliveryAction?>(null)
     val deliveryAction: State<DeliveryAction?> = _deliveryAction
 
-    val uiState: StateFlow<DeliveryDetailState> = deliveryViewer.state.map { viewerState ->
+    val uiState: StateFlow<DeliveryDetailState> = deliveryViewCoordinator.state.map { viewerState ->
         when (viewerState) {
-            is DeliveryViewerState.Empty -> DeliveryDetailState.Loading
-            is DeliveryViewerState.Loading -> DeliveryDetailState.Loading
-            is DeliveryViewerState.Viewing -> {
+            is DeliveryViewState.Empty -> DeliveryDetailState.Loading
+            is DeliveryViewState.Loading -> DeliveryDetailState.Loading
+            is DeliveryViewState.Viewing -> {
                 val delivery = viewerState.currentDelivery
                 val title = "Delivery " + formatLocalDate(
                     delivery.received,
@@ -96,13 +92,13 @@ class DeliveryDetailViewModel(
     fun deleteDelivery(deliveryId: Long) {
         viewModelScope.launch {
             deliveryRepository.deleteDeliveryById(deliveryId)
-            deliveryViewer.clear()
+            deliveryViewCoordinator.clear()
         }
     }
 
     fun showEditDelivery() {
-        when (val current = deliveryViewer.state.value) {
-            is DeliveryViewerState.Viewing -> {
+        when (val current = deliveryViewCoordinator.state.value) {
+            is DeliveryViewState.Viewing -> {
                 val delivery = current.currentDelivery
                 val body = DeliveryBody(
                     delivery.received,
@@ -120,8 +116,8 @@ class DeliveryDetailViewModel(
     }
 
     fun showDeleteDelivery() {
-        when (val current = deliveryViewer.state.value) {
-            is DeliveryViewerState.Viewing -> {
+        when (val current = deliveryViewCoordinator.state.value) {
+            is DeliveryViewState.Viewing -> {
                 _deliveryAction.value = DeliveryAction.Delete(current.currentDelivery.id)
             }
 

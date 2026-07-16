@@ -1,25 +1,25 @@
-package com.julianfortune.glacier.ui.common.provider
+package com.julianfortune.glacier.ui.delegate
 
-import com.julianfortune.glacier.data.repository.SupplierRepository
+import com.julianfortune.glacier.data.repository.ProgramRepository
 import com.julianfortune.glacier.ui.common.data.Option
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class DefaultSupplierOptionsProvider(
-    supplierRepository: SupplierRepository,
+class DefaultProgramOptionsProvider(
+    programRepository: ProgramRepository,
     scope: CoroutineScope
-) : SupplierOptionsProvider {
+) : ProgramOptionsProvider {
 
-    override val supplierOptions = supplierRepository.getAll()
-        .map { suppliers ->
-            suppliers.map { Option(it.id, it.name) }
+    override val programOptions = programRepository.getAll()
+        .map { xs ->
+            xs.map { Option(it.id, it.name) }
         }
         .stateIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList()
         )
-    
+
 }

@@ -4,13 +4,12 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.util.formatCents
-import com.julianfortune.glacier.core.viewer.DeliveryViewer
-import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
+import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator
+import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.ui.common.provider.DefaultPurchasingAccountOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.ItemOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.ProgramOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.PurchasingAccountOptionsProvider
+import com.julianfortune.glacier.ui.delegate.ItemOptionsProvider
+import com.julianfortune.glacier.ui.delegate.ProgramOptionsProvider
+import com.julianfortune.glacier.ui.delegate.PurchasingAccountOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliverySubTotalCostCents
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliveryTotalWeightPounds
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateEntryTotalCostCents
@@ -24,7 +23,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class EntryTableViewModel(
-    private val deliveryViewer: DeliveryViewer,
+    private val deliveryViewCoordinator: DeliveryViewCoordinator,
     private val deliveryRepository: DeliveryRepository,
     itemOptionsProvider: ItemOptionsProvider,
     programOptionsProvider: ProgramOptionsProvider,
@@ -39,14 +38,14 @@ class EntryTableViewModel(
     private val selectedEntryRows = MutableStateFlow<Set<Long>>(emptySet())
 
     val uiState: StateFlow<EntryTableState?> = combine(
-        deliveryViewer.state,
+        deliveryViewCoordinator.state,
         entryAction,
         selectionEnabled,
         selectedEntryRows,
     ) { viewerState, entryAction, selectionEnabled, selections ->
         when (viewerState) {
-            is DeliveryViewerState.Empty, is DeliveryViewerState.Loading -> null
-            is DeliveryViewerState.Viewing -> {
+            is DeliveryViewState.Empty, is DeliveryViewState.Loading -> null
+            is DeliveryViewState.Viewing -> {
                 val delivery = viewerState.currentDelivery
 
                 val selectionState = when {
@@ -107,8 +106,8 @@ class EntryTableViewModel(
     }
 
     fun showEditEntry(entryId: Long) {
-        when (val current = deliveryViewer.state.value) {
-            is DeliveryViewerState.Viewing -> {
+        when (val current = deliveryViewCoordinator.state.value) {
+            is DeliveryViewState.Viewing -> {
                 // TODO(P1): Better error handling ...
                 val entry = current.currentDelivery.entries.find { it.id == entryId }!!
                 val body = EntryBody(
@@ -150,9 +149,9 @@ class EntryTableViewModel(
     }
 
     fun onToggleAllEntriesSelection() {
-        val current = deliveryViewer.state.value
+        val current = deliveryViewCoordinator.state.value
 
-        if (current !is DeliveryViewerState.Viewing) {
+        if (current !is DeliveryViewState.Viewing) {
             // TODO(P2): Error handling ...
             return
         }
@@ -206,9 +205,9 @@ class EntryTableViewModel(
 
     // TODO: These can be moved into a `EntryMutationProvider`...?
     fun saveEntry(body: EntryBody) {
-        val current = deliveryViewer.state.value
+        val current = deliveryViewCoordinator.state.value
 
-        if (current !is DeliveryViewerState.Viewing) {
+        if (current !is DeliveryViewState.Viewing) {
             // TODO(P2): Error handling ...
             return
         }

@@ -1,6 +1,6 @@
-package com.julianfortune.glacier.core.viewer
+package com.julianfortune.glacier.ui.coordinator.delivery
 
-import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
+import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.data.common.EntityMetadata
 import com.julianfortune.glacier.data.domain.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.time.Instant
 import java.time.LocalDate
 
-class MockDeliveryViewer(state: DeliveryViewerState?) : DeliveryViewer {
+class MockDeliveryViewCoordinator(state: DeliveryViewState?) : DeliveryViewCoordinator {
 
     private val _state = MutableStateFlow(
-        state ?: DeliveryViewerState.Viewing(
+        state ?: DeliveryViewState.Viewing(
             Delivery(
                 1,
                 LocalDate.now(),

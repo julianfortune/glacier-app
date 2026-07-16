@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.repository.ItemRepository
-import com.julianfortune.glacier.ui.common.provider.CategoryOptionsProvider
-import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
+import com.julianfortune.glacier.ui.delegate.CategoryOptionsProvider
 import com.julianfortune.glacier.ui.page.item.data.ItemBody
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted

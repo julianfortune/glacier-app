@@ -2,10 +2,10 @@ package com.julianfortune.glacier.ui.feature.delivery.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.core.viewer.DeliveryViewer
-import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
+import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator
+import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.data.repository.DeliveryRepository
-import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
+import com.julianfortune.glacier.ui.delegate.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DeliveryHeadlineListViewModel(
-    private val deliveryViewer: DeliveryViewer,
+    private val deliveryViewCoordinator: DeliveryViewCoordinator,
     private val deliveryRepository: DeliveryRepository,
     supplierOptionsProvider: SupplierOptionsProvider
 ) : ViewModel(), SupplierOptionsProvider by supplierOptionsProvider {
@@ -32,11 +32,11 @@ class DeliveryHeadlineListViewModel(
             initialValue = null
         )
 
-    val selectedId = deliveryViewer.state.map {
+    val selectedId = deliveryViewCoordinator.state.map {
         when (it) {
-            DeliveryViewerState.Empty -> null
-            DeliveryViewerState.Loading -> null
-            is DeliveryViewerState.Viewing -> it.currentDelivery.id
+            DeliveryViewState.Empty -> null
+            DeliveryViewState.Loading -> null
+            is DeliveryViewState.Viewing -> it.currentDelivery.id
         }
     }
 
@@ -50,7 +50,7 @@ class DeliveryHeadlineListViewModel(
         )
 
     fun onSelect(id: Long) {
-        deliveryViewer.view(id)
+        deliveryViewCoordinator.view(id)
     }
 
     fun saveNewDelivery(delivery: DeliveryBody) {
@@ -64,7 +64,7 @@ class DeliveryHeadlineListViewModel(
 
             result.map { newId ->
                 _uiEventChannel.send(UiEvent.DeliveryCreated(newId))
-                deliveryViewer.view(newId)
+                deliveryViewCoordinator.view(newId)
             }
             // TODO(P3): Error handling
         }

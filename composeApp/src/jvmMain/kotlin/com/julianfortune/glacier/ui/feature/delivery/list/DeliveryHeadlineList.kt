@@ -62,7 +62,6 @@ fun DeliveryHeadlineList(
                     modifier = modifier.clickable(
                         enabled = true,
                         onClick = {
-                            // TODO
                             viewModel.onSelect(c.id)
                         }
                     ),

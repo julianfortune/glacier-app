@@ -1,6 +1,6 @@
-package com.julianfortune.glacier.core.viewer
+package com.julianfortune.glacier.ui.coordinator.delivery
 
-import com.julianfortune.glacier.core.viewer.data.DeliveryViewerState
+import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.data.domain.Delivery
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import kotlinx.coroutines.CoroutineScope
@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultDeliveryViewer(
+class DefaultDeliveryViewCoordinator(
     deliveryRepository: DeliveryRepository,
     coroutineScope: CoroutineScope,
-) : DeliveryViewer {
+) : DeliveryViewCoordinator {
 
     private val _targetDeliveryId = MutableStateFlow<Long?>(null)
 
@@ -26,16 +26,16 @@ class DefaultDeliveryViewer(
         id?.let { deliveryRepository.getDeliveryById(it) } ?: flowOf(null)
     }
 
-    override val state: StateFlow<DeliveryViewerState> = combine(_delivery, _targetDeliveryId) { delivery, targetId ->
+    override val state: StateFlow<DeliveryViewState> = combine(_delivery, _targetDeliveryId) { delivery, targetId ->
         when {
-            targetId == null -> DeliveryViewerState.Empty
-            delivery != null && delivery.id == targetId -> DeliveryViewerState.Viewing(delivery)
-            else -> DeliveryViewerState.Loading
+            targetId == null -> DeliveryViewState.Empty
+            delivery != null && delivery.id == targetId -> DeliveryViewState.Viewing(delivery)
+            else -> DeliveryViewState.Loading
         }
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = DeliveryViewerState.Empty,
+        initialValue = DeliveryViewState.Empty,
     )
 
     override fun view(deliveryId: Long) {

@@ -20,7 +20,7 @@ import java.time.format.FormatStyle
 fun ReportHeadlineList(
     viewModel: ReportHeadlineListViewModel = koinViewModel(),
 ) {
-    val selectedId = null // TODO: `by viewModel.selectedId.collectAsState(null)`
+    val selectedId by viewModel.selectedId.collectAsState(null)
     val reportHeadlines by viewModel.allReports.collectAsState(emptyList())
 
     Collection(
@@ -43,7 +43,7 @@ fun ReportHeadlineList(
                     modifier = modifier.clickable(
                         enabled = true,
                         onClick = {
-                            // TODO ...
+                            viewModel.onSelect(report.id)
                         }
                     ),
                     tonalElevation = elevation,

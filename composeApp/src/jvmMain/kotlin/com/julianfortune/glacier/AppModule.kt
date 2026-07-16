@@ -1,7 +1,7 @@
 package com.julianfortune.glacier
 
-import com.julianfortune.glacier.core.viewer.DefaultDeliveryViewer
-import com.julianfortune.glacier.core.viewer.DeliveryViewer
+import com.julianfortune.glacier.ui.coordinator.delivery.DefaultDeliveryViewCoordinator
+import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator
 import com.julianfortune.glacier.data.repository.BasicReportRepository
 import com.julianfortune.glacier.data.repository.CategoryRepository
 import com.julianfortune.glacier.data.repository.DeliveryRepository
@@ -10,16 +10,18 @@ import com.julianfortune.glacier.data.repository.ProgramRepository
 import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
-import com.julianfortune.glacier.ui.common.provider.CategoryOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.DefaultCategoryOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.DefaultItemOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.DefaultProgramOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.DefaultPurchasingAccountOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.DefaultSupplierOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.ItemOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.ProgramOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.PurchasingAccountOptionsProvider
-import com.julianfortune.glacier.ui.common.provider.SupplierOptionsProvider
+import com.julianfortune.glacier.ui.coordinator.report.DefaultReportViewCoordinator
+import com.julianfortune.glacier.ui.coordinator.report.ReportViewCoordinator
+import com.julianfortune.glacier.ui.delegate.CategoryOptionsProvider
+import com.julianfortune.glacier.ui.delegate.DefaultCategoryOptionsProvider
+import com.julianfortune.glacier.ui.delegate.DefaultItemOptionsProvider
+import com.julianfortune.glacier.ui.delegate.DefaultProgramOptionsProvider
+import com.julianfortune.glacier.ui.delegate.DefaultPurchasingAccountOptionsProvider
+import com.julianfortune.glacier.ui.delegate.DefaultSupplierOptionsProvider
+import com.julianfortune.glacier.ui.delegate.ItemOptionsProvider
+import com.julianfortune.glacier.ui.delegate.ProgramOptionsProvider
+import com.julianfortune.glacier.ui.delegate.PurchasingAccountOptionsProvider
+import com.julianfortune.glacier.ui.delegate.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
 import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTableViewModel
@@ -45,14 +47,20 @@ val appModule = module {
     single { PurchasingAccountRepository(get()) }
 
     // View coordinators
-    single<DeliveryViewer> {
-        DefaultDeliveryViewer(
+    single<DeliveryViewCoordinator> {
+        DefaultDeliveryViewCoordinator(
+            get(),
+            CoroutineScope(Dispatchers.Default),
+        )
+    }
+    single<ReportViewCoordinator> {
+        DefaultReportViewCoordinator(
             get(),
             CoroutineScope(Dispatchers.Default),
         )
     }
 
-    // ViewModel capability providers
+    // ViewModel delegates
     single<CategoryOptionsProvider> {
         DefaultCategoryOptionsProvider(
             categoryRepository = get(),
@@ -121,7 +129,7 @@ val appModule = module {
         NamedEntityPageViewModel(get<PurchasingAccountRepository>())
     }
     viewModel {
-        ReportHeadlineListViewModel(get())
+        ReportHeadlineListViewModel(get(), get())
     }
     viewModel(named("supplierViewModel")) {
         NamedEntityPageViewModel(get<SupplierRepository>())
