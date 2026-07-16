@@ -3,6 +3,7 @@ package com.julianfortune.glacier.data.repository
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.createTestDatabase
+import com.julianfortune.glacier.data.domain.BasicReport
 import com.julianfortune.glacier.data.domain.CostStatus
 import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.domain.Program
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDate
+import kotlin.collections.first
 import kotlin.properties.Delegates
 
 class DeliveryRepositoryTest {

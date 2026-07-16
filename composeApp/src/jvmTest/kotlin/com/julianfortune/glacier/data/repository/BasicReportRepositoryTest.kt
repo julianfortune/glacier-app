@@ -102,12 +102,12 @@ class BasicReportRepositoryTest {
         assertThat(storedReport.name).isEqualTo(name)
 
         // Verify foreign keys directly against our variables (handles both null and non-null cases)
-        assertThat(storedReport.filter.item?.id).isEqualTo(itemId)
-        assertThat(storedReport.filter.category?.id).isEqualTo(itemCategoryId)
-        assertThat(storedReport.filter.costStatus).isEqualTo(costStatus)
-        assertThat(storedReport.filter.program?.id).isEqualTo(programId)
-        assertThat(storedReport.filter.purchasingAccount?.id).isEqualTo(purchasingAccountId)
-        assertThat(storedReport.filter.supplier?.id).isEqualTo(supplierId)
+        assertThat(storedReport.criteria.item?.id).isEqualTo(itemId)
+        assertThat(storedReport.criteria.category?.id).isEqualTo(itemCategoryId)
+        assertThat(storedReport.criteria.costStatus).isEqualTo(costStatus)
+        assertThat(storedReport.criteria.program?.id).isEqualTo(programId)
+        assertThat(storedReport.criteria.purchasingAccount?.id).isEqualTo(purchasingAccountId)
+        assertThat(storedReport.criteria.supplier?.id).isEqualTo(supplierId)
     }
 
     @Nested
@@ -163,7 +163,7 @@ class BasicReportRepositoryTest {
 
             assertThat(storedReport).isNotNull()
             assertThat(storedReport!!.name).isEqualTo(updatedName)
-            assertThat(storedReport.filter.costStatus).isEqualTo(CostStatus.PURCHASED)
+            assertThat(storedReport.criteria.costStatus).isEqualTo(CostStatus.PURCHASED)
         }
 
         @Test
@@ -177,8 +177,8 @@ class BasicReportRepositoryTest {
             assertThat(result).isNotNull()
             assertThat(result!!.id).isEqualTo(reportId)
             assertThat(result.name).isEqualTo(initialName)
-            assertThat(result.start).isEqualTo(initialStart)
-            assertThat(result.end).isEqualTo(initialEnd)
+            assertThat(result.criteria.start).isEqualTo(initialStart)
+            assertThat(result.criteria.end).isEqualTo(initialEnd)
         }
 
         @Test

@@ -7,12 +7,12 @@ import java.time.LocalDate
 data class BasicReport(
     override val id: Long,
     val name: String,
-    val start: LocalDate,
-    val end: LocalDate,
-    val filter: Filter,
+    val criteria: Criteria,
     val metadata: EntityMetadata,
 ) : Entity {
-    data class Filter(
+    data class Criteria(
+        val start: LocalDate,
+        val end: LocalDate,
         val item: ItemHeadline?,
         val category: Category?,
         val costStatus: CostStatus?,

@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.data.repository
 
+import androidx.compose.runtime.snapshots.toInt
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -7,6 +8,7 @@ import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.data.common.EntityMetadata
+import com.julianfortune.glacier.data.domain.BasicReport
 import com.julianfortune.glacier.data.domain.CostStatus
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.Delivery
@@ -14,6 +16,7 @@ import com.julianfortune.glacier.data.domain.DeliveryHeadline
 import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.domain.Program
 import com.julianfortune.glacier.data.domain.PurchasingAccount
+import com.julianfortune.glacier.data.domain.ReportResult
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.db.GetByDeliveryId
@@ -181,10 +184,10 @@ class DeliveryRepository(private val database: Database) {
         unitWeight: Weight,
         costStatus: CostStatus,
         unitCostCents: Long,
-        itemWeight: Weight?,
-        itemsPerUnit: Long?,
-        programId: Long?,
-        purchasingAccountId: Long?,
+        itemWeight: Weight? = null,
+        itemsPerUnit: Long? = null,
+        programId: Long? = null,
+        purchasingAccountId: Long? = null,
     ): Result<Long> {
         val now = Instant.now()
         val costStatus = CostStatusCodec.serialize(costStatus)

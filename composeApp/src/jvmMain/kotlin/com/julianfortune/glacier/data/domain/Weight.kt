@@ -10,6 +10,7 @@ import java.math.RoundingMode
 data class Weight(val centigrams: Long) {
 
     companion object Companion {
+        const val CENTIGRAMS_PER_KG = 100
         const val GRAMS_PER_OZ = 28.3495
         const val OZ_PER_POUND = 16
 
@@ -24,6 +25,12 @@ data class Weight(val centigrams: Long) {
             assert(centigrams <= Long.MAX_VALUE.toBigInteger()) { "`Weight`s must fit in 8 bytes" }
 
             return ofCentigrams(centigrams.toLong())
+        }
+
+        fun ofKilograms(kg: Long): Weight {
+            assert(kg >= 0) { "`Weight`s must be positive" }
+
+            return Weight(kg * CENTIGRAMS_PER_KG)
         }
 
         fun ofImperial(pounds: Int, ounces: Float): Weight {

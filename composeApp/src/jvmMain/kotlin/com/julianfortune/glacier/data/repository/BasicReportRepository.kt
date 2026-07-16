@@ -85,9 +85,9 @@ class BasicReportRepository(private val database: Database) {
                     BasicReport(
                         row.id,
                         row.name,
-                        start,
-                        end,
-                        BasicReport.Filter(
+                        BasicReport.Criteria(
+                            start,
+                            end,
                             item,
                             category,
                             costStatus,

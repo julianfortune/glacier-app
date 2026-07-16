@@ -33,7 +33,6 @@ getById: -- Only used for testing
 SELECT *
 FROM DeliveryEntry
 WHERE id = :id
-ORDER BY createdAtEpochSeconds ASC
 LIMIT 1;
 
 getByDeliveryId:
@@ -48,6 +47,55 @@ FROM DeliveryEntry
     LEFT JOIN PurchasingAccount ON DeliveryEntry.purchasingAccountId = PurchasingAccount.id
 WHERE DeliveryEntry.deliveryId = :deliveryId
 ORDER BY createdAtEpochSeconds ASC;
+
+-- Gets report results for a BasicReport
+getStatisticsByBasicReportCriteria:
+SELECT
+    COUNT(DISTINCT Delivery.id) AS deliveryCount, -- Count of deliviries included
+    COUNT(DeliveryEntry.id) AS entryCount, -- Count of delivery entry rows included
+    SUM(DeliveryEntry.unitCostCents * DeliveryEntry.unitCount) AS totalCostCents, -- Total cost
+    -- TODO: Confirm this won't overflow
+    SUM(DeliveryEntry.unitWeightCentigrams * DeliveryEntry.unitCount) AS totalWeightCentigrams -- Total weight
+FROM DeliveryEntry
+    LEFT JOIN Delivery ON DeliveryEntry.deliveryId = Delivery.id
+    LEFT JOIN ItemCategory ON DeliveryEntry.itemId = ItemCategory.itemId
+WHERE (Delivery.receivedDate BETWEEN :startDate AND :endDate) -- Inclusive range
+    AND (:itemId IS NULL OR DeliveryEntry.itemId = :itemId)
+    AND (:itemCategoryId IS NULL OR ItemCategory.categoryId = :itemCategoryId)
+    AND (:costStatus IS NULL OR DeliveryEntry.costStatus = :costStatus)
+    AND (:programId IS NULL OR DeliveryEntry.programId = :programId)
+    AND (:purchasingAccountId IS NULL OR DeliveryEntry.purchasingAccountId = :purchasingAccountId)
+    AND (:supplierId IS NULL OR Delivery.supplierId = :supplierId)
+LIMIT 1
+;
+
+-- Gets all matching rows for a BasicReport
+getAllByBasicReportCriteriaPaginated:
+SELECT
+    DeliveryEntry.*,
+    Item.name AS itemName,
+    Program.name AS programName,
+    PurchasingAccount.name AS purchasingAccountName,
+    Delivery.receivedDate AS deliveryReceivedDate,
+    Delivery.supplierId AS deliverySupplierId,
+    ItemCategory.categoryId AS itemCategoryId
+FROM DeliveryEntry
+    LEFT JOIN Delivery ON DeliveryEntry.deliveryId = Delivery.id
+    LEFT JOIN ItemCategory ON DeliveryEntry.itemId = ItemCategory.itemId
+    LEFT JOIN Item ON DeliveryEntry.itemId = Item.id
+    LEFT JOIN Program ON DeliveryEntry.programId = Program.id
+    LEFT JOIN PurchasingAccount ON DeliveryEntry.purchasingAccountId = PurchasingAccount.id
+WHERE Delivery.receivedDate BETWEEN :startDate AND :endDate -- Inclusive range
+    AND (:itemId IS NULL OR DeliveryEntry.itemId = :itemId)
+    AND (:itemCategoryId IS NULL OR ItemCategory.categoryId = :itemCategoryId)
+    AND (:costStatus IS NULL OR DeliveryEntry.costStatus = :costStatus)
+    AND (:programId IS NULL OR DeliveryEntry.programId = :programId)
+    AND (:purchasingAccountId IS NULL OR DeliveryEntry.purchasingAccountId = :purchasingAccountId)
+    AND (:supplierId IS NULL OR Delivery.supplierId = :supplierId)
+ORDER BY Delivery.receivedDate ASC, DeliveryEntry.id ASC -- Ensures pages are stable
+LIMIT :limit
+OFFSET :offset
+;
 
 deleteById:
 DELETE FROM DeliveryEntry WHERE id = :id;
