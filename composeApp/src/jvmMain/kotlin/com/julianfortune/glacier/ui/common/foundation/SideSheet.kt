@@ -2,58 +2,147 @@ package com.julianfortune.glacier.ui.common.foundation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 
+
+/**
+ * SideSheet for displaying static content
+ */
 @Composable
 fun SideSheet(
-    // TODO(P0): Update to have `isVisible: Boolean` and be fully controlled
-    //  (and use `onDismissRequest: () -> Unit = {},` instead of `isDismissable`)
-    onClose: () -> Unit,
-    isDismissable: Boolean = true,
-    scrimAlpha: Float = 0.6f,
-    color: Color = MaterialTheme.colorScheme.background,
+    isVisible: Boolean,
+    onDismissRequest: () -> Unit = {},
+    shape: Shape = RectangleShape,
+    color: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = contentColorFor(color),
     tonalElevation: Dp = 0.dp,
-    content: @Composable (close: () -> Unit) -> Unit,
+    shadowElevation: Dp = 0.dp,
+    border: BorderStroke? = null,
+    weight: Float? = null,
+    backdropColor: Color = Color.Black.copy(alpha = 0.6f),
+    backdropWidth: Dp? = null,    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
-    val isVisible = remember { MutableTransitionState(false).apply { targetState = true } }
+    val visibleState = remember { MutableTransitionState(isVisible) }
 
-    val close = {
-        isVisible.targetState = false
+    LaunchedEffect(isVisible) {
+        visibleState.targetState = isVisible
     }
 
-    val onDismissRequest = {
-        if (isDismissable) {
-            close()
+    SideSheetUi(
+        visibleState,
+        onDismissRequest = onDismissRequest,
+        shape = shape,
+        color = color,
+        contentColor = contentColor,
+        tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
+        border = border,
+        weight = weight,
+        backdropColor = backdropColor,
+        backdropWidth = backdropWidth,
+        modifier = modifier,
+    ) {
+        content()
+    }
+}
+
+
+/**
+ * SideSheet for displaying static content based on `state`
+ */
+@Composable
+fun <State> SideSheet(
+    state: State?,
+    onDismissRequest: () -> Unit = {},
+    shape: Shape = RectangleShape,
+    color: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = contentColorFor(color),
+    tonalElevation: Dp = 0.dp,
+    shadowElevation: Dp = 0.dp,
+    border: BorderStroke? = null,
+    weight: Float? = null,
+    backdropColor: Color = Color.Black.copy(alpha = 0.6f),
+    backdropWidth: Dp? = null,
+    modifier: Modifier = Modifier,
+    content: @Composable (currentState: State) -> Unit,
+) {
+    val cachedState = remember { mutableStateOf(state) }
+    val visibleState = remember { MutableTransitionState(state != null) }
+
+    LaunchedEffect(state) {
+        when (state) {
+            // Initiate close animation but retain the cached value to preserve `content` during animation out
+            null -> visibleState.targetState = false
+            // Initiate the opening animation and cache the state value
+            else -> {
+                cachedState.value = state
+                visibleState.targetState = true
+            }
         }
     }
 
-    // Notify the parent when the side sheet has closed
-    LaunchedEffect(isVisible.currentState, isVisible.targetState) {
-        if (isVisible.targetState == false && isVisible.currentState == false) {
-            onClose()
+    SideSheetUi(
+        visibleState,
+        onDismissRequest = onDismissRequest,
+        shape = shape,
+        color = color,
+        contentColor = contentColor,
+        tonalElevation = tonalElevation,
+        shadowElevation = shadowElevation,
+        border = border,
+        weight = weight,
+        backdropColor = backdropColor,
+        backdropWidth = backdropWidth,
+        modifier = modifier,
+    ) {
+        cachedState.value?.let { currentState ->
+            content(currentState)
         }
     }
+}
 
-    val isTransitioning = isVisible.currentState != isVisible.targetState
-    if (isTransitioning || isVisible.currentState) {
+@Composable
+fun SideSheetUi(
+    visibleState: MutableTransitionState<Boolean> = remember { MutableTransitionState(true) },
+    onDismissRequest: () -> Unit = {},
+    shape: Shape = RectangleShape,
+    color: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = contentColorFor(color),
+    tonalElevation: Dp = 0.dp,
+    shadowElevation: Dp = 0.dp,
+    border: BorderStroke? = null,
+    weight: Float? = null,
+    backdropColor: Color = Color.Black.copy(alpha = 0.6f),
+    backdropWidth: Dp? = null,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val isTransitioning = visibleState.currentState != visibleState.targetState
+    if (isTransitioning || visibleState.currentState) {
         Popup(
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(
@@ -64,14 +153,14 @@ fun SideSheet(
 
                 // Darkening backdrop
                 AnimatedVisibility(
-                    visibleState = isVisible,
+                    visibleState = visibleState,
                     enter = fadeIn(),
                     exit = fadeOut(),
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = scrimAlpha))
+                            .background(backdropColor)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -82,20 +171,58 @@ fun SideSheet(
                 }
 
                 AnimatedVisibility(
-                    visibleState = isVisible,
+                    visibleState = visibleState,
                     enter = slideIn(initialOffset = { IntOffset(x = it.width, y = 0) }),
                     exit = slideOut { IntOffset(x = it.width, y = 0) },
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxHeight(),
-                        tonalElevation = tonalElevation,
-                        color = color,
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.End,
                     ) {
-                        content(close)
+                        val spacerModifier = when (backdropWidth) {
+                            null -> Modifier.weight(1f, true)
+                            else -> Modifier.width(backdropWidth)
+                        }
+
+                        Spacer(spacerModifier)
+
+                        val surfaceModifier = when (weight) {
+                            null -> modifier.fillMaxHeight()
+                            else -> modifier.fillMaxHeight().weight(weight)
+                        }
+
+                        Surface(
+                            modifier = surfaceModifier,
+                            shape = shape,
+                            color = color,
+                            contentColor = contentColor,
+                            tonalElevation = tonalElevation,
+                            shadowElevation = shadowElevation,
+                            border = border,
+                        ) {
+                            content()
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun SideSheetPreview() {
+    MaterialTheme {
+        SideSheetUi(
+            weight = 1f
+        ) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text("Hello, world!")
             }
         }
     }

@@ -10,21 +10,20 @@ import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.common.foundation.SideSheet
 
 @Composable
-fun EntrySideSheet(
-    onClose: () -> Unit,
-    content: @Composable (close: () -> Unit) -> Unit,
+fun <State> EntrySideSheet(
+    state: State?,
+    onDismissRequest: () -> Unit = {},
+    content: @Composable (currentState: State) -> Unit,
 ) {
     SideSheet(
-        onClose = onClose,
+        state,
+        onDismissRequest = onDismissRequest,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
         tonalElevation = 1.dp,
-    ) { dismissSheet ->
-        Column(
-            modifier = Modifier
-                .width(640.dp)
-                .padding(16.dp),
-        ) {
-            content(dismissSheet)
+        modifier = Modifier.width(640.dp),
+    ) { currentState ->
+        Column(modifier = Modifier.padding(16.dp)) {
+            content(currentState)
         }
     }
 }

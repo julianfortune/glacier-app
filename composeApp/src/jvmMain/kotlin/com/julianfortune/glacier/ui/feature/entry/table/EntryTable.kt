@@ -26,6 +26,7 @@ import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.common.foundation.SideSheet
 import com.julianfortune.glacier.ui.feature.entry.form.EntryForm
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryAction
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryTableState
@@ -67,47 +68,44 @@ fun EntryTable(
                 viewModel::clearEntrySelection,
             )
 
-            // TODO: Move inside `..Ui()` below
+            EntrySideSheet(
+                state = (state.action as? EntryAction.Add),
+                onDismissRequest = { viewModel.cancelEntryOperation() },
+            ) {
+                EntryForm(
+                    "New Entry",
+                    "Create",
+                    itemOptions,
+                    onCancel = {
+                        viewModel.cancelEntryOperation()
+                    },
+                    onSubmit = { entry ->
+                        viewModel.saveEntry(entry)
+                        viewModel.cancelEntryOperation()
+                    }
+                )
+            }
+
+            EntrySideSheet(
+                state = (state.action as? EntryAction.Edit),
+                onDismissRequest = { viewModel.cancelEntryOperation() },
+            ) { editAction ->
+                EntryForm(
+                    "Edit Entry",
+                    "Update",
+                    itemOptions,
+                    initialEntry = editAction.entry,
+                    onCancel = {
+                        viewModel.cancelEntryOperation()
+                    },
+                    onSubmit = { newEntry ->
+                        viewModel.updateEntry(editAction.id, newEntry)
+                        viewModel.cancelEntryOperation()
+                    }
+                )
+            }
+
             when (val action = state.action) {
-                is EntryAction.Add -> {
-                    EntrySideSheet(
-                        onClose = { viewModel.cancelEntryOperation() }
-                    ) { dismissSheet ->
-                        EntryForm(
-                            "New Entry",
-                            "Create",
-                            itemOptions,
-                            onCancel = {
-                                dismissSheet()
-                            },
-                            onSubmit = { entry ->
-                                viewModel.saveEntry(entry)
-                                dismissSheet()
-                            }
-                        )
-                    }
-                }
-
-                is EntryAction.Edit -> {
-                    EntrySideSheet(
-                        onClose = { viewModel.cancelEntryOperation() }
-                    ) { dismissSheet ->
-                        EntryForm(
-                            "Edit Entry",
-                            "Update",
-                            itemOptions,
-                            initialEntry = action.entry,
-                            onCancel = {
-                                dismissSheet()
-                            },
-                            onSubmit = { newEntry ->
-                                viewModel.updateEntry(action.id, newEntry)
-                                dismissSheet()
-                            }
-                        )
-                    }
-                }
-
                 is EntryAction.Delete -> {
                     Dialog(
                         onDismissRequest = { viewModel.cancelEntryOperation() },
@@ -126,7 +124,7 @@ fun EntryTable(
                     }
                 }
 
-                null -> Unit
+                else -> Unit
             }
         }
     }
