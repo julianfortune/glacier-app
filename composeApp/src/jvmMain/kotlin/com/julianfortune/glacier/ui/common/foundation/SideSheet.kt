@@ -42,8 +42,9 @@ fun SideSheet(
     shadowElevation: Dp = 0.dp,
     border: BorderStroke? = null,
     weight: Float? = null,
-    backdropColor: Color = Color.Black.copy(alpha = 0.6f),
-    backdropWidth: Dp? = null,    modifier: Modifier = Modifier,
+    scrimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
+    leadingSpaceWidth: Dp? = null,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val visibleState = remember { MutableTransitionState(isVisible) }
@@ -62,8 +63,8 @@ fun SideSheet(
         shadowElevation = shadowElevation,
         border = border,
         weight = weight,
-        backdropColor = backdropColor,
-        backdropWidth = backdropWidth,
+        scrimColor = scrimColor,
+        leadingSpaceWidth = leadingSpaceWidth,
         modifier = modifier,
     ) {
         content()
@@ -72,7 +73,7 @@ fun SideSheet(
 
 
 /**
- * SideSheet for displaying static content based on `state`
+ * SideSheet for displaying dynamic content based on `state`
  */
 @Composable
 fun <State> SideSheet(
@@ -85,8 +86,8 @@ fun <State> SideSheet(
     shadowElevation: Dp = 0.dp,
     border: BorderStroke? = null,
     weight: Float? = null,
-    backdropColor: Color = Color.Black.copy(alpha = 0.6f),
-    backdropWidth: Dp? = null,
+    scrimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
+    leadingSpaceWidth: Dp? = null,
     modifier: Modifier = Modifier,
     content: @Composable (currentState: State) -> Unit,
 ) {
@@ -115,8 +116,8 @@ fun <State> SideSheet(
         shadowElevation = shadowElevation,
         border = border,
         weight = weight,
-        backdropColor = backdropColor,
-        backdropWidth = backdropWidth,
+        scrimColor = scrimColor,
+        leadingSpaceWidth = leadingSpaceWidth,
         modifier = modifier,
     ) {
         cachedState.value?.let { currentState ->
@@ -136,8 +137,8 @@ fun SideSheetUi(
     shadowElevation: Dp = 0.dp,
     border: BorderStroke? = null,
     weight: Float? = null,
-    backdropColor: Color = Color.Black.copy(alpha = 0.6f),
-    backdropWidth: Dp? = null,
+    scrimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f),
+    leadingSpaceWidth: Dp? = null,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -160,7 +161,7 @@ fun SideSheetUi(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(backdropColor)
+                            .background(scrimColor)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -180,9 +181,9 @@ fun SideSheetUi(
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.End,
                     ) {
-                        val spacerModifier = when (backdropWidth) {
+                        val spacerModifier = when (leadingSpaceWidth) {
                             null -> Modifier.weight(1f, true)
-                            else -> Modifier.width(backdropWidth)
+                            else -> Modifier.width(leadingSpaceWidth)
                         }
 
                         Spacer(spacerModifier)
