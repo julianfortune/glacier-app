@@ -1,15 +1,15 @@
 package com.julianfortune.glacier.ui.common.input
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -23,7 +23,7 @@ import com.julianfortune.glacier.ui.common.data.Option
  * Heavily inspired by: https://mui.com/material-ui/react-autocomplete/
  */
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun <ID> AutocompleteSelect(
     selectedOptionId: ID?,
@@ -65,44 +65,54 @@ fun <ID> AutocompleteSelect(
         expanded = expanded,
         onExpandedChange = {
             expanded = !expanded
-        }
+        },
+        // TODO(P3): Arrow key presses change menu item focus via `Modifier.onPreviewKeyEvent { ... }`
     ) {
+
         OutlinedTextField(
             value = textFieldValue,
             label = label,
+            singleLine = true,
             onValueChange = {
+                println("[OutlinedTextField] onValueChange: $it")
                 input = it
                 onSelectedChange(null)
                 expanded = true
             },
             colors = OutlinedTextFieldDefaults.colors(),
             trailingIcon = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End,
-                ) {
-                    // TODO(P3): Improve 'clear' icon UX and re-enable
+                when {
                     // Show 'clear' button when there's text or a selection
-                    if (false && textFieldValue.isNotEmpty()) {
-                        IconButton(
-                            modifier = Modifier.size(28.dp).pointerHoverIcon(PointerIcon.Hand),
-                            onClick = { clear() }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Clear selection"
-                            )
+                    textFieldValue.isNotEmpty() -> IconButton(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                            .focusProperties { canFocus = false },
+                        onClick = {
+                            clear()
                         }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear selection"
+                        )
                     }
-                    // Dropdown toggle icon
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+
+                    // Otherwise show the toggle icon
+                    else -> ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 }
             },
             modifier = modifier
+                .height(64.dp)
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .onFocusChanged {
-                    expanded = it.isFocused
-                    if (!it.isFocused && input != null) {
+                    val isFocused = it.hasFocus || it.isFocused
+
+                    if (!isFocused) {
+                        expanded = false
+                    }
+
+                    if (!isFocused && input != null) {
                         clear()
                     }
                 },
@@ -110,7 +120,9 @@ fun <ID> AutocompleteSelect(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = {
+                expanded = false
+            },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             shadowElevation = 5.dp,
         ) {
