@@ -1,5 +1,9 @@
 package com.julianfortune.glacier
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.text.JPopupTextMenu
+import androidx.compose.foundation.text.LocalTextContextMenu
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,6 +21,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import java.nio.file.Paths
 
+@OptIn(ExperimentalFoundationApi::class)
 fun main() {
     // Makes app bar match system theme on macOS
     System.setProperty("apple.awt.application.appearance", "system")

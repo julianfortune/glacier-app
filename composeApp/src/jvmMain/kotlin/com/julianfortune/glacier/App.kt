@@ -1,5 +1,8 @@
 package com.julianfortune.glacier
 
+import androidx.compose.foundation.DarkDefaultContextMenuRepresentation
+import androidx.compose.foundation.LightDefaultContextMenuRepresentation
+import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -24,7 +27,7 @@ import org.koin.core.qualifier.named
 
 enum class NavigationPage(val title: String, val icon: ImageVector) {
     DELIVERIES("Deliveries", Icons.Outlined.LocalShipping),
-    ITEMS("Items", Icons.Outlined.FoodBank),
+    ITEMS("Items", Icons.Outlined.EggAlt),
     SUPPLIERS("Suppliers", Icons.Outlined.Storefront),
     PROGRAMS("Programs", Icons.Outlined.Cases),
     PURCHASING_ACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
@@ -41,58 +44,61 @@ fun App() {
         colorScheme = darkColorScheme(), //  darkColorScheme() or lightColorScheme()
         typography = AppTypography(),
     ) {
-        Row {
-            NavigationRail(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            ) {
-                NavigationPage.entries.forEach { page ->
-                    NavigationRailItem(
-                        colors = NavigationRailItemDefaults.colors(),
-                        modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                        selected = selectedNavigationItem == page,
-                        onClick = {
-                            selectedNavigationItem = page
-                        },
-                        icon = {
-                            Icon(page.icon, null)
-                        },
-                        label = { Text(page.title) })
+        val contextMenuRepresentation = DarkDefaultContextMenuRepresentation // LightDefaultContextMenuRepresentation
+        CompositionLocalProvider(LocalContextMenuRepresentation provides contextMenuRepresentation) {
+            Row {
+                NavigationRail(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ) {
+                    NavigationPage.entries.forEach { page ->
+                        NavigationRailItem(
+                            colors = NavigationRailItemDefaults.colors(),
+                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                            selected = selectedNavigationItem == page,
+                            onClick = {
+                                selectedNavigationItem = page
+                            },
+                            icon = {
+                                Icon(page.icon, null)
+                            },
+                            label = { Text(page.title) })
+                    }
                 }
-            }
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                when (selectedNavigationItem) {
-                    NavigationPage.CATEGORIES -> NamedEntityPage<Category>(
-                        koinViewModel(named("categoryViewModel")),
-                        "Categories",
-                        "Category"
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    when (selectedNavigationItem) {
+                        NavigationPage.CATEGORIES -> NamedEntityPage<Category>(
+                            koinViewModel(named("categoryViewModel")),
+                            "Categories",
+                            "Category"
+                        )
 
-                    NavigationPage.DELIVERIES -> DeliveriesPage()
+                        NavigationPage.DELIVERIES -> DeliveriesPage()
 
-                    NavigationPage.ITEMS -> ItemsPage()
+                        NavigationPage.ITEMS -> ItemsPage()
 
-                    NavigationPage.PROGRAMS -> NamedEntityPage<Program>(
-                        koinViewModel(named("programViewModel")),
-                        "Programs",
-                        "Program"
-                    )
+                        NavigationPage.PROGRAMS -> NamedEntityPage<Program>(
+                            koinViewModel(named("programViewModel")),
+                            "Programs",
+                            "Program"
+                        )
 
-                    NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityPage<PurchasingAccount>(
-                        koinViewModel(named("purchasingAccountViewModel")),
-                        "Accounts",
-                        "Account"
-                    )
+                        NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityPage<PurchasingAccount>(
+                            koinViewModel(named("purchasingAccountViewModel")),
+                            "Accounts",
+                            "Account"
+                        )
 
-                    NavigationPage.SUPPLIERS -> NamedEntityPage<Supplier>(
-                        koinViewModel(named("supplierViewModel")),
-                        "Suppliers",
-                        "Supplier"
-                    )
+                        NavigationPage.SUPPLIERS -> NamedEntityPage<Supplier>(
+                            koinViewModel(named("supplierViewModel")),
+                            "Suppliers",
+                            "Supplier"
+                        )
 
-                    NavigationPage.REPORTS -> ReportsPage()
+                        NavigationPage.REPORTS -> ReportsPage()
+                    }
                 }
             }
         }

@@ -8,6 +8,7 @@ import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.data.repository.ProgramRepository
 import com.julianfortune.glacier.data.repository.PurchasingAccountRepository
+import com.julianfortune.glacier.data.repository.ReportResultRepository
 import com.julianfortune.glacier.data.repository.SupplierRepository
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.ui.coordinator.report.DefaultReportViewCoordinator
@@ -25,6 +26,7 @@ import com.julianfortune.glacier.ui.delegate.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
 import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTableViewModel
+import com.julianfortune.glacier.ui.feature.report.detail.ReportDetailViewModel
 import com.julianfortune.glacier.ui.feature.report.list.ReportHeadlineListViewModel
 import com.julianfortune.glacier.ui.page.item.ItemsPageViewModel
 import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPageViewModel
@@ -42,6 +44,7 @@ val appModule = module {
     single { DeliveryRepository(get()) }
     single { CategoryRepository(get()) }
     single { ItemRepository(get()) }
+    single { ReportResultRepository(get()) }
     single { SupplierRepository(get()) }
     single { ProgramRepository(get()) }
     single { PurchasingAccountRepository(get()) }
@@ -127,6 +130,9 @@ val appModule = module {
     }
     viewModel(named("purchasingAccountViewModel")) {
         NamedEntityPageViewModel(get<PurchasingAccountRepository>())
+    }
+    viewModel {
+        ReportDetailViewModel(get(), get(), get(), get(), get(), get(), get(), get())
     }
     viewModel {
         ReportHeadlineListViewModel(get(), get())

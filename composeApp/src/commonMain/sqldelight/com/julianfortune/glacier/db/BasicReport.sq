@@ -97,3 +97,11 @@ SET
     supplierId = :supplierId,
     updatedAtEpochSeconds = :updatedAtEpochSeconds
 WHERE id = :id;
+
+updateNameById:
+UPDATE BasicReport
+SET
+    name = :name,
+    updatedAtEpochSeconds = :updatedAtEpochSeconds
+WHERE id = :id;
+

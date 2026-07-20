@@ -18,17 +18,15 @@ import com.julianfortune.glacier.ui.theme.AppPreview
 fun TopBar(
     title: String,
     modifier: Modifier = Modifier,
-    actionContent: @Composable () -> Unit = {},
+    actionContent: @Composable RowScope.() -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.height(68.dp).padding(horizontal = 16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            SelectionContainer(
-                modifier = Modifier.weight(1f) // Grow to fill all available space to start
-            ) {
+            SelectionContainer {
                 Text(
                     title,
                     style = MaterialTheme.typography.labelLarge,

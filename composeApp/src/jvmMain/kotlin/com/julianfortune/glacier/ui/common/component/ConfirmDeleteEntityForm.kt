@@ -17,6 +17,21 @@ fun ConfirmDeleteEntityForm(
     onCancel: () -> Unit,
     onConfirm: (id: Long) -> Unit
 ) {
+    ConfirmDeleteEntityForm(
+        text,
+        onCancel,
+        onConfirm = {
+            onConfirm(id)
+        }
+    )
+}
+
+@Composable
+fun ConfirmDeleteEntityForm(
+    text: String,
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit
+) {
     Column(
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -49,13 +64,10 @@ fun ConfirmDeleteEntityForm(
                     containerColor = MaterialTheme.colorScheme.error,
                     contentColor = MaterialTheme.colorScheme.onError,
                 ),
-                onClick = {
-                    onConfirm(id)
-                },
+                onClick = onConfirm,
             ) {
                 Text("Delete")
             }
         }
     }
-
 }

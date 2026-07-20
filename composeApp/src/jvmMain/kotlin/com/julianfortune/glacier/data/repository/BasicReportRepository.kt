@@ -167,6 +167,26 @@ class BasicReportRepository(private val database: Database) {
         }
     }
 
+    suspend fun updateName(
+        id: Long,
+        name: String,
+    ): Result<Long> {
+        val now = Instant.now()
+
+        return Result.runCatching {
+            val rowsUpdated = database.basicReportQueries.updateNameById(
+                name,
+                now.epochSecond,
+                id,
+            )
+
+            return when {
+                rowsUpdated > 0 -> Result.success(id)
+                else -> Result.failure(IllegalStateException("BasicReport with id=$id could not be updated"))
+            }
+        }
+    }
+
     suspend fun delete(id: Long): Result<Long> {
         val rowsDeleted = database.basicReportQueries.deleteById(id)
 

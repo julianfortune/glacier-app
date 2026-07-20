@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.common.layout.ListDetailScaffold
+import com.julianfortune.glacier.ui.feature.report.detail.ReportDetail
 import com.julianfortune.glacier.ui.feature.report.list.ReportHeadlineList
 
 @Composable
@@ -14,14 +15,12 @@ fun ReportsPage() {
     ListDetailScaffold(
         listWidth = 320.dp,
         listView = {
-             ReportHeadlineList()
+            ReportHeadlineList()
         },
         separator = {
             VerticalDivider(thickness = 1.dp)
         },
     ) {
-        Spacer(modifier = Modifier.fillMaxWidth())
-        // TODO ...
-        // ReportDetail()
+        ReportDetail()
     }
 }
