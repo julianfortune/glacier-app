@@ -24,7 +24,6 @@ class ItemsPageViewModel(
     private val _itemOperation = mutableStateOf<EntityOperation<Item>?>(null)
     val itemOperation: State<EntityOperation<Item>?> = _itemOperation
 
-    // TODO: Understand what this is doing
     val items = itemRepository.getAll()
         .stateIn(
             scope = viewModelScope,

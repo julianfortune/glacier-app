@@ -11,7 +11,6 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.page.item.data.ItemBody
