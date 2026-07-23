@@ -2,19 +2,17 @@ package com.julianfortune.glacier.ui.page.namedentity
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.common.NamedEntity
 import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
+import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.layout.Collection
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import com.julianfortune.glacier.ui.page.namedentity.ui.UpdateNamedEntityForm
@@ -71,61 +69,56 @@ fun <T : NamedEntity> NamedEntityPage(
 
     // Modal
     if (currentOperation != null) {
-        BasicAlertDialog(
-            onDismissRequest = { }, // Ignore implicit attempts to close the dialog
+        Dialog(
+            onDismissRequest = {
+                viewModel.dismissOperation()
+            }
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                when (currentOperation) {
-                    is EntityOperation.CreateNew -> {
-                        UpdateNamedEntityForm(viewModel, "Create $entityName", "Create") { newName ->
-                            coroutineScope.launch {
-                                viewModel.save(newName)
-                                viewModel.dismissOperation()
-                            }
+            when (currentOperation) {
+                is EntityOperation.CreateNew -> {
+                    UpdateNamedEntityForm(viewModel, "Create $entityName", "Create") { newName ->
+                        coroutineScope.launch {
+                            viewModel.save(newName)
+                            viewModel.dismissOperation()
                         }
                     }
-
-                    is EntityOperation.Edit -> {
-                        val original = (currentOperation as EntityOperation.Edit).entity
-
-                        UpdateNamedEntityForm(
-                            viewModel,
-                            "Edit $entityName",
-                            "Save",
-                            original
-                        ) { newName ->
-                            coroutineScope.launch {
-                                viewModel.update(original.id, newName)
-                                viewModel.dismissOperation()
-                            }
-                        }
-                    }
-
-                    is EntityOperation.Delete -> {
-                        val id = (currentOperation as EntityOperation.Delete).id
-
-                        ConfirmDeleteEntityForm(
-                            id,
-                            "Delete $entityName",
-                            onCancel = {
-                                viewModel.dismissOperation()
-                            },
-                            onConfirm = {
-                                coroutineScope.launch {
-                                    viewModel.delete(id)
-                                    viewModel.dismissOperation()
-                                }
-                            }
-                        )
-                    }
-
-                    else -> throw Error("`operation` must not be `null`")
                 }
+
+                is EntityOperation.Edit -> {
+                    val original = (currentOperation as EntityOperation.Edit).entity
+
+                    UpdateNamedEntityForm(
+                        viewModel,
+                        "Rename $entityName",
+                        "Save",
+                        original,
+                    ) { newName ->
+                        coroutineScope.launch {
+                            viewModel.update(original.id, newName)
+                            viewModel.dismissOperation()
+                        }
+                    }
+                }
+
+                is EntityOperation.Delete -> {
+                    val id = (currentOperation as EntityOperation.Delete).id
+
+                    ConfirmDeleteEntityForm(
+                        id,
+                        "Delete $entityName",
+                        onCancel = {
+                            viewModel.dismissOperation()
+                        },
+                        onConfirm = {
+                            coroutineScope.launch {
+                                viewModel.delete(id)
+                                viewModel.dismissOperation()
+                            }
+                        }
+                    )
+                }
+
+                else -> throw Error("`operation` must not be `null`")
             }
         }
     }

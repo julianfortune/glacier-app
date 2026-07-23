@@ -24,7 +24,7 @@ fun Dialog(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 contentColor = MaterialTheme.colorScheme.onSurface,
             ),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.large,
         ) {
             content()
         }
