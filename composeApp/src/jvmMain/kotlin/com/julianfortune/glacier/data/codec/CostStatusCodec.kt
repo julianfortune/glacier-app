@@ -8,11 +8,11 @@ import dev.forkhandles.result4k.Success
 
 object CostStatusCodec : Codec<CostStatus> {
 
-    override fun deserialize(value: String): Result<CostStatus, Throwable> {
+    override fun deserialize(value: String): Result<CostStatus, CodecError> {
         return when (value) {
             "NO_COST" -> Success(CostStatus.NO_COST)
             "PURCHASED" -> Success(CostStatus.PURCHASED)
-            else -> Failure(Exception("Unrecognized weightUnits: ${value}"))
+            else -> Failure(CodecError.InvalidInput(value))
         }
     }
 

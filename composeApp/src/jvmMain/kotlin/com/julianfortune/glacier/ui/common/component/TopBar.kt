@@ -29,8 +29,8 @@ fun TopBar(
             SelectionContainer {
                 Text(
                     title,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = LocalContentColor.current.copy(alpha = 0.5f)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = LocalContentColor.current
                 )
             }
 

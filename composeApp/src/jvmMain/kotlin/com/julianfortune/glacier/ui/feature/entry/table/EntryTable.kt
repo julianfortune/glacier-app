@@ -21,12 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
-import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.common.data.Option
-import com.julianfortune.glacier.ui.common.foundation.SideSheet
+import com.julianfortune.glacier.ui.common.foundation.Dialog
+import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.feature.entry.form.EntryForm
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryAction
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryTableState
@@ -284,7 +283,7 @@ fun EntryTableUi(
 
         HorizontalDivider(
             color = MaterialTheme.colorScheme.outlineVariant,
-            thickness = 0.5.dp
+            thickness = 1.dp
         )
 
         state.rows.forEach { entryRow ->
@@ -337,7 +336,7 @@ fun EntryTableUi(
             }
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant,
-                thickness = 0.5.dp
+                thickness = 1.dp
             )
         }
 
@@ -354,7 +353,7 @@ fun EntryTableUi(
             )
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant,
-                thickness = 0.5.dp
+                thickness = 1.dp
             )
         }
 

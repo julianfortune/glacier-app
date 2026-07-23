@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.core.codec
 
+import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
@@ -23,7 +24,7 @@ class LocalDateCodecTest {
 
         // THEN
         assertThat(result).isInstanceOf(Success::class.java)
-        assertThat(result.orThrow().toEpochDay()).isEqualTo(expectedEpochDay)
+        assertThat(result.unwrapUnsafe().toEpochDay()).isEqualTo(expectedEpochDay)
     }
 
     @ParameterizedTest

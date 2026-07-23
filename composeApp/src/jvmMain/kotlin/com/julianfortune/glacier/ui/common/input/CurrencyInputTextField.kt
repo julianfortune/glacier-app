@@ -84,7 +84,7 @@ fun CurrencyInputTextField(
         prefix = {
             Icon(
                 imageVector = Icons.Filled.AttachMoney,
-                contentDescription = "Dollar sign",
+                contentDescription = "US dollars",
                 modifier = Modifier.height(20.dp)
             )
         },

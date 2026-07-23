@@ -2,6 +2,7 @@ package com.julianfortune.glacier.ui.page.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
@@ -9,9 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
 import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.common.foundation.Dialog
+import com.julianfortune.glacier.ui.common.foundation.SideSheet
 import com.julianfortune.glacier.ui.common.layout.Collection
 import com.julianfortune.glacier.ui.page.item.data.ItemBody
 import com.julianfortune.glacier.ui.page.item.ui.ItemForm
@@ -66,63 +70,69 @@ fun ItemsPage(viewModel: ItemsPageViewModel = koinViewModel()) {
         }
     }
 
-    // Create/edit item modal
-    if (itemOperation != null) {
+    SideSheet(
+        isVisible = itemOperation is EntityOperation.CreateNew,
+        onDismissRequest = { viewModel.dismissItemModal() },
+        modifier = Modifier.width(640.dp),
+    ) {
+        ItemForm(
+            categoryOptions,
+            "Create Item",
+            "Create",
+            onCancel = viewModel::cancelItemOperation,
+        ) { body ->
+            coroutineScope.launch {
+                viewModel.saveItem(body)
+                viewModel.dismissItemModal()
+            }
+        }
+    }
+
+    SideSheet(
+        state = itemOperation as? EntityOperation.Edit,
+        onDismissRequest = { viewModel.dismissItemModal() },
+        modifier = Modifier.width(640.dp),
+    ) { editOperation ->
+        // TODO: Conversion in VM
+        val itemBody = ItemBody(
+            editOperation.entity.name,
+            editOperation.entity.categories.firstOrNull()?.id,
+            editOperation.entity.savedWeights
+        )
+
+        ItemForm(
+            categoryOptions,
+            "Edit Item",
+            "Save",
+            itemBody,
+            onCancel = viewModel::cancelItemOperation,
+        ) { body ->
+            coroutineScope.launch {
+                viewModel.updateItem(editOperation.entity.id, body)
+                viewModel.dismissItemModal()
+            }
+        }
+    }
+
+    // Delete modal
+    if (itemOperation is EntityOperation.Delete) {
         Dialog(
             onDismissRequest = { viewModel.cancelItemOperation() }
         ) {
-            when (itemOperation) {
-                is EntityOperation.CreateNew -> {
-                    ItemForm(
-                        categoryOptions,
-                        "Create Item",
-                        "Create",
-                        onCancel = viewModel::cancelItemOperation,
-                    ) { body ->
-                        coroutineScope.launch {
-                            viewModel.saveItem(body)
-                            viewModel.dismissItemModal()
-                        }
+            val itemId = (itemOperation as EntityOperation.Delete).id
+            ConfirmDeleteEntityForm(
+                itemId,
+                "Delete Item",
+                onCancel = {
+                    viewModel.cancelItemOperation()
+                },
+                onConfirm = {
+                    coroutineScope.launch {
+                        viewModel.deleteItem(itemId)
+                        viewModel.dismissItemModal()
                     }
                 }
-
-                is EntityOperation.Edit -> {
-                    val originalItem = (itemOperation as EntityOperation.Edit).entity
-                    val itemBody = ItemBody(originalItem.name, originalItem.categories.firstOrNull()?.id)
-
-                    ItemForm(
-                        categoryOptions,
-                        "Edit Item",
-                        "Save",
-                        itemBody,
-                        onCancel = viewModel::cancelItemOperation,
-                    ) { body ->
-                        coroutineScope.launch {
-                            viewModel.updateItem(originalItem.id, body)
-                            viewModel.dismissItemModal()
-                        }
-                    }
-                }
-
-                is EntityOperation.Delete -> {
-                    val itemId = (itemOperation as EntityOperation.Delete).id
-                    ConfirmDeleteEntityForm(
-                        itemId,
-                        "Delete Item",
-                        onCancel = {
-                            viewModel.cancelItemOperation()
-                        },
-                        onConfirm = {
-                            coroutineScope.launch {
-                                viewModel.deleteItem(itemId)
-                                viewModel.dismissItemModal()
-                            }
-                        }
-                    )
-                }
-
-                else -> throw Error("`itemOperation` must not be `null`")
-            }
+            )
         }
     }
 }

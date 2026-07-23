@@ -4,12 +4,12 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.data.common.EntityMetadata
 import com.julianfortune.glacier.data.domain.*
 import com.julianfortune.glacier.db.Database
-import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -26,8 +26,8 @@ class BasicReportRepository(private val database: Database) {
             .map { reports ->
                 reports.map {
                     // TODO(P3): Error handling
-                    val start = LocalDateCodec.deserialize(it.startDate).orThrow()
-                    val end = LocalDateCodec.deserialize(it.endDate).orThrow()
+                    val start = LocalDateCodec.deserialize(it.startDate).unwrapUnsafe()
+                    val end = LocalDateCodec.deserialize(it.endDate).unwrapUnsafe()
 
                     BasicReportHeadline(it.id, it.name, start, end)
                 }
@@ -41,8 +41,8 @@ class BasicReportRepository(private val database: Database) {
             when (row) {
                 null -> null
                 else -> {
-                    val start = LocalDateCodec.deserialize(row.startDate).orThrow()
-                    val end = LocalDateCodec.deserialize(row.endDate).orThrow()
+                    val start = LocalDateCodec.deserialize(row.startDate).unwrapUnsafe()
+                    val end = LocalDateCodec.deserialize(row.endDate).unwrapUnsafe()
 
                     val item = row.itemId?.let { itemId ->
                         ItemHeadline(
@@ -57,7 +57,7 @@ class BasicReportRepository(private val database: Database) {
                                 ?: throw Exception("`categoryName` must be defined by foreign key constraints")
                         )
                     }
-                    val costStatus = row.costStatus?.let { CostStatusCodec.deserialize(it).orThrow() }
+                    val costStatus = row.costStatus?.let { CostStatusCodec.deserialize(it).unwrapUnsafe() }
                     val program = row.programId?.let { id ->
                         Program(
                             id,

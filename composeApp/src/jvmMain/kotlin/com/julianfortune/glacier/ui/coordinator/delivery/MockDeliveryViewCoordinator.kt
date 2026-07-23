@@ -1,8 +1,8 @@
 package com.julianfortune.glacier.ui.coordinator.delivery
 
-import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.data.common.EntityMetadata
 import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.Instant

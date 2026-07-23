@@ -4,9 +4,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.julianfortune.glacier.ui.common.data.FormFieldState
 import com.julianfortune.glacier.ui.common.input.CurrencyInput
 import com.julianfortune.glacier.ui.common.input.LocalDateInput
-import com.julianfortune.glacier.ui.common.data.FormFieldState
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryFormState
 

@@ -5,17 +5,16 @@ import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
 
 object LocalDateCodec : Codec<LocalDate> {
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE
 
-    override fun deserialize(value: String): Result<LocalDate, Throwable> {
+    override fun deserialize(value: String): Result<LocalDate, CodecError> {
         return try {
             Success(LocalDate.parse(value, formatter))
-        } catch (e: DateTimeParseException) {
-            Failure(e)
+        } catch (_: Throwable) {
+            Failure(CodecError.InvalidInput(value))
         }
     }
 

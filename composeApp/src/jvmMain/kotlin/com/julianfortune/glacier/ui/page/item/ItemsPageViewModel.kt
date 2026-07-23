@@ -32,11 +32,20 @@ class ItemsPageViewModel(
         )
 
     suspend fun saveItem(body: ItemBody) {
-        itemRepository.insert(body.name, setOfNotNull(body.categoryId))
+        itemRepository.insert(
+            body.name,
+            setOfNotNull(body.categoryId),
+            body.savedWeights,
+        )
     }
 
     suspend fun updateItem(id: Long, body: ItemBody) {
-        itemRepository.update(id, body.name, setOfNotNull(body.categoryId))
+        itemRepository.update(
+            id,
+            body.name,
+            setOfNotNull(body.categoryId),
+            body.savedWeights,
+        )
     }
 
     suspend fun deleteItem(id: Long) {

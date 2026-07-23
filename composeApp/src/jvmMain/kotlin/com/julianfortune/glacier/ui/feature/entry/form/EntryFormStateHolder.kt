@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.julianfortune.glacier.data.domain.CostStatus
 import com.julianfortune.glacier.data.domain.Weight
-import com.julianfortune.glacier.ui.common.input.CurrencyInput
 import com.julianfortune.glacier.ui.common.data.FormFieldState
+import com.julianfortune.glacier.ui.common.input.CurrencyInput
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormState
 

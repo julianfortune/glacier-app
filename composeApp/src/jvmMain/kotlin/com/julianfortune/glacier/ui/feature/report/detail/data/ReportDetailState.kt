@@ -1,14 +1,6 @@
 package com.julianfortune.glacier.ui.feature.report.detail.data
 
-import com.julianfortune.glacier.data.domain.BasicReport
-import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.domain.CostStatus
-import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.data.domain.Program
-import com.julianfortune.glacier.data.domain.PurchasingAccount
-import com.julianfortune.glacier.data.domain.ReportResult
-import com.julianfortune.glacier.data.domain.Supplier
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.domain.*
 
 sealed interface ReportDetailState {
 

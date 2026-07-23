@@ -1,10 +1,8 @@
 package com.julianfortune.glacier
 
 import androidx.compose.foundation.DarkDefaultContextMenuRepresentation
-import androidx.compose.foundation.LightDefaultContextMenuRepresentation
 import androidx.compose.foundation.LocalContextMenuRepresentation
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -13,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Program
 import com.julianfortune.glacier.data.domain.PurchasingAccount
@@ -22,6 +21,7 @@ import com.julianfortune.glacier.ui.page.item.ItemsPage
 import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPage
 import com.julianfortune.glacier.ui.page.report.ReportsPage
 import com.julianfortune.glacier.ui.theme.AppTypography
+import com.julianfortune.glacier.ui.theme.darkScheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.qualifier.named
 
@@ -41,7 +41,7 @@ fun App() {
     var selectedNavigationItem by remember { mutableStateOf(NavigationPage.DELIVERIES) }
 
     MaterialTheme(
-        colorScheme = darkColorScheme(), //  darkColorScheme() or lightColorScheme()
+        colorScheme = darkScheme, //  darkColorScheme() or lightColorScheme()
         typography = AppTypography(),
     ) {
         val contextMenuRepresentation = DarkDefaultContextMenuRepresentation // LightDefaultContextMenuRepresentation
@@ -50,18 +50,30 @@ fun App() {
                 NavigationRail(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ) {
-                    NavigationPage.entries.forEach { page ->
-                        NavigationRailItem(
-                            colors = NavigationRailItemDefaults.colors(),
-                            modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                            selected = selectedNavigationItem == page,
-                            onClick = {
-                                selectedNavigationItem = page
-                            },
-                            icon = {
-                                Icon(page.icon, null)
-                            },
-                            label = { Text(page.title) })
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        NavigationPage.entries.forEach { page ->
+                            NavigationRailItem(
+                                colors = NavigationRailItemDefaults.colors(),
+                                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                                selected = selectedNavigationItem == page,
+                                onClick = {
+                                    selectedNavigationItem = page
+                                },
+                                icon = {
+                                    Icon(page.icon, null)
+                                },
+                                label = {
+                                    Text(
+                                        page.title,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                })
+                        }
                     }
                 }
                 Surface(

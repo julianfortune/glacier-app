@@ -12,16 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.ui.feature.delivery.form.DeliveryForm
+import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
+import com.julianfortune.glacier.ui.common.component.TopBar
+import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryAction
 import com.julianfortune.glacier.ui.feature.delivery.detail.data.DeliveryDetailState
 import com.julianfortune.glacier.ui.feature.delivery.detail.ui.DeliveryDetailTopBar
 import com.julianfortune.glacier.ui.feature.delivery.detail.ui.DeliveryHeader
 import com.julianfortune.glacier.ui.feature.delivery.detail.ui.DeliverySummary
+import com.julianfortune.glacier.ui.feature.delivery.form.DeliveryForm
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTable
-import com.julianfortune.glacier.ui.common.component.ConfirmDeleteEntityForm
-import com.julianfortune.glacier.ui.common.foundation.Dialog
-import com.julianfortune.glacier.ui.common.component.TopBar
 import com.julianfortune.glacier.ui.theme.dynamicScrollbarStyle
 import org.koin.compose.viewmodel.koinViewModel
 

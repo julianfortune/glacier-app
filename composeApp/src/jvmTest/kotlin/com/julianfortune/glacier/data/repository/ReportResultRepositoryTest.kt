@@ -1,14 +1,14 @@
 package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.async.coroutines.awaitAsOne
+import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.data.domain.CostStatus
-import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -241,8 +241,8 @@ class ReportResultRepositoryTest {
         expectedTotalCostDollars: Long
     ) {
         // GIVEN
-        val startDate = LocalDateCodec.deserialize(startString).orThrow()
-        val endDate = LocalDateCodec.deserialize(endString).orThrow()
+        val startDate = LocalDateCodec.deserialize(startString).unwrapUnsafe()
+        val endDate = LocalDateCodec.deserialize(endString).unwrapUnsafe()
 
         // WHEN
         val result = runBlocking {

@@ -3,9 +3,12 @@ package com.julianfortune.glacier.data.repository
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import com.julianfortune.glacier.core.util.unwrapUnsafe
+import com.julianfortune.glacier.data.codec.WeightListCodec
 import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.ItemHeadline
+import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -33,8 +36,16 @@ class ItemRepository(private val database: Database) {
                 val categories = rows
                     .filter { it.categoryId != null } // Since it's a LEFT JOIN there may be no category
                     .map { Category(it.categoryId!!, it.categoryName!!) }
+                val savedWeights = first.savedWeightInCentigramsListJson?.let {
+                    WeightListCodec.deserialize(it).unwrapUnsafe().toSet()
+                }
 
-                Item(first.id, first.name, categories, emptyList())
+                Item(
+                    first.id,
+                    first.name,
+                    categories,
+                    savedWeights
+                )
             }
 
     }
@@ -49,24 +60,37 @@ class ItemRepository(private val database: Database) {
             .asFlow()
             .mapToList(Dispatchers.IO)
             .map { rows ->
-                rows.groupBy { it.id }.map { (itemId, itemRows) ->
-                    val firstRow = itemRows.first()
-                    val categories = rows.map { Category(it.categoryId!!, it.categoryName!!) }
+                rows.groupBy { it.id }
+                    .map { (itemId, itemRows) ->
+                        val firstRow = itemRows.first()
+                        val categories = rows
+                            .filter { it.categoryId != null } // Since it's a LEFT JOIN there may be no category
+                            .map { Category(it.categoryId!!, it.categoryName!!) }
+                        val savedWeights = firstRow.savedWeightInCentigramsListJson?.let {
+                            WeightListCodec.deserialize(it).unwrapUnsafe().toSet()
+                        }
 
-                    Item(
-                        id = itemId,
-                        name = firstRow.name,
-                        categories = categories,
-                        savedWeights = emptyList(), // TODO
-                    )
-                }
+                        Item(
+                            id = itemId,
+                            name = firstRow.name,
+                            categories = categories,
+                            savedWeights = savedWeights,
+                        )
+                    }
             }
     }
 
-    suspend fun insert(name: String, categoryIds: Set<Long>): Result<Long> {
+    suspend fun insert(name: String, categoryIds: Set<Long>, savedWeights: Set<Weight>?): Result<Long> {
         return Result.runCatching {
             database.transactionWithResult {
-                val itemId = database.itemQueries.insert(name, null).awaitAsOne()
+                val savedWeightsJson = when (savedWeights?.size) {
+                    null, 0 -> null
+                    else -> WeightListCodec.serialize(savedWeights.toList())
+                }
+                val itemId = database.itemQueries.insert(
+                    name,
+                    savedWeightsJson
+                ).awaitAsOne()
 
                 categoryIds.forEach { categoryId ->
                     database.itemCategoryQueries.insert(itemId, categoryId)
@@ -77,10 +101,20 @@ class ItemRepository(private val database: Database) {
         }
     }
 
-    suspend fun update(itemId: Long, name: String, categoryIds: Set<Long>): Result<Long> {
+    suspend fun update(
+        itemId: Long,
+        name: String,
+        categoryIds: Set<Long>,
+        savedWeights: Set<Weight>?,
+    ): Result<Long> {
+        val savedWeightsJson = when (savedWeights?.size) {
+            null, 0 -> null
+            else -> WeightListCodec.serialize(savedWeights.toList())
+        }
+
         return runCatching {
             database.transactionWithResult {
-                database.itemQueries.updateById(name, null, itemId)
+                database.itemQueries.updateById(name, savedWeightsJson, itemId)
 
                 database.itemCategoryQueries.deleteByItemId(itemId)
                 categoryIds.forEach { categoryId ->
@@ -93,7 +127,8 @@ class ItemRepository(private val database: Database) {
     }
 
     suspend fun deleteById(id: Long): Boolean {
-        val rowsUpdated = database.itemQueries.deleteById(id) // `ItemCategories` are deleted automatically by CASCADE-ing
+        val rowsUpdated =
+            database.itemQueries.deleteById(id) // `ItemCategories` are deleted automatically by CASCADE-ing
 
         return rowsUpdated > 1
     }

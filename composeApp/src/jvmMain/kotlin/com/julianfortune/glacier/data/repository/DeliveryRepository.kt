@@ -1,28 +1,21 @@
 package com.julianfortune.glacier.data.repository
 
-import androidx.compose.runtime.snapshots.toInt
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.data.common.EntityMetadata
-import com.julianfortune.glacier.data.domain.BasicReport
-import com.julianfortune.glacier.data.domain.CostStatus
-import com.julianfortune.glacier.data.domain.Weight
-import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.data.domain.DeliveryHeadline
-import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.data.domain.Program
-import com.julianfortune.glacier.data.domain.PurchasingAccount
-import com.julianfortune.glacier.data.domain.ReportResult
-import com.julianfortune.glacier.data.domain.Supplier
+import com.julianfortune.glacier.data.domain.*
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.db.GetByDeliveryId
-import dev.forkhandles.result4k.orThrow
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 
@@ -35,7 +28,7 @@ class DeliveryRepository(private val database: Database) {
             .map { deliveries ->
                 deliveries.map { d ->
                     // TODO(P3): Better error handling
-                    val receivedDate = LocalDateCodec.deserialize(d.receivedDate).orThrow()
+                    val receivedDate = LocalDateCodec.deserialize(d.receivedDate).unwrapUnsafe()
                     val supplier = supplierFromJoinedRow(d.supplierId, d.supplierName)
                     val metadata = EntityMetadata.ofEpochSeconds(d.createdAtEpochSeconds, d.updatedAtEpochSeconds)
 
@@ -67,7 +60,7 @@ class DeliveryRepository(private val database: Database) {
 
             Delivery(
                 deliveryRow.id,
-                LocalDateCodec.deserialize(deliveryRow.receivedDate).orThrow(),
+                LocalDateCodec.deserialize(deliveryRow.receivedDate).unwrapUnsafe(),
                 supplier,
                 deliveryRow.taxesCents,
                 deliveryRow.feesCents,
@@ -89,7 +82,7 @@ class DeliveryRepository(private val database: Database) {
             row.itemId,
             row.itemName ?: throw Exception("`itemName` must be defined by foreign key constraints")
         )
-        val costStatus = CostStatusCodec.deserialize(row.costStatus).orThrow()
+        val costStatus = CostStatusCodec.deserialize(row.costStatus).unwrapUnsafe()
         val itemWeight = row.itemWeightCentigrams?.let(Weight::ofCentigrams)
         val unitWeight = row.unitWeightCentigrams.let(Weight::ofCentigrams)
         val program = row.programId?.let { id ->

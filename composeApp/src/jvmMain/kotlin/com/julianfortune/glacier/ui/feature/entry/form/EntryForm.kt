@@ -12,11 +12,11 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.common.input.CurrencyInput
 import com.julianfortune.glacier.ui.common.input.CurrencyInputTextField
 import com.julianfortune.glacier.ui.common.input.DropdownSelect
-import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormState
 import com.julianfortune.glacier.ui.theme.AppPreview

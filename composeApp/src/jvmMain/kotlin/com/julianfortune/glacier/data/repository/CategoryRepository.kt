@@ -2,8 +2,8 @@ package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.Query
 import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.db.Category as DbCategory
 import com.julianfortune.glacier.db.Database
+import com.julianfortune.glacier.db.Category as DbCategory
 
 class CategoryRepository(database: Database) : NamedEntityRepository<DbCategory, Category> {
     override val entityName = "Category"

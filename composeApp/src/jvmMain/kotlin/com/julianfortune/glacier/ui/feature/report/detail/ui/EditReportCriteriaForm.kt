@@ -88,10 +88,6 @@ fun EditReportCriteriaFormUi(
     onSubmit: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val anyOption = Option(id = -1, title = "Any")
-    val paidOption = Option(id = 0, title = "Paid")
-    val noCostOption = Option(id = 1, title = "No Cost")
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -150,21 +146,17 @@ fun EditReportCriteriaFormUi(
             color = MaterialTheme.colorScheme.onSurface
         )
 
+        val costStatusOptions = listOf(
+            Option<Boolean?>(id = null, title = "Any"),
+            Option<Boolean?>(id = false, title = "Paid"),
+            Option<Boolean?>(id = true, title = "No Cost"),
+        )
+
         DropdownSelect(
-            options = listOf(anyOption, paidOption, noCostOption),
-            selectedId = when (state.costStatusIsNoCost.value) {
-                null -> -1
-                false -> 0
-                true -> 1
-            },
-            onSelectedChange = { selection ->
-                val isNoCost = when (selection.id) {
-                    -1 -> null
-                    0 -> false
-                    1 -> true
-                    else -> throw Exception("Invalid id: ${selection.id}")
-                }
-                onCostStatusChange(isNoCost)
+            options = costStatusOptions,
+            selectedId = state.costStatusIsNoCost.value,
+            onSelectedChange = { isNoCost ->
+                onCostStatusChange(isNoCost.id)
             },
         )
 

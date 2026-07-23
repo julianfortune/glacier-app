@@ -1,7 +1,7 @@
 package com.julianfortune.glacier.ui.feature.delivery.form.data
 
-import com.julianfortune.glacier.ui.common.input.LocalDateInput
 import com.julianfortune.glacier.ui.common.data.FormFieldState
+import com.julianfortune.glacier.ui.common.input.LocalDateInput
 
 data class DeliveryFormState(
     val receivedDate: FormFieldState<String> = FormFieldState(LocalDateInput.ofToday().value),

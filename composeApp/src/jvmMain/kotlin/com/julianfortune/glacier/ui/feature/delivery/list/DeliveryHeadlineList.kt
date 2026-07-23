@@ -8,9 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.ui.common.layout.Collection
-import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.formatLocalDate
+import com.julianfortune.glacier.ui.common.foundation.Dialog
+import com.julianfortune.glacier.ui.common.layout.Collection
 import com.julianfortune.glacier.ui.feature.delivery.form.DeliveryForm
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -31,7 +31,6 @@ fun DeliveryHeadlineList(
 
     LaunchedEffect(viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
-            println("Received uiEvent: $event")
             when (event) {
                 is DeliveryHeadlineListViewModel.UiEvent.DeliveryCreated -> {
                     creationDialogIsOpen = false // Close the dialog safely

@@ -2,9 +2,9 @@ package com.julianfortune.glacier.ui.feature.delivery.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator
 import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
-import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.ui.delegate.SupplierOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.form.data.DeliveryBody
 import kotlinx.coroutines.ExperimentalCoroutinesApi

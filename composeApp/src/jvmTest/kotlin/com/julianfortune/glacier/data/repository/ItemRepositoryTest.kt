@@ -5,11 +5,9 @@ import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ItemRepositoryTest {
@@ -77,7 +75,7 @@ class ItemRepositoryTest {
         val categoryId = database.categoryQueries.insert("Dairy").awaitAsOne()
 
         // WHEN
-        val id = itemRepository.insert("Butter", setOf(categoryId)).getOrThrow()
+        val id = itemRepository.insert("Butter", setOf(categoryId), emptySet()).getOrThrow()
 
         // THEN
         val rows = database.itemQueries.getAllItems().awaitAsList()
@@ -101,7 +99,7 @@ class ItemRepositoryTest {
         val newCategoryId = database.categoryQueries.insert("Perishable").awaitAsOne()
 
         // WHEN
-        val id = itemRepository.update(itemId, "Margarine", setOf(newCategoryId)).getOrThrow()
+        val id = itemRepository.update(itemId, "Margarine", setOf(newCategoryId), emptySet()).getOrThrow()
 
         // THEN
         assertThat(id).isEqualTo(itemId)
