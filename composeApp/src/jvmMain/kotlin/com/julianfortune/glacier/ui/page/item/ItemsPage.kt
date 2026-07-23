@@ -17,7 +17,7 @@ import com.julianfortune.glacier.ui.common.component.EntityOptionsDropdownMenu
 import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.foundation.SideSheet
 import com.julianfortune.glacier.ui.common.layout.Collection
-import com.julianfortune.glacier.ui.page.item.data.ItemBody
+import com.julianfortune.glacier.ui.feature.item.data.ItemBody
 import com.julianfortune.glacier.ui.page.item.ui.ItemForm
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import kotlinx.coroutines.launch
@@ -97,7 +97,7 @@ fun ItemsPage(viewModel: ItemsPageViewModel = koinViewModel()) {
         val itemBody = ItemBody(
             editOperation.entity.name,
             editOperation.entity.categories.firstOrNull()?.id,
-            editOperation.entity.savedWeights
+            editOperation.entity.format,
         )
 
         ItemForm(

@@ -140,11 +140,7 @@ fun EditReportCriteriaFormUi(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Text(
-            text = "Cost Status",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        Spacer(Modifier.height(0.dp))
 
         val costStatusOptions = listOf(
             Option<Boolean?>(id = null, title = "Any"),
@@ -153,6 +149,7 @@ fun EditReportCriteriaFormUi(
         )
 
         DropdownSelect(
+            label = "Cost Status",
             options = costStatusOptions,
             selectedId = state.costStatusIsNoCost.value,
             onSelectedChange = { isNoCost ->

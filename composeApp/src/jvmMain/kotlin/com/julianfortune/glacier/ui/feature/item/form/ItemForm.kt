@@ -19,10 +19,10 @@ import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.common.input.DropdownSelect
+import com.julianfortune.glacier.ui.feature.item.data.ItemFormatState
 import com.julianfortune.glacier.ui.feature.savedweight.form.SavedWeightInlineForm
-import com.julianfortune.glacier.ui.page.item.data.ItemBody
-import com.julianfortune.glacier.ui.page.item.data.ItemFormState
-import com.julianfortune.glacier.ui.page.item.data.PackagingType
+import com.julianfortune.glacier.ui.feature.item.data.ItemBody
+import com.julianfortune.glacier.ui.feature.item.data.ItemFormState
 import com.julianfortune.glacier.ui.theme.AppPreview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,7 +117,7 @@ fun ItemFormUi(
             )
 
             DropdownSelect(
-                state.packaging is PackagingType.Loose,
+                state.format is ItemFormatState.Loose,
                 listOf(
                     Option(true, "Loose"),
                     Option(false, "Packaged")
@@ -131,7 +131,7 @@ fun ItemFormUi(
         Spacer(modifier = Modifier.height(16.dp))
 
         AnimatedVisibility(
-            state.packaging is PackagingType.Discrete,
+            state.format is ItemFormatState.Packaged,
         ) {
             Column {
                 Card {
@@ -148,7 +148,7 @@ fun ItemFormUi(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        (state.packaging as? PackagingType.Discrete)?.variants?.let { packagingVariants ->
+                        (state.format as? ItemFormatState.Packaged)?.sizes?.let { packagingVariants ->
                             packagingVariants.forEachIndexed { index, text ->
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -222,7 +222,7 @@ fun ItemFormUiPreview() = AppPreview {
         submitButtonText = "Save",
         categoryOptions = emptyList(),
         state = ItemFormState(
-            packaging = PackagingType.Discrete(listOf("8oz", "1lb 8oz"))
+            format = ItemFormatState.Packaged(listOf("8oz", "1lb 8oz"))
         )
     )
 }

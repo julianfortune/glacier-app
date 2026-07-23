@@ -70,6 +70,7 @@ fun <ID> AutocompleteSelect(
     ) {
 
         OutlinedTextField(
+            // TODO(P3): Use `TextFieldState` and `setTextAndPlaceCursorAtEnd` when filling from a selected menu option
             value = textFieldValue,
             label = label,
             singleLine = true,

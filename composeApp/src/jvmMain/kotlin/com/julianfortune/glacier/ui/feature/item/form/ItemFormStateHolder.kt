@@ -5,45 +5,48 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.ui.common.data.FormFieldState
-import com.julianfortune.glacier.ui.page.item.data.ItemBody
-import com.julianfortune.glacier.ui.page.item.data.ItemFormState
-import com.julianfortune.glacier.ui.page.item.data.PackagingType
+import com.julianfortune.glacier.ui.feature.item.data.ItemFormatState
+import com.julianfortune.glacier.ui.feature.item.data.ItemBody
+import com.julianfortune.glacier.ui.feature.item.data.ItemFormState
 
 
-sealed interface PackagingInput {
-    data object Loose : PackagingInput
-    data class Discrete(val variants: Set<Weight>) : PackagingInput
+sealed interface FormatInput {
+    data object Loose : FormatInput
+    data class Packaged(val sizes: Set<Weight>) : FormatInput
 }
 
 class ItemFormStateHolder(initialValue: ItemBody? = null) {
 
     private var nameInput by mutableStateOf(initialValue?.name ?: "")
     private var categoryIdInput by mutableStateOf(initialValue?.categoryId)
-    private var packagingInput by mutableStateOf(
-        initialValue?.savedWeights?.let { PackagingInput.Discrete(it) } ?: PackagingInput.Loose
+    private var formatInput by mutableStateOf(
+        (initialValue?.format as? Item.Format.Packaged)?.let {
+            FormatInput.Packaged(it.sizes)
+        } ?: FormatInput.Loose
     )
 
     val validData: ItemBody? by derivedStateOf {
         val currentName = nameInput
         val currentCategoryId = categoryIdInput
 
-        val currentPackagingInput = packagingInput
+        val currentPackagingInput = formatInput
         val packagingIsValid = when (currentPackagingInput) {
-            is PackagingInput.Loose -> true
-            is PackagingInput.Discrete -> currentPackagingInput.variants.isNotEmpty()
+            is FormatInput.Loose -> true
+            is FormatInput.Packaged -> currentPackagingInput.sizes.isNotEmpty()
         }
 
         if (currentName != "" && packagingIsValid) {
-            val savedWeights = when (currentPackagingInput) {
-                is PackagingInput.Loose -> null
-                is PackagingInput.Discrete -> currentPackagingInput.variants
+            val format = when (currentPackagingInput) {
+                is FormatInput.Loose -> Item.Format.Loose
+                is FormatInput.Packaged -> Item.Format.Packaged(currentPackagingInput.sizes)
             }
 
             ItemBody(
                 currentName,
                 currentCategoryId,
-                savedWeights,
+                format,
             )
         } else {
             null
@@ -51,10 +54,10 @@ class ItemFormStateHolder(initialValue: ItemBody? = null) {
     }
 
     val uiState: ItemFormState by derivedStateOf {
-        val savedWeights = when (val currentPackagingInput = packagingInput) {
-            is PackagingInput.Loose -> PackagingType.Loose
-            is PackagingInput.Discrete -> {
-                val variants = currentPackagingInput.variants
+        val format = when (val currentPackagingInput = formatInput) {
+            is FormatInput.Loose -> ItemFormatState.Loose
+            is FormatInput.Packaged -> {
+                val sizes = currentPackagingInput.sizes
                     .sortedBy { it.centigrams }
                     .map {
                         val (lbs, oz) = it.toImperial()
@@ -66,14 +69,14 @@ class ItemFormStateHolder(initialValue: ItemBody? = null) {
                         listOfNotNull(lbsString, ozString).joinToString(" ")
                     }
 
-                PackagingType.Discrete(variants)
+                ItemFormatState.Packaged(sizes)
             }
         }
 
         ItemFormState(
             FormFieldState(nameInput),
             FormFieldState(categoryIdInput),
-            savedWeights,
+            format,
             isValid = validData != null
         )
     }
@@ -87,17 +90,17 @@ class ItemFormStateHolder(initialValue: ItemBody? = null) {
     }
 
     fun onPackagingIsLooseChange(newValue: Boolean) {
-        packagingInput = when (newValue) {
-            true -> PackagingInput.Loose
-            false -> PackagingInput.Discrete(emptySet())
+        formatInput = when (newValue) {
+            true -> FormatInput.Loose
+            false -> FormatInput.Packaged(emptySet())
         }
     }
 
     fun onAddDiscretePackageSize(newSize: Weight) {
-        when (val current = packagingInput) {
-            is PackagingInput.Discrete -> {
-                packagingInput = current.copy(
-                    variants = current.variants.plus(newSize)
+        when (val current = formatInput) {
+            is FormatInput.Packaged -> {
+                formatInput = current.copy(
+                    sizes = current.sizes.plus(newSize)
                 )
             }
 
@@ -106,10 +109,10 @@ class ItemFormStateHolder(initialValue: ItemBody? = null) {
     }
 
     fun onRemoveDiscretePackageSize(index: Int) {
-        when (val current = packagingInput) {
-            is PackagingInput.Discrete -> {
-                packagingInput = current.copy(
-                    variants = current.variants.sortedBy { it.centigrams }.filterIndexed { i, _ -> i != index }.toSet()
+        when (val current = formatInput) {
+            is FormatInput.Packaged -> {
+                formatInput = current.copy(
+                    sizes = current.sizes.sortedBy { it.centigrams }.filterIndexed { i, _ -> i != index }.toSet()
                 )
             }
 

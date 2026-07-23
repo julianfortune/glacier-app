@@ -4,7 +4,9 @@ import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.domain.Category
+import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.ItemHeadline
+import com.julianfortune.glacier.data.domain.Weight
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
@@ -48,6 +50,7 @@ class ItemRepositoryTest {
         assertThat(item.categories).containsExactly(Category(categoryId, "Produce"))
     }
 
+    // TODO: More thorough testing
     @Test
     fun searchByName(): Unit = runBlocking {
         // GIVEN
@@ -75,7 +78,11 @@ class ItemRepositoryTest {
         val categoryId = database.categoryQueries.insert("Dairy").awaitAsOne()
 
         // WHEN
-        val id = itemRepository.insert("Butter", setOf(categoryId), emptySet()).getOrThrow()
+        val id = itemRepository.insert(
+            "Butter",
+            setOf(categoryId),
+            Item.Format.Loose,
+        ).getOrThrow()
 
         // THEN
         val rows = database.itemQueries.getAllItems().awaitAsList()
@@ -99,14 +106,21 @@ class ItemRepositoryTest {
         val newCategoryId = database.categoryQueries.insert("Perishable").awaitAsOne()
 
         // WHEN
-        val id = itemRepository.update(itemId, "Margarine", setOf(newCategoryId), emptySet()).getOrThrow()
+        val id = itemRepository.update(
+            itemId,
+            "Margarine",
+            setOf(newCategoryId),
+            Item.Format.Packaged(setOf(Weight.ofImperial(1, 0f))),
+        ).getOrThrow()
 
         // THEN
         assertThat(id).isEqualTo(itemId)
 
+        // TODO: Use direct query accessors instead
         val item = itemRepository.getById(itemId).first()
         assertThat(item.name).isEqualTo("Margarine")
         assertThat(item.categories).containsExactly(Category(newCategoryId, "Perishable"))
+        assertThat((item.format as Item.Format.Packaged).sizes).containsExactly(Weight.ofImperial(1, 0f))
     }
 
     @Test

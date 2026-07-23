@@ -8,7 +8,7 @@ import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.data.domain.ItemHeadline
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.ui.delegate.CategoryOptionsProvider
-import com.julianfortune.glacier.ui.page.item.data.ItemBody
+import com.julianfortune.glacier.ui.feature.item.data.ItemBody
 import com.julianfortune.glacier.ui.page.namedentity.data.EntityOperation
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.firstOrNull
@@ -35,7 +35,7 @@ class ItemsPageViewModel(
         itemRepository.insert(
             body.name,
             setOfNotNull(body.categoryId),
-            body.savedWeights,
+            body.format,
         )
     }
 
@@ -44,7 +44,7 @@ class ItemsPageViewModel(
             id,
             body.name,
             setOfNotNull(body.categoryId),
-            body.savedWeights,
+            body.format,
         )
     }
 

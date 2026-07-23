@@ -1,5 +1,6 @@
 package com.julianfortune.glacier.ui.feature.entry.form
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -94,6 +95,23 @@ fun NewEntryFormUi(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // TODO(#29): Select the size of item
+            AnimatedVisibility(
+                false,
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    DropdownSelect(
+                        selectedId = 0,
+                        label = "Size",
+                        options = listOf(Option(0, "8oz"), Option(1, "12oz"), Option(2, "Other")),
+                        onSelectedChange = {  },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
@@ -145,7 +163,7 @@ fun NewEntryFormUi(
                 )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,

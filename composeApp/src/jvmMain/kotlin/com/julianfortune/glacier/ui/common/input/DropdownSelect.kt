@@ -1,8 +1,10 @@
 package com.julianfortune.glacier.ui.common.input
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.common.data.Option
+import com.julianfortune.glacier.ui.theme.AppPreview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,6 +23,7 @@ fun <ID> DropdownSelect(
     selectedId: ID,
     options: List<Option<ID>>,
     onSelectedChange: (Option<ID>) -> Unit,
+    label: String? = null,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -42,14 +47,24 @@ fun <ID> DropdownSelect(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = selectedOption.title,
+                Column(
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    label?.let {
+                        Text(
+                            it,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                    Text(
+                        text = selectedOption.title,
+                    )
+                }
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             }
         }
@@ -83,5 +98,18 @@ fun <ID> DropdownSelect(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun DropdownSelectPreview() = AppPreview {
+    Column {
+        DropdownSelect(
+            0,
+            listOf(Option(0, "Example")),
+            {},
+            label = "Choice"
+        )
     }
 }

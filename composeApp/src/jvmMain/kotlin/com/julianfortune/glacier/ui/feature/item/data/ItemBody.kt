@@ -1,9 +1,9 @@
-package com.julianfortune.glacier.ui.page.item.data
+package com.julianfortune.glacier.ui.feature.item.data
 
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.domain.Item
 
 data class ItemBody(
     val name: String,
     val categoryId: Long?,
-    val savedWeights: Set<Weight>?
+    val format: Item.Format,
 )

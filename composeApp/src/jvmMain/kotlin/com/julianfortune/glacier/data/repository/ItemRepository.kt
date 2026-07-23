@@ -39,12 +39,13 @@ class ItemRepository(private val database: Database) {
                 val savedWeights = first.savedWeightInCentigramsListJson?.let {
                     WeightListCodec.deserialize(it).unwrapUnsafe().toSet()
                 }
+                val format = formatFromSavedWeights(savedWeights)
 
                 Item(
                     first.id,
                     first.name,
                     categories,
-                    savedWeights
+                    format
                 )
             }
 
@@ -69,24 +70,30 @@ class ItemRepository(private val database: Database) {
                         val savedWeights = firstRow.savedWeightInCentigramsListJson?.let {
                             WeightListCodec.deserialize(it).unwrapUnsafe().toSet()
                         }
+                        val format = formatFromSavedWeights(savedWeights)
 
                         Item(
-                            id = itemId,
-                            name = firstRow.name,
-                            categories = categories,
-                            savedWeights = savedWeights,
+                            itemId,
+                            firstRow.name,
+                            categories,
+                            format,
                         )
                     }
             }
     }
 
-    suspend fun insert(name: String, categoryIds: Set<Long>, savedWeights: Set<Weight>?): Result<Long> {
+    private fun formatFromSavedWeights(savedWeights: Set<Weight>?): Item.Format {
+        return when (savedWeights?.size) {
+            null, 0 -> Item.Format.Loose
+            else -> Item.Format.Packaged(savedWeights)
+        }
+    }
+
+    suspend fun insert(name: String, categoryIds: Set<Long>, format: Item.Format): Result<Long> {
         return Result.runCatching {
             database.transactionWithResult {
-                val savedWeightsJson = when (savedWeights?.size) {
-                    null, 0 -> null
-                    else -> WeightListCodec.serialize(savedWeights.toList())
-                }
+                val savedWeightsJson = serializeFormatToJsonList(format)
+
                 val itemId = database.itemQueries.insert(
                     name,
                     savedWeightsJson
@@ -105,12 +112,9 @@ class ItemRepository(private val database: Database) {
         itemId: Long,
         name: String,
         categoryIds: Set<Long>,
-        savedWeights: Set<Weight>?,
+        format: Item.Format,
     ): Result<Long> {
-        val savedWeightsJson = when (savedWeights?.size) {
-            null, 0 -> null
-            else -> WeightListCodec.serialize(savedWeights.toList())
-        }
+        val savedWeightsJson = serializeFormatToJsonList(format)
 
         return runCatching {
             database.transactionWithResult {
@@ -123,6 +127,13 @@ class ItemRepository(private val database: Database) {
 
                 itemId
             }
+        }
+    }
+
+    private fun serializeFormatToJsonList(format: Item.Format): String? {
+        return when (format) {
+            is Item.Format.Loose -> null
+            is Item.Format.Packaged -> WeightListCodec.serialize(format.sizes.toList())
         }
     }
 
