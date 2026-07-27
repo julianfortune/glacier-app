@@ -9,14 +9,22 @@ import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.ui.common.data.FormFieldState
 import com.julianfortune.glacier.ui.common.input.CurrencyInput
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
+import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormEvent
+import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormInputsState
 import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormState
+import com.julianfortune.glacier.ui.feature.entry.form.data.ItemWeightState
 
-// NOTE: In order to test this in a sane way this should probably be converted into a ViewModel
-class EntryFormStateHolder(initialEntry: EntryBody? = null) {
+
+class EntryFormInputsStateHolder(
+    initialEntry: EntryBody? = null,
+) {
 
     private var selectedItemId by mutableStateOf(initialEntry?.itemId)
 
-    // TODO("Verify how to extract initial imperial pounds/ounces from initialEntry.unitWeight or context")
+    // TODO: Mutable state for the item weight dropdown options (and whether it's enabled / disabled)
+    // private var itemWeightOptions by mutableStateOf()
+    private var itemWeight by mutableStateOf(initialEntry?.itemWeight)
+
     private var unitWeightPoundsInput by mutableStateOf(
         initialEntry?.unitWeight?.toImperial()?.first?.toString() ?: ""
     )
@@ -34,6 +42,7 @@ class EntryFormStateHolder(initialEntry: EntryBody? = null) {
     private var selectedProgramId by mutableStateOf<Long?>(initialEntry?.programId)
 
     private var selectedPurchasingAccountId by mutableStateOf<Long?>(initialEntry?.purchasingAccountId)
+
 
     val validData: EntryBody? by derivedStateOf {
         val itemId = selectedItemId
@@ -69,14 +78,16 @@ class EntryFormStateHolder(initialEntry: EntryBody? = null) {
         }
     }
 
-    val uiState: EntryFormState by derivedStateOf {
-        EntryFormState(
+    val inputsState: EntryFormState by derivedStateOf {
+        EntryFormInputsState.Editable(
             selectedItemId = FormFieldState(value = selectedItemId),
-            unitWeightPounds = FormFieldState(
+            itemWeightState = ItemWeightState.Editable(),
+            unitWeight = ,
+            unitWeightPoundsInput = FormFieldState(
                 value = unitWeightPoundsInput,
                 isError = unitWeightPoundsInput.isNotEmpty() && unitWeightPoundsInput.toIntOrNull() == null
             ),
-            unitWeightOunces = FormFieldState(
+            ounc = FormFieldState(
                 value = unitWeightOuncesInput,
                 isError = unitWeightOuncesInput.isNotEmpty() && unitWeightOuncesInput.toFloatOrNull() == null
             ),
@@ -90,33 +101,22 @@ class EntryFormStateHolder(initialEntry: EntryBody? = null) {
         )
     }
 
-    fun onSelectedItemIdChange(value: Long?) {
-        selectedItemId = value
+    fun handleUiEvent(event: EntryFormEvent) {
+        when (event) {
+            is EntryFormEvent.AccountSelected -> TODO()
+            is EntryFormEvent.CostStatusChanged -> costStatusIsNoCost = event.isNoCost
+            is EntryFormEvent.ItemCountChanged -> TODO()
+            is EntryFormEvent.ItemSelected -> selectedItemId = event.itemId
+            is EntryFormEvent.ItemWeightSelected -> TODO()
+            is EntryFormEvent.ProgramSelected -> TODO()
+            is EntryFormEvent.UnitCostChanged -> unitCostInput = event.value
+            is EntryFormEvent.UnitCostLostFocus -> unitCostInput = unitCostInput?.toSimplifiedForm()
+            is EntryFormEvent.UnitCountChanged -> unitCountInput = event.value
+            is EntryFormEvent.WeightOuncesChanged -> unitWeightOuncesInput = event.value
+            is EntryFormEvent.WeightPoundsChanged -> unitWeightPoundsInput = event.value
+            else -> {
+                // Ignore irrelevant events (submit, abort)
+            }
+        }
     }
-
-    fun onWeightPoundsChange(value: String) {
-        unitWeightPoundsInput = value
-    }
-
-    fun onWeightOuncesChange(value: String) {
-        unitWeightOuncesInput = value
-    }
-
-    fun onCostStatusChange(value: Boolean) {
-        costStatusIsNoCost = value
-    }
-
-    fun onUnitCostChange(value: CurrencyInput?) {
-        unitCostInput = value
-    }
-
-    fun onUnitCostFocusLost() {
-        unitCostInput = unitCostInput?.toSimplifiedForm()
-    }
-
-    fun onUnitCountChange(value: String) {
-        unitCountInput = value
-    }
-
-    // TODO(Program and purchasing accouant)
 }
