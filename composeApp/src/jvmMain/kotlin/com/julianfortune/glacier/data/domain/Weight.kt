@@ -11,7 +11,7 @@ data class Weight(val centigrams: Long) {
 
     companion object Companion {
         const val CENTIGRAMS_PER_KG = 100
-        const val GRAMS_PER_OZ = 28.3495
+        const val GRAMS_PER_OZ = 28.349523125
         const val OZ_PER_POUND = 16
 
         fun ofCentigrams(centigrams: Long): Weight {

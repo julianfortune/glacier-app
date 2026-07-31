@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.theme.AppPreview
+import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +25,8 @@ fun <ID> DropdownSelect(
     options: List<Option<ID>>,
     onSelectedChange: (Option<ID>) -> Unit,
     label: String? = null,
+    // TODO: Make the enabled=false state look visually disabled
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -33,15 +36,25 @@ fun <ID> DropdownSelect(
             ?: throw IndexOutOfBoundsException("SelectedId ($selectedId) does not correspond to any value in `options`")
     }
 
+    LaunchedEffect(enabled) {
+        if (!enabled) {
+            expanded = false
+        }
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+        onExpandedChange = {
+            if (enabled) {
+                expanded = !expanded
+            }
+        },
         modifier = modifier
     ) {
         Surface(
             modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
-                .pointerHoverIcon(PointerIcon.Hand),
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = enabled)
+                .pointerHoverIcon(if (enabled) PointerIcon.Hand else PointerIcon.Default),
             shape = MaterialTheme.shapes.extraSmall,
             color = MaterialTheme.colorScheme.surfaceVariant,
         ) {

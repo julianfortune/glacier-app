@@ -21,6 +21,7 @@ import com.julianfortune.glacier.ui.feature.entry.table.data.EntryTableState
 import com.julianfortune.glacier.ui.feature.entry.table.data.SelectionState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 
 class EntryTableViewModel(
     private val deliveryViewCoordinator: DeliveryViewCoordinator,
@@ -82,7 +83,7 @@ class EntryTableViewModel(
                 }
 
                 val totalCount = (delivery.entries.sumOf { it.unitCount }).toString()
-                val totalWeight = calculateDeliveryTotalWeightPounds(delivery).toString()
+                val totalWeight = ((calculateDeliveryTotalWeightPounds(delivery) * 10).roundToLong() / 10f).toString()
                 val subtotal = "$" + formatCents(calculateDeliverySubTotalCostCents(delivery))
 
                 EntryTableState(

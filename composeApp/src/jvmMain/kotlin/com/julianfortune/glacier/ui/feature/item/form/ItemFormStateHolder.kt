@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.Item
 import com.julianfortune.glacier.ui.common.data.FormFieldState
+import com.julianfortune.glacier.ui.common.formatWeight
 import com.julianfortune.glacier.ui.feature.item.data.ItemFormatState
 import com.julianfortune.glacier.ui.feature.item.data.ItemBody
 import com.julianfortune.glacier.ui.feature.item.data.ItemFormState
@@ -59,15 +60,7 @@ class ItemFormStateHolder(initialValue: ItemBody? = null) {
             is FormatInput.Packaged -> {
                 val sizes = currentPackagingInput.sizes
                     .sortedBy { it.centigrams }
-                    .map {
-                        val (lbs, oz) = it.toImperial()
-                        val lbsString = if (lbs != 0L) "${lbs}lb" else null
-                        val ozString = if (oz > 0) {
-                            oz.toString().removeSuffix(".0") + "oz"
-                        } else null
-
-                        listOfNotNull(lbsString, ozString).joinToString(" ")
-                    }
+                    .map { formatWeight(it) }
 
                 ItemFormatState.Packaged(sizes)
             }
@@ -90,9 +83,13 @@ class ItemFormStateHolder(initialValue: ItemBody? = null) {
     }
 
     fun onPackagingIsLooseChange(newValue: Boolean) {
-        formatInput = when (newValue) {
-            true -> FormatInput.Loose
-            false -> FormatInput.Packaged(emptySet())
+        val currentPackingIsLoose = formatInput is FormatInput.Loose
+        // Ensure we only switch the state if needed in order to not reset the packaged sizes
+        if (currentPackingIsLoose != newValue) {
+            formatInput = when (newValue) {
+                true -> FormatInput.Loose
+                false -> FormatInput.Packaged(emptySet())
+            }
         }
     }
 
