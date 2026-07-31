@@ -10,7 +10,6 @@ import com.julianfortune.glacier.ui.delegate.*
 import com.julianfortune.glacier.ui.feature.delivery.detail.DeliveryDetailViewModel
 import com.julianfortune.glacier.ui.feature.delivery.list.DeliveryHeadlineListViewModel
 import com.julianfortune.glacier.ui.feature.entry.form.EntryFormViewModel
-import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
 import com.julianfortune.glacier.ui.feature.entry.table.EntryTableViewModel
 import com.julianfortune.glacier.ui.feature.report.detail.ReportDetailViewModel
 import com.julianfortune.glacier.ui.feature.report.list.ReportHeadlineListViewModel

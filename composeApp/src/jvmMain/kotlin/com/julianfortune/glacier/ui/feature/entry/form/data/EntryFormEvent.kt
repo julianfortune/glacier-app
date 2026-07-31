@@ -1,6 +1,5 @@
 package com.julianfortune.glacier.ui.feature.entry.form.data
 
-import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.ui.common.input.CurrencyInput
 
 sealed interface EntryFormEvent {

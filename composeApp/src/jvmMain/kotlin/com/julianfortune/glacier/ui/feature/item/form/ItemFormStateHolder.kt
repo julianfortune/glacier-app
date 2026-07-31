@@ -4,13 +4,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.data.domain.Item
+import com.julianfortune.glacier.data.domain.Weight
 import com.julianfortune.glacier.ui.common.data.FormFieldState
 import com.julianfortune.glacier.ui.common.formatWeight
-import com.julianfortune.glacier.ui.feature.item.data.ItemFormatState
 import com.julianfortune.glacier.ui.feature.item.data.ItemBody
 import com.julianfortune.glacier.ui.feature.item.data.ItemFormState
+import com.julianfortune.glacier.ui.feature.item.data.ItemFormatState
 
 
 sealed interface FormatInput {
