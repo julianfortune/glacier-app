@@ -89,7 +89,7 @@ class DeliveryRepository(private val database: Database) {
             Program(id, row.programName ?: throw Exception("`programName` must be defined by foreign key constraints"))
         }
         val account = row.purchasingAccountId?.let { id ->
-            PurchasingAccount(
+            Account(
                 id,
                 row.purchasingAccountName
                     ?: throw Exception("`purchasingAccountName` must be defined by foreign key constraints")

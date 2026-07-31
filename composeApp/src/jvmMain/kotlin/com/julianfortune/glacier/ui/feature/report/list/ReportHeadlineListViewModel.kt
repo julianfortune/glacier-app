@@ -2,7 +2,7 @@ package com.julianfortune.glacier.ui.feature.report.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.repository.BasicReportRepository
+import com.julianfortune.glacier.data.repository.ReportRepository
 import com.julianfortune.glacier.ui.coordinator.report.ReportViewCoordinator
 import com.julianfortune.glacier.ui.coordinator.report.data.ReportViewState
 import com.julianfortune.glacier.ui.feature.report.list.data.CreateReportBody
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ReportHeadlineListViewModel(
-    private val basicReportRepository: BasicReportRepository,
+    private val reportRepository: ReportRepository,
     private val reportViewCoordinator: ReportViewCoordinator,
 ) : ViewModel() {
 
@@ -24,7 +24,7 @@ class ReportHeadlineListViewModel(
         }
     }
 
-    val allReports = basicReportRepository.getAllAsHeadlines()
+    val allReports = reportRepository.getAllAsHeadlines()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -37,7 +37,7 @@ class ReportHeadlineListViewModel(
 
     fun createNewReport(body: CreateReportBody) {
         viewModelScope.launch {
-            val result = basicReportRepository.insert(
+            val result = reportRepository.insert(
                 body.name,
                 body.start,
                 body.end,

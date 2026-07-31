@@ -70,7 +70,7 @@ fun ReportCriteriaSection(
                 KeyValueItem(Icons.Outlined.Money, "Cost Status", description)
             }
             state.program?.let { KeyValueItem(Icons.Outlined.Cases, "Program", it.name) }
-            state.purchasingAccount?.let { KeyValueItem(Icons.Outlined.AccountBalanceWallet, "Account", it.name) }
+            state.account?.let { KeyValueItem(Icons.Outlined.AccountBalanceWallet, "Account", it.name) }
             state.supplier?.let { KeyValueItem(Icons.Outlined.Storefront, "Supplier", it.name) }
         }
     }
@@ -87,7 +87,7 @@ fun ReportCriteriaSectionPreview() = AppPreview {
             category = Category(1, "Produce"),
             costStatus = CostStatus.PURCHASED,
             program = Program(1, "Breakfast"),
-            purchasingAccount = PurchasingAccount(1, "Account I"),
+            account = Account(1, "Account I"),
             supplier = Supplier(1, "ABC Foods"),
         )
     )

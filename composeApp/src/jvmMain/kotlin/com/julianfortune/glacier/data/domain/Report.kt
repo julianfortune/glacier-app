@@ -4,7 +4,7 @@ import com.julianfortune.glacier.data.common.Entity
 import com.julianfortune.glacier.data.common.EntityMetadata
 import java.time.LocalDate
 
-data class BasicReport(
+data class Report(
     override val id: Long,
     val name: String,
     val criteria: Criteria,
@@ -17,7 +17,7 @@ data class BasicReport(
         val category: Category?,
         val costStatus: CostStatus?,
         val program: Program?,
-        val purchasingAccount: PurchasingAccount?,
+        val account: Account?,
         val supplier: Supplier?,
     )
 }

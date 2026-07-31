@@ -23,7 +23,7 @@ data class Delivery(
         val itemWeight: Weight?,
         val itemsPerUnit: Long?,
         val program: Program?,
-        val purchasingAccount: PurchasingAccount?,
+        val account: Account?,
         val metadata: EntityMetadata,
     ) : Entity
 }

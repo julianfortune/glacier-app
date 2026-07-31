@@ -21,7 +21,7 @@ class EditReportCriteriaStateHolder(initialValues: ReportCriteriaBody) {
     private var costStatusIsNoCost by mutableStateOf<Boolean?>(initialValues.costStatus?.let { it == CostStatus.NO_COST })
 
     private var programIdInput by mutableStateOf<Long?>(initialValues.programId)
-    private var purchasingAccountIdInput by mutableStateOf<Long?>(initialValues.purchasingAccountId)
+    private var accountIdInput by mutableStateOf<Long?>(initialValues.accountId)
     private var supplierIdInput by mutableStateOf<Long?>(initialValues.supplierId)
 
     val validData: ReportCriteriaBody? by derivedStateOf {
@@ -36,7 +36,7 @@ class EditReportCriteriaStateHolder(initialValues: ReportCriteriaBody) {
                 categoryIdInput,
                 costStatusIsNoCost?.let { isNoCost -> if (isNoCost) CostStatus.NO_COST else CostStatus.PURCHASED },
                 programIdInput,
-                purchasingAccountIdInput,
+                accountIdInput,
                 supplierIdInput,
             )
         } else {
@@ -52,7 +52,7 @@ class EditReportCriteriaStateHolder(initialValues: ReportCriteriaBody) {
             categoryId = FormFieldState(categoryIdInput),
             costStatusIsNoCost = FormFieldState(costStatusIsNoCost),
             programId = FormFieldState(programIdInput),
-            purchasingAccountId = FormFieldState(purchasingAccountIdInput),
+            accountId = FormFieldState(accountIdInput),
             supplierId = FormFieldState(supplierIdInput),
             isValid = validData != null,
         )
@@ -91,7 +91,7 @@ class EditReportCriteriaStateHolder(initialValues: ReportCriteriaBody) {
     }
 
     fun onPurchasingAccountIdChanged(purchasingAccountId: Long?) {
-        purchasingAccountIdInput = purchasingAccountId
+        accountIdInput = purchasingAccountId
     }
 
     fun onSupplierIdChanged(supplierId: Long?) {

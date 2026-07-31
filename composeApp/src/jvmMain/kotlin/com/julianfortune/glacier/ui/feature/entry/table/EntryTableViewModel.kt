@@ -9,7 +9,7 @@ import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator
 import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import com.julianfortune.glacier.ui.delegate.ItemOptionsProvider
 import com.julianfortune.glacier.ui.delegate.ProgramOptionsProvider
-import com.julianfortune.glacier.ui.delegate.PurchasingAccountOptionsProvider
+import com.julianfortune.glacier.ui.delegate.AccountOptionsProvider
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliverySubTotalCostCents
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateDeliveryTotalWeightPounds
 import com.julianfortune.glacier.ui.feature.delivery.detail.calculateEntryTotalCostCents
@@ -26,13 +26,11 @@ import kotlin.math.roundToLong
 class EntryTableViewModel(
     private val deliveryViewCoordinator: DeliveryViewCoordinator,
     private val deliveryRepository: DeliveryRepository,
-    itemOptionsProvider: ItemOptionsProvider,
     programOptionsProvider: ProgramOptionsProvider,
-    purchasingAccountOptionsProvider: PurchasingAccountOptionsProvider,
+    accountOptionsProvider: AccountOptionsProvider,
 ) : ViewModel(),
-    ItemOptionsProvider by itemOptionsProvider,
     ProgramOptionsProvider by programOptionsProvider,
-    PurchasingAccountOptionsProvider by purchasingAccountOptionsProvider {
+    AccountOptionsProvider by accountOptionsProvider {
 
     private val entryAction = MutableStateFlow<EntryAction?>(null)
     private val selectionEnabled = MutableStateFlow(false)
@@ -75,7 +73,7 @@ class EntryTableViewModel(
                         e.id in selections,
                         e.item.name,
                         e.program?.name,
-                        e.purchasingAccount?.name,
+                        e.account?.name,
                         e.unitCount.toString(),
                         totalWeight.toPounds().toString(),
                         totalCostCents,
@@ -120,7 +118,7 @@ class EntryTableViewModel(
                     entry.itemWeight,
                     entry.itemsPerUnit,
                     entry.program?.id,
-                    entry.purchasingAccount?.id,
+                    entry.account?.id,
                 )
 
                 entryAction.value = EntryAction.Edit(entry.id, body)
@@ -224,7 +222,7 @@ class EntryTableViewModel(
                 body.itemWeight,
                 body.itemsPerUnit,
                 body.programId,
-                body.purchasingAccountId,
+                body.accountId,
             )
         }
     }
@@ -244,7 +242,7 @@ class EntryTableViewModel(
                 body.itemWeight,
                 body.itemsPerUnit,
                 body.programId,
-                body.purchasingAccountId,
+                body.accountId,
             )
         }
     }

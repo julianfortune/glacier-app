@@ -36,10 +36,9 @@ fun <ID> AutocompleteSelect(
     var expanded by remember { mutableStateOf(false) }
 
     val selectedOptionName: String = remember(selectedOptionId, options) {
-        when (selectedOptionId) {
-            null -> ""
-            else -> options.first { it.id == selectedOptionId }.title
-        }
+        selectedOptionId?.let {
+            options.firstOrNull { it.id == selectedOptionId }?.title
+        } ?: ""
     }
 
     val textFieldValue = remember(input, selectedOptionName) {

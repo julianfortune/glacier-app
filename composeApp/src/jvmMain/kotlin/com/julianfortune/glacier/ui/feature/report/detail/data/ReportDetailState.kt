@@ -26,7 +26,7 @@ data class ReportCriteriaState(
     val category: Category? = null,
     val costStatus: CostStatus? = null,
     val program: Program? = null,
-    val purchasingAccount: PurchasingAccount? = null,
+    val account: Account? = null,
     val supplier: Supplier? = null,
 )
 

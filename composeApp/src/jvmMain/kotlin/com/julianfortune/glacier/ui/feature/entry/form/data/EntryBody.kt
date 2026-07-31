@@ -12,5 +12,5 @@ data class EntryBody(
     val itemWeight: Weight?,
     val itemsPerUnit: Long?,
     val programId: Long?,
-    val purchasingAccountId: Long?,
+    val accountId: Long?,
 )

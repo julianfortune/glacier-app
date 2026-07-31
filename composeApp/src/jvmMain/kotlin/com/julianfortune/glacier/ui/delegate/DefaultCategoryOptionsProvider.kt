@@ -13,9 +13,7 @@ class DefaultCategoryOptionsProvider(
 ) : CategoryOptionsProvider {
     
     override val categoryOptions = categoryRepository.getAll()
-        .map { cs ->
-            cs.map { Option(it.id, it.name) }
-        }
+        .map { entities -> entities.map { it.toOption() } }
         .stateIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(),

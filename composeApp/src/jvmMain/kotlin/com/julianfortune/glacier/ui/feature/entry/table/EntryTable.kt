@@ -45,7 +45,6 @@ fun EntryTable(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val itemOptions by viewModel.itemOptions.collectAsState(emptyList())
     val programOptions by viewModel.programOptions.collectAsState(emptyList())
     val accountOptions by viewModel.accountOptions.collectAsState(emptyList())
 
@@ -79,8 +78,7 @@ fun EntryTable(
                     onSubmit = { entry ->
                         viewModel.saveEntry(entry)
                         viewModel.cancelEntryOperation()
-                    },
-                    itemOptions,
+                    }
                 )
             }
 
@@ -96,8 +94,7 @@ fun EntryTable(
                     onSubmit = { newEntry ->
                         viewModel.updateEntry(editAction.id, newEntry)
                         viewModel.cancelEntryOperation()
-                    },
-                    itemOptions,
+                    }
                 )
             }
 

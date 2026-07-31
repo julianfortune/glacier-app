@@ -9,6 +9,9 @@ import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.formatWeight
 import com.julianfortune.glacier.ui.common.input.CurrencyInput
+import com.julianfortune.glacier.ui.delegate.ProgramOptionsProvider
+import com.julianfortune.glacier.ui.delegate.AccountOptionsProvider
+import com.julianfortune.glacier.ui.delegate.ItemOptionsProvider
 import com.julianfortune.glacier.ui.feature.entry.form.data.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -16,7 +19,15 @@ import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EntryFormViewModel(private val itemRepository: ItemRepository) : ViewModel() {
+class EntryFormViewModel(
+    private val itemRepository: ItemRepository,
+    private val itemOptionsProvider: ItemOptionsProvider,
+    private val programOptionsProvider: ProgramOptionsProvider,
+    private val accountOptionsProvider: AccountOptionsProvider,
+) : ViewModel(),
+    ItemOptionsProvider by itemOptionsProvider,
+    ProgramOptionsProvider by programOptionsProvider,
+    AccountOptionsProvider by accountOptionsProvider {
 
     private data class FormInputs(
         val selectedItemId: Long? = null,
@@ -191,7 +202,7 @@ class EntryFormViewModel(private val itemRepository: ItemRepository) : ViewModel
                     unitCostInput = CurrencyInput.fromLong(entryBody.unitCostCents),
                     unitCountInput = "",
                     selectedProgramId = entryBody.programId,
-                    selectedAccountId = entryBody.purchasingAccountId
+                    selectedAccountId = entryBody.accountId
                 )
 
                 viewModelScope.launch {

@@ -25,14 +25,14 @@ val appModule = module {
     single { Database(get()) }
 
     // Repositories
-    single { BasicReportRepository(get()) }
+    single { ReportRepository(get()) }
     single { DeliveryRepository(get()) }
     single { CategoryRepository(get()) }
     single { ItemRepository(get()) }
     single { ReportResultRepository(get()) }
     single { SupplierRepository(get()) }
     single { ProgramRepository(get()) }
-    single { PurchasingAccountRepository(get()) }
+    single { AccountRepository(get()) }
 
     // View coordinators
     single<DeliveryViewCoordinator> {
@@ -67,9 +67,9 @@ val appModule = module {
             scope = CoroutineScope(Dispatchers.Default)
         )
     }
-    single<PurchasingAccountOptionsProvider> {
-        DefaultPurchasingAccountOptionsProvider(
-            purchasingAccountRepository = get(),
+    single<AccountOptionsProvider> {
+        DefaultAccountOptionsProvider(
+            accountRepository = get(),
             scope = CoroutineScope(Dispatchers.Default)
         )
     }
@@ -86,7 +86,6 @@ val appModule = module {
     }
     viewModel {
         EntryTableViewModel(
-            get(),
             get(),
             get(),
             get(),
@@ -108,7 +107,12 @@ val appModule = module {
         )
     }
     viewModel {
-        EntryFormViewModel(get())
+        EntryFormViewModel(
+            get(),
+            get(),
+            get(),
+            get()
+        )
     }
     viewModel {
         ItemsPageViewModel(get(), get())
@@ -117,7 +121,7 @@ val appModule = module {
         NamedEntityPageViewModel(get<ProgramRepository>())
     }
     viewModel(named("purchasingAccountViewModel")) {
-        NamedEntityPageViewModel(get<PurchasingAccountRepository>())
+        NamedEntityPageViewModel(get<AccountRepository>())
     }
     viewModel {
         ReportDetailViewModel(get(), get(), get(), get(), get(), get(), get(), get())

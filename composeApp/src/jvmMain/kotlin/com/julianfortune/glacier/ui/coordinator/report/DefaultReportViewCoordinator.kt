@@ -1,7 +1,7 @@
 package com.julianfortune.glacier.ui.coordinator.report
 
-import com.julianfortune.glacier.data.domain.BasicReport
-import com.julianfortune.glacier.data.repository.BasicReportRepository
+import com.julianfortune.glacier.data.domain.Report
+import com.julianfortune.glacier.data.repository.ReportRepository
 import com.julianfortune.glacier.ui.coordinator.report.data.ReportViewState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultReportViewCoordinator(
-    basicReportRepository: BasicReportRepository,
+    reportRepository: ReportRepository,
     coroutineScope: CoroutineScope,
 ) : ReportViewCoordinator {
 
     private val _targetBasicReportId = MutableStateFlow<Long?>(null)
 
-    private val _report: Flow<BasicReport?> = _targetBasicReportId.flatMapLatest { id ->
-        id?.let { basicReportRepository.getById(it) } ?: flowOf(null)
+    private val _report: Flow<Report?> = _targetBasicReportId.flatMapLatest { id ->
+        id?.let { reportRepository.getById(it) } ?: flowOf(null)
     }
 
     override val state = combine(_report, _targetBasicReportId) { report, targetId ->

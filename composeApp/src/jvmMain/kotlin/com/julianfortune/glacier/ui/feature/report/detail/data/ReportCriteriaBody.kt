@@ -10,6 +10,6 @@ data class ReportCriteriaBody(
     val categoryId: Long? = null,
     val costStatus: CostStatus? = null,
     val programId: Long? = null,
-    val purchasingAccountId: Long? = null,
+    val accountId: Long? = null,
     val supplierId: Long? = null,
 )

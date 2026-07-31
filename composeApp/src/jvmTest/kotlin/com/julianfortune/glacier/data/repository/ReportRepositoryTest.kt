@@ -17,16 +17,16 @@ import java.time.LocalDate
 import kotlin.properties.Delegates.notNull
 
 
-class BasicReportRepositoryTest {
+class ReportRepositoryTest {
 
     val database = runBlocking { createTestDatabase() }
-    val basicReportRepository = BasicReportRepository(database)
+    val reportRepository = ReportRepository(database)
 
     @Test
     fun getById() {
         // WHEN
         val result = runBlocking {
-            basicReportRepository.getById(1L).firstOrNull()
+            reportRepository.getById(1L).firstOrNull()
         }
 
         // THEN
@@ -81,7 +81,7 @@ class BasicReportRepositoryTest {
 
         // WHEN
         val id = runBlocking {
-            basicReportRepository.insert(
+            reportRepository.insert(
                 name = name,
                 start = start,
                 end = end,
@@ -95,7 +95,7 @@ class BasicReportRepositoryTest {
         }
 
         // THEN
-        val storedReport = runBlocking { basicReportRepository.getById(id).first() }
+        val storedReport = runBlocking { reportRepository.getById(id).first() }
 
         assertThat(storedReport).isNotNull()
         assertThat(storedReport!!.id).isEqualTo(id)
@@ -106,7 +106,7 @@ class BasicReportRepositoryTest {
         assertThat(storedReport.criteria.category?.id).isEqualTo(itemCategoryId)
         assertThat(storedReport.criteria.costStatus).isEqualTo(costStatus)
         assertThat(storedReport.criteria.program?.id).isEqualTo(programId)
-        assertThat(storedReport.criteria.purchasingAccount?.id).isEqualTo(purchasingAccountId)
+        assertThat(storedReport.criteria.account?.id).isEqualTo(purchasingAccountId)
         assertThat(storedReport.criteria.supplier?.id).isEqualTo(supplierId)
     }
 
@@ -121,7 +121,7 @@ class BasicReportRepositoryTest {
         @BeforeEach
         fun setUp() {
             reportId = runBlocking {
-                basicReportRepository.insert(
+                reportRepository.insert(
                     name = initialName,
                     start = initialStart,
                     end = initialEnd,
@@ -144,7 +144,7 @@ class BasicReportRepositoryTest {
 
             // WHEN
             val id = runBlocking {
-                basicReportRepository.update(
+                reportRepository.update(
                     id = reportId,
                     name = updatedName,
                     start = updatedStart,
@@ -159,7 +159,7 @@ class BasicReportRepositoryTest {
             }
 
             // THEN
-            val storedReport = runBlocking { basicReportRepository.getById(id).first() }
+            val storedReport = runBlocking { reportRepository.getById(id).first() }
 
             assertThat(storedReport).isNotNull()
             assertThat(storedReport!!.name).isEqualTo(updatedName)
@@ -170,7 +170,7 @@ class BasicReportRepositoryTest {
         fun getOneById() {
             // WHEN
             val result = runBlocking {
-                basicReportRepository.getById(reportId).first()
+                reportRepository.getById(reportId).first()
             }
 
             // THEN
@@ -185,12 +185,12 @@ class BasicReportRepositoryTest {
         fun deleteBasicReport() {
             // WHEN
             val id = runBlocking {
-                basicReportRepository.delete(reportId).getOrThrow()
+                reportRepository.delete(reportId).getOrThrow()
             }
 
             // THEN
             val result = runBlocking {
-                basicReportRepository.getById(id).firstOrNull()
+                reportRepository.getById(id).firstOrNull()
             }
             assertThat(result).isNull()
         }
@@ -207,7 +207,7 @@ class BasicReportRepositoryTest {
         fun setUp() {
             runBlocking {
                 (1..3).forEach { index ->
-                    basicReportRepository.insert(
+                    reportRepository.insert(
                         name = getName(index),
                         start = getStartDate(index),
                         end = getEndDate(index),
@@ -226,7 +226,7 @@ class BasicReportRepositoryTest {
         fun getAllAsHeadlines() {
             // WHEN
             val headlines = runBlocking {
-                basicReportRepository.getAllAsHeadlines().first()
+                reportRepository.getAllAsHeadlines().first()
             }
 
             // THEN

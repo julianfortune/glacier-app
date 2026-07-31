@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.util.formatCents
 import com.julianfortune.glacier.data.domain.ReportResult
-import com.julianfortune.glacier.data.repository.BasicReportRepository
+import com.julianfortune.glacier.data.repository.ReportRepository
 import com.julianfortune.glacier.data.repository.ReportResultRepository
 import com.julianfortune.glacier.ui.common.formatLocalDate
 import com.julianfortune.glacier.ui.coordinator.report.ReportViewCoordinator
@@ -20,19 +20,19 @@ import kotlinx.coroutines.launch
 import java.time.format.FormatStyle
 
 class ReportDetailViewModel(
-    private val basicReportRepository: BasicReportRepository,
+    private val reportRepository: ReportRepository,
     private val reportResultRepository: ReportResultRepository,
     private val reportViewCoordinator: ReportViewCoordinator,
     private val itemOptionsProvider: ItemOptionsProvider,
     private val categoryOptionsProvider: CategoryOptionsProvider,
     private val programOptionsProvider: ProgramOptionsProvider,
-    private val purchasingAccountOptionsProvider: PurchasingAccountOptionsProvider,
+    private val accountOptionsProvider: AccountOptionsProvider,
     private val supplierOptionsProvider: SupplierOptionsProvider,
 ) : ViewModel(),
     ItemOptionsProvider by itemOptionsProvider,
     CategoryOptionsProvider by categoryOptionsProvider,
     ProgramOptionsProvider by programOptionsProvider,
-    PurchasingAccountOptionsProvider by purchasingAccountOptionsProvider,
+    AccountOptionsProvider by accountOptionsProvider,
     SupplierOptionsProvider by supplierOptionsProvider {
 
     private val editNameState = MutableStateFlow<String?>(null) // Contains the existing name
@@ -50,7 +50,7 @@ class ReportDetailViewModel(
                     criteria.category?.id,
                     criteria.costStatus,
                     criteria.program?.id,
-                    criteria.purchasingAccount?.id,
+                    criteria.account?.id,
                     criteria.supplier?.id,
                 )
             }
@@ -82,7 +82,7 @@ class ReportDetailViewModel(
                             report.criteria.category,
                             report.criteria.costStatus,
                             report.criteria.program,
-                            report.criteria.purchasingAccount,
+                            report.criteria.account,
                             report.criteria.supplier,
                         ),
                         results = results?.let {
@@ -118,7 +118,7 @@ class ReportDetailViewModel(
         when (val current = reportViewCoordinator.state.value) {
             is ReportViewState.Viewing -> {
                 viewModelScope.launch {
-                    val result = basicReportRepository.updateName(
+                    val result = reportRepository.updateName(
                         current.currentReport.id,
                         newName,
                     )
@@ -141,7 +141,7 @@ class ReportDetailViewModel(
         when (val current = reportViewCoordinator.state.value) {
             is ReportViewState.Viewing -> {
                 viewModelScope.launch {
-                    val result = basicReportRepository.delete(current.currentReport.id)
+                    val result = reportRepository.delete(current.currentReport.id)
 
                     // TODO: Error-handling
                     result.getOrThrow()
@@ -163,7 +163,7 @@ class ReportDetailViewModel(
                     currentCriteria.category?.id,
                     currentCriteria.costStatus,
                     currentCriteria.program?.id,
-                    currentCriteria.purchasingAccount?.id,
+                    currentCriteria.account?.id,
                     currentCriteria.supplier?.id,
                 )
             }
@@ -176,7 +176,7 @@ class ReportDetailViewModel(
         when (val current = reportViewCoordinator.state.value) {
             is ReportViewState.Viewing -> {
                 viewModelScope.launch {
-                    val result = basicReportRepository.update(
+                    val result = reportRepository.update(
                         current.currentReport.id,
                         current.currentReport.name,
                         newCriteria.start,
@@ -185,7 +185,7 @@ class ReportDetailViewModel(
                         newCriteria.categoryId,
                         newCriteria.costStatus,
                         newCriteria.programId,
-                        newCriteria.purchasingAccountId,
+                        newCriteria.accountId,
                         newCriteria.supplierId,
                     )
 

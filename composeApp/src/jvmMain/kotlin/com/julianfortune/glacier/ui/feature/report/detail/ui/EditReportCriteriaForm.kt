@@ -166,7 +166,7 @@ fun EditReportCriteriaFormUi(
         )
 
         AutocompleteSelect(
-            selectedOptionId = state.purchasingAccountId.value,
+            selectedOptionId = state.accountId.value,
             options = purchasingAccountOptions,
             onSelectedChange = { onPurchasingAccountIdChange(it?.id) },
             label = { Text("Account") },

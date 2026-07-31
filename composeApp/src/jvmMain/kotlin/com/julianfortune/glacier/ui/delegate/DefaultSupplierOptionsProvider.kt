@@ -13,9 +13,7 @@ class DefaultSupplierOptionsProvider(
 ) : SupplierOptionsProvider {
 
     override val supplierOptions = supplierRepository.getAll()
-        .map { suppliers ->
-            suppliers.map { Option(it.id, it.name) }
-        }
+        .map { entities -> entities.map { it.toOption() } }
         .stateIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(),

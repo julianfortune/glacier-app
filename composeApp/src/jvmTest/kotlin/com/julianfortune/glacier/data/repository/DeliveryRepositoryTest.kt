@@ -267,8 +267,8 @@ class DeliveryRepositoryTest {
 
                 assertThat(firstEntry.item).isEqualTo(ItemHeadline(initialItemId, initialItemName))
                 assertThat(firstEntry.program).isEqualTo(Program(initialProgramId, initialProgramName))
-                assertThat(firstEntry.purchasingAccount).isEqualTo(
-                    PurchasingAccount(
+                assertThat(firstEntry.account).isEqualTo(
+                    Account(
                         initialPurchasingAccountId,
                         initialPurchasingAccountName
                     )

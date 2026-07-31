@@ -17,9 +17,9 @@ import java.time.Instant
 import java.time.LocalDate
 
 
-class BasicReportRepository(private val database: Database) {
+class ReportRepository(private val database: Database) {
 
-    fun getAllAsHeadlines(): Flow<List<BasicReportHeadline>> {
+    fun getAllAsHeadlines(): Flow<List<ReportHeadline>> {
         return database.basicReportQueries.getAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
@@ -29,12 +29,12 @@ class BasicReportRepository(private val database: Database) {
                     val start = LocalDateCodec.deserialize(it.startDate).unwrapUnsafe()
                     val end = LocalDateCodec.deserialize(it.endDate).unwrapUnsafe()
 
-                    BasicReportHeadline(it.id, it.name, start, end)
+                    ReportHeadline(it.id, it.name, start, end)
                 }
             }
     }
 
-    fun getById(id: Long): Flow<BasicReport?> = database.basicReportQueries.getByIdWithHydration(id)
+    fun getById(id: Long): Flow<Report?> = database.basicReportQueries.getByIdWithHydration(id)
         .asFlow()
         .mapToOneOrNull(Dispatchers.IO)
         .map { row ->
@@ -66,7 +66,7 @@ class BasicReportRepository(private val database: Database) {
                         )
                     }
                     val account = row.purchasingAccountId?.let { id ->
-                        PurchasingAccount(
+                        Account(
                             id,
                             row.purchasingAccountName
                                 ?: throw Exception("`purchasingAccountName` must be defined by foreign key constraints")
@@ -82,10 +82,10 @@ class BasicReportRepository(private val database: Database) {
 
                     val metadata = EntityMetadata.ofEpochSeconds(row.createdAtEpochSeconds, row.updatedAtEpochSeconds)
 
-                    BasicReport(
+                    Report(
                         row.id,
                         row.name,
-                        BasicReport.Criteria(
+                        Report.Criteria(
                             start,
                             end,
                             item,

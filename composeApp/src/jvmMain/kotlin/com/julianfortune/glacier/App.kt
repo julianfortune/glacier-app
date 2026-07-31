@@ -14,7 +14,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.data.domain.Category
 import com.julianfortune.glacier.data.domain.Program
-import com.julianfortune.glacier.data.domain.PurchasingAccount
+import com.julianfortune.glacier.data.domain.Account
 import com.julianfortune.glacier.data.domain.Supplier
 import com.julianfortune.glacier.ui.page.delivery.DeliveriesPage
 import com.julianfortune.glacier.ui.page.item.ItemsPage
@@ -97,7 +97,7 @@ fun App() {
                             "Program"
                         )
 
-                        NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityPage<PurchasingAccount>(
+                        NavigationPage.PURCHASING_ACCOUNTS -> NamedEntityPage<Account>(
                             koinViewModel(named("purchasingAccountViewModel")),
                             "Accounts",
                             "Account"

@@ -27,29 +27,35 @@ fun EntryForm(
     initialEntry: EntryBody?,
     onCancel: () -> Unit,
     onSubmit: (body: EntryBody) -> Unit,
-    // TODO: These should be provided by the viewModel
-    itemOptions: List<Option<Long>>,
     modifier: Modifier = Modifier,
     viewModel: EntryFormViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
     val validData by viewModel.validData.collectAsState()
 
+    val itemOptions by viewModel.itemOptions.collectAsState(emptyList())
+    val programOptions by viewModel.programOptions.collectAsState(emptyList())
+    val accountOptions by viewModel.accountOptions.collectAsState(emptyList())
+
     LaunchedEffect(initialEntry) {
         viewModel.setInitialEntry(initialEntry)
     }
 
     NewEntryFormUi(
-        itemOptions = itemOptions,
         state = state,
+        itemOptions = itemOptions,
+        programOptions = programOptions,
+        accountOptions = accountOptions,
         eventHandler = { event ->
             when (event) {
                 is EntryFormEvent.AbortForm -> {
                     onCancel()
                 }
+
                 is EntryFormEvent.SubmitForm -> {
                     validData?.let { onSubmit(it) }
                 }
+
                 else -> {
                     viewModel.onEvent(event)
                 }
@@ -63,7 +69,9 @@ fun EntryForm(
 @Composable
 fun NewEntryFormUi(
     state: EntryFormState,
-    itemOptions: List<Option<Long>>,
+    itemOptions: List<Option<Long>> = emptyList(),
+    programOptions: List<Option<Long>> = emptyList(),
+    accountOptions: List<Option<Long>> = emptyList(),
     eventHandler: (EntryFormEvent) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -221,9 +229,39 @@ fun NewEntryFormUi(
                 singleLine = true,
             )
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Associations",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
 
-            // TODO(!!): Add program and purchasing account dropdowns
+            AutocompleteSelect(
+                selectedOptionId = state.selectedProgramId,
+                options = programOptions,
+                onSelectedChange = {
+                    eventHandler(EntryFormEvent.ProgramSelected(it?.id))
+                },
+                label = { Text("Program") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AutocompleteSelect(
+                selectedOptionId = state.selectedAccountId,
+                options = accountOptions,
+                onSelectedChange = {
+                    eventHandler(EntryFormEvent.AccountSelected(it?.id))
+                },
+                label = { Text("Account") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Action Buttons
             Row(
@@ -263,7 +301,6 @@ fun EntryFormPreview() {
         Column(modifier = Modifier.padding(16.dp)) {
             NewEntryFormUi(
                 state = EntryFormState(),
-                itemOptions = listOf(Option(1L, "Placeholder Item")),
             )
         }
     }

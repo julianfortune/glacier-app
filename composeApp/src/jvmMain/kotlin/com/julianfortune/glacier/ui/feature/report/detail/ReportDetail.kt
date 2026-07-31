@@ -197,7 +197,7 @@ fun ReportDetailUiPreview() = AppPreview {
                 category = Category(1, "Produce"),
                 costStatus = CostStatus.PURCHASED,
                 program = Program(1, "Breakfast"),
-                purchasingAccount = PurchasingAccount(1, "Account I"),
+                account = Account(1, "Account I"),
                 supplier = Supplier(1, "ABC Foods"),
             ),
             ReportResultState(
