@@ -27,6 +27,7 @@ import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.foundation.Dialog
 import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
 import com.julianfortune.glacier.ui.feature.entry.form.EntryForm
+import com.julianfortune.glacier.ui.feature.entry.form.EntryFormViewModel
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryAction
 import com.julianfortune.glacier.ui.feature.entry.table.data.EntryTableState
 import com.julianfortune.glacier.ui.feature.entry.table.data.SelectionState
@@ -72,16 +73,15 @@ fun EntryTable(
                 onDismissRequest = { viewModel.cancelEntryOperation() },
             ) {
                 EntryForm(
-                    "New Entry",
-                    "Create",
-                    itemOptions,
+                    null,
                     onCancel = {
                         viewModel.cancelEntryOperation()
                     },
                     onSubmit = { entry ->
                         viewModel.saveEntry(entry)
                         viewModel.cancelEntryOperation()
-                    }
+                    },
+                    itemOptions,
                 )
             }
 
@@ -90,17 +90,15 @@ fun EntryTable(
                 onDismissRequest = { viewModel.cancelEntryOperation() },
             ) { editAction ->
                 EntryForm(
-                    "Edit Entry",
-                    "Update",
-                    itemOptions,
-                    initialEntry = editAction.entry,
+                    editAction.entry,
                     onCancel = {
                         viewModel.cancelEntryOperation()
                     },
                     onSubmit = { newEntry ->
                         viewModel.updateEntry(editAction.id, newEntry)
                         viewModel.cancelEntryOperation()
-                    }
+                    },
+                    itemOptions,
                 )
             }
 

@@ -1,10 +1,16 @@
 package com.julianfortune.glacier.ui.feature.entry.form
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -15,43 +21,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.input.AutocompleteSelect
-import com.julianfortune.glacier.ui.common.input.CurrencyInput
 import com.julianfortune.glacier.ui.common.input.CurrencyInputTextField
 import com.julianfortune.glacier.ui.common.input.DropdownSelect
-import com.julianfortune.glacier.ui.feature.entry.form.data.EntryBody
-import com.julianfortune.glacier.ui.feature.entry.form.data.EntryFormState
+import com.julianfortune.glacier.ui.feature.entry.form.data.*
 import com.julianfortune.glacier.ui.theme.AppPreview
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun EntryForm(
-    title: String,
-    submitButtonText: String,
-    itemOptions: List<Option<Long>>,
-    initialEntry: EntryBody? = null,
+    initialEntry: EntryBody?,
     onCancel: () -> Unit,
     onSubmit: (body: EntryBody) -> Unit,
-    modifier: Modifier = Modifier
+    // TODO: These should be provided by the viewModel
+    itemOptions: List<Option<Long>>,
+    modifier: Modifier = Modifier,
+    viewModel: EntryFormViewModel = koinViewModel(),
 ) {
-    val stateHolder = remember(initialEntry) {
-        EntryFormStateHolder(initialEntry)
+    val state by viewModel.uiState.collectAsState()
+    val validData by viewModel.validData.collectAsState()
+
+    LaunchedEffect(initialEntry) {
+        viewModel.setInitialEntry(initialEntry)
     }
 
     NewEntryFormUi(
-        title = title,
-        submitButtonText = submitButtonText,
         itemOptions = itemOptions,
-        state = stateHolder.uiState,
-        onSelectedItemIdChange = stateHolder::onSelectedItemIdChange,
-        onWeightPoundsChange = stateHolder::onWeightPoundsChange,
-        onWeightOuncesChange = stateHolder::onWeightOuncesChange,
-        onCostStatusChange = stateHolder::onCostStatusChange,
-        onUnitCostChange = stateHolder::onUnitCostChange,
-        onUnitCostFocusLost = stateHolder::onUnitCostFocusLost,
-        onUnitCountChange = stateHolder::onUnitCountChange,
-        onCancel = onCancel,
-        onSubmit = {
-            stateHolder.validData?.let { onSubmit(it) }
+        state = state,
+        eventHandler = { event ->
+            when (event) {
+                is EntryFormEvent.AbortForm -> {
+                    onCancel()
+                }
+                is EntryFormEvent.SubmitForm -> {
+                    validData?.let { onSubmit(it) }
+                }
+                else -> {
+                    viewModel.onEvent(event)
+                }
+            }
         },
         modifier = modifier
     )
@@ -60,19 +68,9 @@ fun EntryForm(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewEntryFormUi(
-    title: String,
-    submitButtonText: String,
-    itemOptions: List<Option<Long>>,
     state: EntryFormState,
-    onSelectedItemIdChange: (Long?) -> Unit = {},
-    onWeightPoundsChange: (String) -> Unit = {},
-    onWeightOuncesChange: (String) -> Unit = {},
-    onCostStatusChange: (Boolean) -> Unit = {},
-    onUnitCostChange: (CurrencyInput?) -> Unit = {},
-    onUnitCostFocusLost: () -> Unit = {},
-    onUnitCountChange: (String) -> Unit = {},
-    onCancel: () -> Unit = {},
-    onSubmit: () -> Unit = {},
+    itemOptions: List<Option<Long>>,
+    eventHandler: (EntryFormEvent) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -80,7 +78,7 @@ fun NewEntryFormUi(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = title,
+            text = state.title,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -88,28 +86,30 @@ fun NewEntryFormUi(
 
         Column {
             AutocompleteSelect(
-                selectedOptionId = state.selectedItemId.value,
+                selectedOptionId = state.selectedItemId,
                 options = itemOptions,
-                onSelectedChange = { onSelectedItemIdChange(it?.id) },
+                onSelectedChange = {
+                    eventHandler(EntryFormEvent.ItemSelected(it?.id))
+                },
                 label = { Text("Item") },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // TODO(#29): Select the size of item
-            AnimatedVisibility(
-                false,
-            ) {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
+            Column {
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    DropdownSelect(
-                        selectedId = 0,
-                        label = "Size",
-                        options = listOf(Option(0, "8oz"), Option(1, "12oz"), Option(2, "Other")),
-                        onSelectedChange = {  },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                val options = (state.itemWeightOptions as? ItemWeightOptionsState.Enabled)?.options ?: emptyList()
+
+                DropdownSelect(
+                    selectedId = state.selectedItemWeightIndex,
+                    label = "Size",
+                    enabled = state.itemWeightOptions is ItemWeightOptionsState.Enabled,
+                    options = options.plus(Option(null, "Other")),
+                    onSelectedChange = {
+                        eventHandler(EntryFormEvent.ItemWeightSelected(it.id))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -122,45 +122,53 @@ fun NewEntryFormUi(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = state.unitWeightPounds.value,
-                    onValueChange = onWeightPoundsChange,
-                    label = { Text("Lbs") },
-                    modifier = Modifier
-                        .height(64.dp)
-                        .weight(1f)
-                        .onFocusChanged { state ->
-                            if (!state.isFocused) {
-                                // Check for error
-                            }
+            when (state.unitWeight) {
+                is UnitWeightState.PackagedItems -> {
+                    OutlinedTextField(
+                        value = state.unitWeight.itemCount,
+                        onValueChange = {
+                            eventHandler(EntryFormEvent.ItemCountChanged(it))
                         },
-                    singleLine = true,
-                    isError = state.unitWeightPounds.isError,
-                    colors = OutlinedTextFieldDefaults.colors(),
-                )
+                        label = { Text("Count") },
+                        modifier = Modifier
+                            .height(64.dp)
+                            .fillMaxWidth(),
+                        singleLine = true,
+                    )
+                }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                is UnitWeightState.LooseItems -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = state.unitWeight.unitWeightPounds,
+                            onValueChange = {
+                                eventHandler(EntryFormEvent.WeightPoundsChanged(it))
+                            },
+                            label = { Text("Lbs") },
+                            modifier = Modifier
+                                .height(64.dp)
+                                .weight(1f),
+                            singleLine = true,
+                        )
 
-                OutlinedTextField(
-                    value = state.unitWeightOunces.value,
-                    onValueChange = onWeightOuncesChange,
-                    label = { Text("Oz") },
-                    modifier = Modifier
-                        .height(64.dp)
-                        .weight(1f)
-                        .onFocusChanged { state ->
-                            if (!state.isFocused) {
-                                // Check for error
-                            }
-                        },
-                    singleLine = true,
-                    isError = state.unitWeightOunces.isError,
-                    colors = OutlinedTextFieldDefaults.colors(),
-                )
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        OutlinedTextField(
+                            value = state.unitWeight.unitWeightOunces,
+                            onValueChange = {
+                                eventHandler(EntryFormEvent.WeightOuncesChanged(it))
+                            },
+                            label = { Text("Oz") },
+                            modifier = Modifier
+                                .height(64.dp)
+                                .weight(1f),
+                            singleLine = true,
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -174,9 +182,9 @@ fun NewEntryFormUi(
 
                 DropdownSelect(
                     options = listOf(paidOption, noCostOption),
-                    selectedId = state.costStatusIsNoCost.value,
+                    selectedId = state.costStatusIsNoCost,
                     onSelectedChange = { selection ->
-                        onCostStatusChange(selection.id)
+                        eventHandler(EntryFormEvent.CostStatusChanged(selection.id))
                     },
                     modifier = Modifier.weight(0.3f).padding(0.dp, 8.dp, 0.dp, 0.dp)
                 )
@@ -185,10 +193,14 @@ fun NewEntryFormUi(
 
                 CurrencyInputTextField(
                     label = { Text("Price") },
-                    value = state.unitCost.value,
-                    onValueChange = onUnitCostChange,
-                    onFocusLost = onUnitCostFocusLost,
-                    enabled = !state.costStatusIsNoCost.value,
+                    value = state.unitCost,
+                    onValueChange = {
+                        eventHandler(EntryFormEvent.UnitCostChanged(it))
+                    },
+                    onFocusLost = {
+                        eventHandler(EntryFormEvent.UnitCostLostFocus)
+                    },
+                    enabled = !state.costStatusIsNoCost,
                     modifier = Modifier.weight(0.7f)
                 )
             }
@@ -204,46 +216,47 @@ fun NewEntryFormUi(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = state.unitCount.value,
-                onValueChange = onUnitCountChange,
+                value = state.unitCount,
+                onValueChange = {
+                    eventHandler(EntryFormEvent.UnitCountChanged(it))
+                },
                 label = { Text("Count") },
                 modifier = Modifier
                     .height(64.dp)
-                    .fillMaxWidth()
-                    .onFocusChanged { state ->
-                        if (!state.isFocused) {
-                            // Check for error
-                        }
-                    },
+                    .fillMaxWidth(),
                 singleLine = true,
-                isError = state.unitCount.isError,
-                colors = OutlinedTextFieldDefaults.colors(),
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             // TODO(!!): Add program and purchasing account dropdowns
-        }
 
-        // Action Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                onClick = onCancel
+            // Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Cancel")
-            }
+                TextButton(
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                    onClick = {
+                        eventHandler(EntryFormEvent.AbortForm)
+                    }
+                ) {
+                    Text("Cancel")
+                }
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Button(
-                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-                enabled = state.isValid,
-                onClick = onSubmit,
-            ) {
-                Text(submitButtonText)
+                Button(
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
+                    enabled = state.isValid,
+                    onClick = {
+                        eventHandler(EntryFormEvent.SubmitForm)
+                    },
+                ) {
+                    Text(state.submissionText)
+                }
             }
         }
     }
@@ -255,10 +268,8 @@ fun EntryFormPreview() {
     AppPreview {
         Column(modifier = Modifier.padding(16.dp)) {
             NewEntryFormUi(
-                title = "New Entry",
-                submitButtonText = "Save",
+                state = EntryFormState(),
                 itemOptions = listOf(Option(1L, "Placeholder Item")),
-                state = EntryFormState()
             )
         }
     }
