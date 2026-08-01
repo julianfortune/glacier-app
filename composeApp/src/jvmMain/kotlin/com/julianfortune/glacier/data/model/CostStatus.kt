@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.data.domain
+package com.julianfortune.glacier.data.model
 
 enum class CostStatus {
     PURCHASED,

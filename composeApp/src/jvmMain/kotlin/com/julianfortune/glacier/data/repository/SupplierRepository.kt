@@ -1,7 +1,7 @@
 package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.Query
-import com.julianfortune.glacier.data.domain.Supplier
+import com.julianfortune.glacier.data.model.Supplier
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.db.Supplier as DbSupplier
 

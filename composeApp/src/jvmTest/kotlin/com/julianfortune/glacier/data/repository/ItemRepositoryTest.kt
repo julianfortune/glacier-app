@@ -3,10 +3,10 @@ package com.julianfortune.glacier.data.repository
 import app.cash.sqldelight.async.coroutines.awaitAsList
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.createTestDatabase
-import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.Category
+import com.julianfortune.glacier.data.model.Item
+import com.julianfortune.glacier.data.model.ItemHeadline
+import com.julianfortune.glacier.data.model.Weight
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat

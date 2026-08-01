@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.coordinator.delivery.data
 
-import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.model.Delivery
 
 sealed interface DeliveryViewState {
     data object Empty : DeliveryViewState

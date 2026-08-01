@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.data.domain
+package com.julianfortune.glacier.data.model
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest

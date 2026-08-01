@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.coordinator.report
 
-import com.julianfortune.glacier.data.domain.Report
+import com.julianfortune.glacier.data.model.Report
 import com.julianfortune.glacier.data.repository.ReportRepository
 import com.julianfortune.glacier.ui.coordinator.report.data.ReportViewState
 import kotlinx.coroutines.CoroutineScope

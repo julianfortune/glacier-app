@@ -2,7 +2,7 @@ package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.createTestDatabase
-import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.model.CostStatus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking

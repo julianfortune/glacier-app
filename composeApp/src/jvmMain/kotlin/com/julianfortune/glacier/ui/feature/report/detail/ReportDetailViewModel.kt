@@ -3,7 +3,7 @@ package com.julianfortune.glacier.ui.feature.report.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.util.formatCents
-import com.julianfortune.glacier.data.domain.ReportResult
+import com.julianfortune.glacier.data.model.ReportResult
 import com.julianfortune.glacier.data.repository.ReportRepository
 import com.julianfortune.glacier.data.repository.ReportResultRepository
 import com.julianfortune.glacier.ui.common.formatLocalDate

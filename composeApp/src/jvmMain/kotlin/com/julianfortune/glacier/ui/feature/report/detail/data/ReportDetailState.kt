@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.feature.report.detail.data
 
-import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.data.model.*
 
 sealed interface ReportDetailState {
 

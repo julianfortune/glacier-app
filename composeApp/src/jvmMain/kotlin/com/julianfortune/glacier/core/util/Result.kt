@@ -1,6 +1,5 @@
 package com.julianfortune.glacier.core.util
 
-import com.julianfortune.glacier.core.UnexpectedFailureException
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success

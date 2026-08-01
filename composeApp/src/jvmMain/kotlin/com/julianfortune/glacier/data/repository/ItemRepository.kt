@@ -5,10 +5,10 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.data.codec.WeightListCodec
-import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.ItemHeadline
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.Category
+import com.julianfortune.glacier.data.model.Item
+import com.julianfortune.glacier.data.model.ItemHeadline
+import com.julianfortune.glacier.data.model.Weight
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

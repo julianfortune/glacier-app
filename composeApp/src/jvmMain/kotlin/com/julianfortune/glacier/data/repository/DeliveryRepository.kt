@@ -8,7 +8,7 @@ import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import com.julianfortune.glacier.data.common.EntityMetadata
-import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.data.model.*
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.db.GetByDeliveryId
 import kotlinx.coroutines.Dispatchers

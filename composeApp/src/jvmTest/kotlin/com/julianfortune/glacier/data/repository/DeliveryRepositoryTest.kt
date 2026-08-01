@@ -3,7 +3,7 @@ package com.julianfortune.glacier.data.repository
 import app.cash.sqldelight.async.coroutines.awaitAsOne
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.codec.LocalDateCodec
-import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.data.model.*
 import com.julianfortune.glacier.db.Database
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking

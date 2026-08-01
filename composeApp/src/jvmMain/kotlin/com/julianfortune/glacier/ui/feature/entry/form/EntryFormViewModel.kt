@@ -2,16 +2,16 @@ package com.julianfortune.glacier.ui.feature.entry.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.CostStatus
-import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.CostStatus
+import com.julianfortune.glacier.data.model.Item
+import com.julianfortune.glacier.data.model.Weight
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.ui.common.data.Option
 import com.julianfortune.glacier.ui.common.formatWeight
 import com.julianfortune.glacier.ui.common.input.CurrencyInput
-import com.julianfortune.glacier.ui.delegate.ProgramOptionsProvider
 import com.julianfortune.glacier.ui.delegate.AccountOptionsProvider
 import com.julianfortune.glacier.ui.delegate.ItemOptionsProvider
+import com.julianfortune.glacier.ui.delegate.ProgramOptionsProvider
 import com.julianfortune.glacier.ui.feature.entry.form.data.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -25,12 +25,14 @@ class EntryFormViewModel(
     private val programOptionsProvider: ProgramOptionsProvider,
     private val accountOptionsProvider: AccountOptionsProvider,
 ) : ViewModel(),
+    // TODO: Should all be use-cases
     ItemOptionsProvider by itemOptionsProvider,
     ProgramOptionsProvider by programOptionsProvider,
     AccountOptionsProvider by accountOptionsProvider {
 
     private data class FormInputs(
         val selectedItemId: Long? = null,
+        // TODO: Just make this a `Weight?` or Long? holding centigrams
         val weightIndex: Int? = null,
         val unitPoundsInput: String = "",
         val unitOuncesInput: String = "",
@@ -91,7 +93,6 @@ class EntryFormViewModel(
         // A unit count must be provided
         val unitCount = inputs.unitCountInput.toLongOrNull()
         if (unitCount == null || unitCount <= 0) return@combine null
-
 
         // Only defined if the user has selected a package size from the dropdown
         val itemWeight: Weight? = inputs.weightIndex?.let { selectedWeightIndex ->

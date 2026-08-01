@@ -1,4 +1,4 @@
-package com.julianfortune.glacier.data.domain
+package com.julianfortune.glacier.data.model
 
 import com.julianfortune.glacier.core.util.dividedBy
 import java.math.BigInteger

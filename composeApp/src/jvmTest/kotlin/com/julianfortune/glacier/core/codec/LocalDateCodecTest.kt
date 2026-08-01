@@ -4,7 +4,6 @@ import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.data.codec.LocalDateCodec
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.orThrow
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource

@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.data.codec
 
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.Weight
 import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
 import dev.forkhandles.result4k.Success

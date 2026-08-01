@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.coordinator.report.data
 
-import com.julianfortune.glacier.data.domain.Report
+import com.julianfortune.glacier.data.model.Report
 
 sealed interface ReportViewState {
     data object Empty : ReportViewState

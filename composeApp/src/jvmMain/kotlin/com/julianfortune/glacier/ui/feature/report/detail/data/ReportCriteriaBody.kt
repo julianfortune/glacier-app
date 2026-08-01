@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.feature.report.detail.data
 
-import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.model.CostStatus
 import java.time.LocalDate
 
 data class ReportCriteriaBody(

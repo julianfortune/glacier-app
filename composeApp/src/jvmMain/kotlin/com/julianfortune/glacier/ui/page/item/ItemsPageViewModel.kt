@@ -4,8 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.julianfortune.glacier.data.domain.Item
-import com.julianfortune.glacier.data.domain.ItemHeadline
+import com.julianfortune.glacier.data.model.Item
+import com.julianfortune.glacier.data.model.ItemHeadline
 import com.julianfortune.glacier.data.repository.ItemRepository
 import com.julianfortune.glacier.ui.delegate.CategoryOptionsProvider
 import com.julianfortune.glacier.ui.feature.item.data.ItemBody

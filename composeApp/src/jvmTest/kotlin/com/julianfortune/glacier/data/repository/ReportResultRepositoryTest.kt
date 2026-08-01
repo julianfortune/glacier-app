@@ -5,7 +5,7 @@ import com.julianfortune.glacier.core.util.unwrapUnsafe
 import com.julianfortune.glacier.createTestDatabase
 import com.julianfortune.glacier.data.codec.CostStatusCodec
 import com.julianfortune.glacier.data.codec.LocalDateCodec
-import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.model.CostStatus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat

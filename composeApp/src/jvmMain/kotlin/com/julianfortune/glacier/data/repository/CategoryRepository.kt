@@ -1,7 +1,7 @@
 package com.julianfortune.glacier.data.repository
 
 import app.cash.sqldelight.Query
-import com.julianfortune.glacier.data.domain.Category
+import com.julianfortune.glacier.data.model.Category
 import com.julianfortune.glacier.db.Database
 import com.julianfortune.glacier.db.Category as DbCategory
 

@@ -4,7 +4,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.julianfortune.glacier.data.domain.CostStatus
+import com.julianfortune.glacier.data.model.CostStatus
 import com.julianfortune.glacier.ui.common.data.FormFieldState
 import com.julianfortune.glacier.ui.common.input.LocalDateInput
 import com.julianfortune.glacier.ui.feature.report.detail.data.EditReportCriteriaFormState

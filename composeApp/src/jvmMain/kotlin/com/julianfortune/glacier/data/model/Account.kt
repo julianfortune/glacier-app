@@ -1,8 +1,8 @@
-package com.julianfortune.glacier.data.domain
+package com.julianfortune.glacier.data.model
 
 import com.julianfortune.glacier.data.common.NamedEntity
 
-data class Supplier(
+data class Account(
     override val id: Long,
     override val name: String,
 ) : NamedEntity

@@ -1,7 +1,7 @@
 package com.julianfortune.glacier.data.codec
 
 import com.julianfortune.glacier.core.util.unwrapUnsafe
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.Weight
 import dev.forkhandles.result4k.Failure
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest

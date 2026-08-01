@@ -1,7 +1,7 @@
 package com.julianfortune.glacier.ui.feature.entry.form.data
 
-import com.julianfortune.glacier.data.domain.CostStatus
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.CostStatus
+import com.julianfortune.glacier.data.model.Weight
 
 data class EntryBody(
     val itemId: Long,

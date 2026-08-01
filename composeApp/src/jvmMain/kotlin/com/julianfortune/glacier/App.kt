@@ -12,10 +12,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.Category
-import com.julianfortune.glacier.data.domain.Program
-import com.julianfortune.glacier.data.domain.Account
-import com.julianfortune.glacier.data.domain.Supplier
+import com.julianfortune.glacier.data.model.Account
+import com.julianfortune.glacier.data.model.Category
+import com.julianfortune.glacier.data.model.Program
+import com.julianfortune.glacier.data.model.Supplier
 import com.julianfortune.glacier.ui.page.delivery.DeliveriesPage
 import com.julianfortune.glacier.ui.page.item.ItemsPage
 import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPage

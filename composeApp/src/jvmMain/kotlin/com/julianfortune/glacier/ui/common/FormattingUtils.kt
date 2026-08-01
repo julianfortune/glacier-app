@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.common
 
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.Weight
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle

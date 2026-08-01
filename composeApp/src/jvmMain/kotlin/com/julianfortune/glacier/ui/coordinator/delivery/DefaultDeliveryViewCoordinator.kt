@@ -1,6 +1,6 @@
 package com.julianfortune.glacier.ui.coordinator.delivery
 
-import com.julianfortune.glacier.data.domain.Delivery
+import com.julianfortune.glacier.data.model.Delivery
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.ui.coordinator.delivery.data.DeliveryViewState
 import kotlinx.coroutines.CoroutineScope

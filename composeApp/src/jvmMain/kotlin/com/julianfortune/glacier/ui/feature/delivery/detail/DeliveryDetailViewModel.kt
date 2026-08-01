@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.julianfortune.glacier.core.util.formatCents
-import com.julianfortune.glacier.data.domain.CostStatus
-import com.julianfortune.glacier.data.domain.Delivery
-import com.julianfortune.glacier.data.domain.Weight
+import com.julianfortune.glacier.data.model.CostStatus
+import com.julianfortune.glacier.data.model.Delivery
+import com.julianfortune.glacier.data.model.Weight
 import com.julianfortune.glacier.data.repository.DeliveryRepository
 import com.julianfortune.glacier.ui.common.formatLocalDate
 import com.julianfortune.glacier.ui.coordinator.delivery.DeliveryViewCoordinator

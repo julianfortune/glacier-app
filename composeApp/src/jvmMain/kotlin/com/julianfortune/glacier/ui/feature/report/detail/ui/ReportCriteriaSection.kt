@@ -14,7 +14,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.julianfortune.glacier.data.domain.*
+import com.julianfortune.glacier.data.model.*
 import com.julianfortune.glacier.ui.common.component.KeyValueItem
 import com.julianfortune.glacier.ui.common.component.KeyValueList
 import com.julianfortune.glacier.ui.feature.report.detail.data.ReportCriteriaState
