@@ -137,10 +137,15 @@ class ItemRepository(private val database: Database) {
         }
     }
 
-    suspend fun deleteById(id: Long): Boolean {
-        val rowsUpdated =
+    suspend fun deleteById(id: Long): Result<Long> {
+        return Result.runCatching {
             database.itemQueries.deleteById(id) // `ItemCategories` are deleted automatically by CASCADE-ing
-
-        return rowsUpdated > 1
+        }.fold(
+            onSuccess = { rowsDeleted ->
+                if (rowsDeleted > 0) Result.success(id)
+                else Result.failure(IllegalStateException("Item with id=$id could not be deleted"))
+            },
+            onFailure = { Result.failure(it) }
+        )
     }
 }

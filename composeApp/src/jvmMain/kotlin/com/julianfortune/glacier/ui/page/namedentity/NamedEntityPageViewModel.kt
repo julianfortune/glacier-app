@@ -31,7 +31,10 @@ open class NamedEntityPageViewModel<T : NamedEntity>(private val repository: Nam
     }
 
     suspend fun delete(id: Long) {
-        repository.delete(id = id)
+        // TODO: Error handling
+        repository.delete(id = id).onFailure {
+            println(">> Error=$it")
+        }
     }
 
     fun showCreateNew() {

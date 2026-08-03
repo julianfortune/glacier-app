@@ -49,7 +49,10 @@ class ItemsPageViewModel(
     }
 
     suspend fun deleteItem(id: Long) {
-        itemRepository.deleteById(id)
+        // TODO: Error handling
+        itemRepository.deleteById(id).onFailure {
+            println(">> Error=$it")
+        }
     }
 
     fun showNewItem() {
