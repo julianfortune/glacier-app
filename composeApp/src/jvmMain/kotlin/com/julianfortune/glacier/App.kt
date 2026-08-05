@@ -20,6 +20,7 @@ import com.julianfortune.glacier.ui.page.delivery.DeliveriesPage
 import com.julianfortune.glacier.ui.page.item.ItemsPage
 import com.julianfortune.glacier.ui.page.namedentity.NamedEntityPage
 import com.julianfortune.glacier.ui.page.report.ReportsPage
+import com.julianfortune.glacier.ui.page.sandbox.SandboxPage
 import com.julianfortune.glacier.ui.theme.AppTypography
 import com.julianfortune.glacier.ui.theme.darkScheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -33,6 +34,7 @@ enum class NavigationPage(val title: String, val icon: ImageVector) {
     PURCHASING_ACCOUNTS("Accounts", Icons.Outlined.AccountBalanceWallet),
     CATEGORIES("Categories", Icons.Outlined.Category),
     REPORTS("Reports", Icons.Outlined.Analytics),
+    SANDBOX("Sandbox", Icons.Outlined.FormatPaint),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +112,8 @@ fun App() {
                         )
 
                         NavigationPage.REPORTS -> ReportsPage()
+
+                        NavigationPage.SANDBOX -> SandboxPage()
                     }
                 }
             }
